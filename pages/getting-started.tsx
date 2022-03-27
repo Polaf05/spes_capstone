@@ -1,14 +1,15 @@
 import React from "react";
 import { UploadIcon, DownloadIcon } from "@heroicons/react/outline";
 import Image from "next/image";
+import Link from "next/link";
 
 const gettingStarted = () => {
   return (
     <React.Fragment>
-      <div className="bg-[url('/bg-getting-started.jpg')] bg-cover min-h-screen">
+      <div className="bg-[url('/bg-form.jpg')] bg-cover min-h-screen">
         <div className="flex justify-center">
-          <div className="flex flex-row justify-between bg-ocean-100 w-3/4 h-full my-32 rounded-xl p-20">
-            <section className="grid justify-items-start w-1/2">
+          <div className="flex flex-row justify-between bg-ocean-100 w-3/5  h-full my-32 rounded-xl p-20">
+            <section className="grid justify-items-start w-2/3">
               <h1 className="text-2xl font-bold">Getting Started</h1>
               <section className="m-4">
                 <h6 className="text-lg font-bold">Instructions</h6>
@@ -28,7 +29,7 @@ const gettingStarted = () => {
                   <button className="flex justify-center rounded-xl w-52 h-14 bg-ocean-400 pt-2">
                     <UploadIcon className="text-white w-8 h-10"></UploadIcon>
                   </button>
-                  <button className="flex justify-center rounded-xl w-52 h-14 bg-ocean-300 text-white font-bold pt-4 text-base">
+                  <button className="flex justify-center rounded-xl w-44 h-14 bg-ocean-300 text-white font-bold pt-4 text-base">
                     Submit
                   </button>
                 </section>
@@ -41,7 +42,7 @@ const gettingStarted = () => {
                 </button>
               </section>
             </section>
-            <section className="relative space-y-28">
+            <section className="relative space-y-24 w-1/3">
               <div className="grid justify-end">
                 <Image
                   src="/logo.png"
@@ -50,11 +51,14 @@ const gettingStarted = () => {
                   height={130}
                 />
               </div>
-              <div className="w-3/4 m-8">
+              <div className="w-3/4 m-8 space-y-12">
                 <h6 className="text-lg font-bold inline-block">
                   An error message will appear here if there's a problem with
                   your file
                 </h6>
+                <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
+                  Continue
+                </button>
               </div>
             </section>
           </div>

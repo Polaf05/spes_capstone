@@ -6,7 +6,7 @@ import Image from "next/image";
 
 const Home: NextPage = () => {
   return (
-    <div className="bg-[url('/bg_index.jpg')] bg-cover min-h-screen">
+    <div className="bg-[url('/bg-index.jpg')] bg-cover min-h-screen">
       <div className="flex flex-row justify-between ">
         <div className="mt-32 ml-32 space-y-10 w-2/5">
           <h1 className="font-poppins text-6xl font-bold break-words leading-tight">
@@ -26,7 +26,7 @@ const Home: NextPage = () => {
           </Link>
         </div>
         <div className="mt-32 mx-40">
-          <Image src="/logo.png" alt="logo picture" width={300} height={200} />
+          <Image src="/logo.png" alt="logo picture" width={240} height={200} />
         </div>
       </div>
     </div>
