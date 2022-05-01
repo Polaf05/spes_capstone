@@ -29,6 +29,9 @@ module.exports = {
           good: "#65EF73",
           verygood: "#52BDF9",
         },
+        table: {
+          delawan: "#F2EFD1",
+        },
       },
       fontSize: {
         xs: ".512rem", //p-xs

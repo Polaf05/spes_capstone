@@ -25,14 +25,30 @@ const gettingStarted = () => {
                 <h6 className="text-lg font-bold">
                   Please upload your file here:
                 </h6>
-                <section className="flex justify-between">
-                  <button className="flex justify-center rounded-xl w-52 h-14 bg-ocean-400 pt-2">
-                    <UploadIcon className="text-white w-8 h-10"></UploadIcon>
-                  </button>
-                  <button className="flex justify-center rounded-xl w-44 h-14 bg-ocean-300 text-white font-bold pt-4 text-base">
-                    Submit
-                  </button>
-                </section>
+
+                <form action="">
+                  <div>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 w-full border-gray-300 border-dashed rounded-md">
+                      <div className="space-y-1 text-center">
+                        <div className="flex text-lg text-gray-600">
+                          <label className="relative cursor-pointer  font-bold text-ocean-400 hover:text-ocean-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ocean-400">
+                            <span>Upload a file</span>
+                            <input
+                              id="file-upload"
+                              name="file-upload"
+                              type="file"
+                              className="sr-only"
+                            />
+                          </label>
+                          <p className="pl-1">or drag and drop</p>
+                        </div>
+                        <p className="text-lg text-gray-500">
+                          .xlsx file format
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </form>
 
                 <h6 className="text-md font-bold">
                   If you don't have a template file yet, please download here:
@@ -56,9 +72,11 @@ const gettingStarted = () => {
                   An error message will appear here if there's a problem with
                   your file
                 </h6>
-                <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
-                  Continue
-                </button>
+                <Link href={"/tasks"} passHref>
+                  <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
+                    Continue
+                  </button>
+                </Link>
               </div>
             </section>
           </div>
