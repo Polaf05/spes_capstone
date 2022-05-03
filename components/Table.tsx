@@ -8,7 +8,6 @@ import React, { useState } from "react";
 import { Student } from "../types/Students";
 
 const Table = ({ students }: { students: Student[] }) => {
-  let test = students;
   let counter = 0;
 
   const [sortingMethod, setSorting] = useState("name");
@@ -18,11 +17,11 @@ const Table = ({ students }: { students: Student[] }) => {
   };
   console.log(sortingMethod);
   if (sortingMethod == "grade_before") {
-    test.sort((a, b) => {
+    students.sort((a, b) => {
       return b.grade_before - a.grade_before;
     });
   } else if (sortingMethod == "name") {
-    test.sort((a, b) => {
+    students.sort((a, b) => {
       let fa = a.name.toLowerCase(),
         fb = b.name.toLowerCase();
 
@@ -35,18 +34,18 @@ const Table = ({ students }: { students: Student[] }) => {
       return 0;
     });
   } else if (sortingMethod == "grade_after") {
-    test.sort((a, b) => {
+    students.sort((a, b) => {
       return b.grade_after - a.grade_after;
+    });
+  } else {
+    students.sort((a, b) => {
+      return b.diff - a.diff;
     });
   }
 
   return (
     <div className="w-full bg-gray-50">
-      <div
-        className={
-          "relative mx-10 pb-2 text-base font-semibold grid grid-cols-6 gap-4"
-        }
-      >
+      <div className={"relative mx-10 pb-2 text-base grid grid-cols-6 gap-4"}>
         <div className="col-span-3 ">
           <button
             type="button"
@@ -104,7 +103,7 @@ const Table = ({ students }: { students: Student[] }) => {
         <table className="w-full text-center text-black ">
           {
             <tbody className="text-lg">
-              {test.map((student) => (
+              {students.map((student) => (
                 <tr
                   key={student.id}
                   className={
@@ -122,17 +121,15 @@ const Table = ({ students }: { students: Student[] }) => {
                   <td className="px-5 py-4">{student.grade_before}</td>
                   <td>
                     <span className="text-base">
-                      {"(" +
-                        (student.grade_after - student.grade_before).toFixed(
-                          1
-                        ) +
-                        ")"}
+                      {"(" + student.diff.toFixed(1) + ")"}
                     </span>
                   </td>
 
                   <td
                     className={
-                      student.grade_before < student.grade_after
+                      student.grade_before == student.grade_after
+                        ? "px-5 py-4 text-gray-900 font-semibold"
+                        : student.grade_before < student.grade_after
                         ? "px-5 py-4 text-green-800 font-semibold"
                         : "px-5 py-4 text-red-800 font-semibold"
                     }

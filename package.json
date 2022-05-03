@@ -13,6 +13,7 @@
     "@heroicons/react": "^1.0.6",
     "chart.js": "^3.7.1",
     "eslint-config-prettier": "^8.5.0",
+    "fuzzyis": "^1.0.2",
     "next": "12.1.0",
     "prettier": "^2.6.0",
     "react": "17.0.2",

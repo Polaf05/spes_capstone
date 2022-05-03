@@ -4,4 +4,5 @@ export type Student = {
   grade_before: number;
   grade_after: number;
   remarks: string;
+  diff: number;
 };

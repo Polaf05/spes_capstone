@@ -17,6 +17,7 @@ module.exports = {
           400: "#4B94BD",
         },
         tallano_gold: {
+          disp: "#EBD849",
           100: "#FCF9DD",
           200: "#FFF598",
           300: "#F9E852",
