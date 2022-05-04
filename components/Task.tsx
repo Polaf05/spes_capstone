@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Table from "./Table";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
+import MyModal from "./PopUp";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -138,18 +139,59 @@ export const Task = ({
         <div className="col-span-5 py-6 bg-gray-50 rounded-2xl shadow-md max-h-fit">
           <Table students={students}></Table>
         </div>
-        <div className="grid grid-rows-6">
-          <div className="row-span-4 border ">
-            <Doughnut
-              data={data}
-              options={{
-                plugins: {
-                  legend: {
-                    display: false,
+        <div className="col-span-3 grid grid-rows-6">
+          <div className="row-span-4 grid grid-cols-12 gap-4">
+            <div className="col-span-6">
+              <Doughnut
+                data={data}
+                options={{
+                  plugins: {
+                    legend: {
+                      display: false,
+                    },
                   },
-                },
-              }}
-            />
+                }}
+              />
+            </div>
+            <div className="col-span-4">
+              <h6 className="text-lg font-semibold pt-3 border-b-2 border-black">
+                Legend
+              </h6>
+              <section className="mt-4">
+                <div className="flex justify-between">
+                  <p>Very Good</p>
+                  <div className="bg-legend-vgood border w-9 h-4"></div>
+                </div>
+                <div className="flex justify-between">
+                  <p>Good</p>
+                  <div className="bg-legend-good border w-9 h-4"></div>
+                </div>
+                <div className="flex justify-between">
+                  <p>Average</p>
+                  <div className="bg-legend-ave border w-9 h-4"></div>
+                </div>
+                <div className="flex justify-between">
+                  <p>Poor</p>
+                  <div className="bg-legend-poor border w-9 h-4"></div>
+                </div>
+                <div className="flex justify-between">
+                  <p>Very Poor</p>
+                  <div className="bg-legend-vpoor border w-9 h-4"></div>
+                </div>
+              </section>
+            </div>
+          </div>
+          <div className="row-span-2 mx-6 overflow-auto max-h-52 md:overflow-auto">
+            <p className="inline-block">
+              Chart Description: Paragraph (Large) Lorem ipsum dolor sit amet,
+              consectetuer adipiscing elit, sed diam nonummy nibh euismod
+              tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+              consectetuer adipiscing elit, sed diam nonummy nibh euismod
+              tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+              consectetuer adipiscing elit, sed diam nonummy nibh euismod
+              tincidunt ut laoreet dolore magna. Chart Description: Paragraph
+              (Large) Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+            </p>
           </div>
         </div>
       </div>

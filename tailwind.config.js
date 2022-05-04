@@ -23,6 +23,13 @@ module.exports = {
           300: "#F9E852",
           400: "#CCB53B",
         },
+        legend: {
+          vgood: "#CCB53B",
+          good: "#F9E852",
+          ave: "#A2CAEB",
+          poor: "#5DB4E5",
+          vpoor: "#4B94BD",
+        },
         misc: {
           danger: "#F95252",
           warning: "#F98E52",

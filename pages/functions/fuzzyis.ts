@@ -88,13 +88,58 @@ function internetInference({
   return internet;
 }
 
-function resourceInference(internet: number, device: number) {
+function resourceInference(internetValue: number, deviceValue: number) {
   const system = new FIS("resource");
 
   //OUTPUT DECLARATION
   const RESOURCE = new LinguisticVariable("resource", [0, 10]);
 
   system.addOutput(RESOURCE);
+
+  //INPUT DECLERATION
+  const INTERNET_CONNECTIVITY = new LinguisticVariable("internet", [0, 10]);
+  const DEVICE = new LinguisticVariable("device", [0, 14]);
+
+  system.addInput(DEVICE);
+  system.addInput(INTERNET_CONNECTIVITY);
+
+  //INTERNET TERMS
+  INTERNET_CONNECTIVITY.addTerm(new Term("very poor", "gauss", [0, 2]));
+  INTERNET_CONNECTIVITY.addTerm(new Term("poor", "gauss", [2, 4]));
+  INTERNET_CONNECTIVITY.addTerm(new Term("average", "gauss", [4, 6]));
+  INTERNET_CONNECTIVITY.addTerm(new Term("good", "gauss", [6, 8]));
+  INTERNET_CONNECTIVITY.addTerm(new Term("very good", "gauss", [8, 10]));
+
+  //DEVICE TERMS
+  DEVICE.addTerm(new Term("no device", "gauss", [0, 2]));
+  DEVICE.addTerm(new Term("rent", "gauss", [2, 4]));
+  DEVICE.addTerm(new Term("borrow", "gauss", [4, 6]));
+  DEVICE.addTerm(new Term("share", "gauss", [6, 8]));
+  DEVICE.addTerm(new Term("mobile", "gauss", [8, 10]));
+  DEVICE.addTerm(new Term("laptop", "gauss", [10, 12]));
+  DEVICE.addTerm(new Term("both", "gauss", [12, 14]));
+
+  //RESOURCE TERMS
+  RESOURCE.addTerm(new Term("very poor", "gauss", [0, 2]));
+  RESOURCE.addTerm(new Term("poor", "gauss", [2, 4]));
+  RESOURCE.addTerm(new Term("average", "gauss", [4, 6]));
+  RESOURCE.addTerm(new Term("good", "gauss", [6, 8]));
+  RESOURCE.addTerm(new Term("very good", "gauss", [8, 10]));
+
+  //RULE SET
+  system.rules = [
+    new Rule(["both", "very good"], ["very good"], "and"),
+    new Rule(["both", "good"], ["very good"], "and"),
+    new Rule(["both", "average"], ["good"], "and"),
+    new Rule(["both", "poor"], ["average"], "and"),
+    new Rule(["both", "very poor"], ["poor"], "and"),
+
+    new Rule(["laptop", "very good"], ["very good"], "and"),
+    new Rule(["laptop", "good"], ["very good"], "and"),
+    new Rule(["laptop", "average"], ["good"], "and"),
+    new Rule(["laptop", "poor"], ["average"], "and"),
+    new Rule(["laptop", "very poor"], ["poor"], "and"),
+  ];
 }
 
 export default internetInference;
