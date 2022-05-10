@@ -9,9 +9,11 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 export const Task = ({
   category,
   assessment,
+  setIsOpen,
 }: {
   category: string;
   assessment: string;
+  setIsOpen: any;
 }) => {
   let students = [
     {
@@ -137,7 +139,7 @@ export const Task = ({
 
       <div className="grid grid-cols-8 grid-flow-col gap-6">
         <div className="col-span-5 py-6 bg-gray-50 rounded-2xl shadow-md max-h-fit">
-          <Table students={students}></Table>
+          <Table setIsOpen={setIsOpen} students={students}></Table>
         </div>
         <div className="col-span-3 grid grid-rows-6">
           <div className="row-span-4 grid grid-cols-12 gap-4">

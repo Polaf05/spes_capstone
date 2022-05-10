@@ -1,19 +1,29 @@
 import React, { useState } from "react";
 import { Tab } from "@headlessui/react";
 import { Task } from "./Task";
+import NameDialog from "./NameDialog";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Example() {
-  let [categories] = useState({
-    Overall: ["Good"],
-    WrittenTasks: ["Average"],
-    PerformanceTasks: ["Very Good"],
-  });
+export default function TasksTab() {
+  const [open, setIsOpen] = useState<boolean>(false);
 
-  let assessment = ["Good", "Very Good", "Average"];
+  const [categories] = useState([
+    {
+      title: "Overall",
+      value: "Good",
+    },
+    {
+      title: "Written Tasks",
+      value: "Average",
+    },
+    {
+      title: "Performance Tasks",
+      value: "Very Good",
+    },
+  ]);
 
   return (
     <React.Fragment>
@@ -21,9 +31,9 @@ export default function Example() {
         <div className="h-full">
           <div className="flex justify-end">
             <Tab.List className="flex p-1 space-x-14 h-[10vh]">
-              {Object.keys(categories).map((category) => (
+              {categories.map((category) => (
                 <Tab
-                  key={category}
+                  key={category.title}
                   className={({ selected }) =>
                     classNames(
                       "w-72 py-2.5 text-xl font-bold",
@@ -33,34 +43,26 @@ export default function Example() {
                     )
                   }
                 >
-                  {category === "WrittenTasks"
-                    ? "Written Tasks"
-                    : category === "PerformanceTasks"
-                    ? "Performance Tasks"
-                    : "Over All"}
+                  {category.title}
                 </Tab>
               ))}
             </Tab.List>
           </div>
 
           <Tab.Panels className="mt-2">
-            {Object.keys(categories).map((category, idx) => (
-              <Tab.Panel key={category} className="h-[80vh]">
+            {categories.map((category, idx) => (
+              <Tab.Panel key={idx} className="h-[80vh]">
                 <Task
-                  category={category}
-                  assessment={
-                    category === "Overall"
-                      ? assessment[0]
-                      : category === "WrittenTasks"
-                      ? assessment[1]
-                      : assessment[2]
-                  }
-                ></Task>
+                  setIsOpen={setIsOpen}
+                  category={category.title}
+                  assessment={category.value}
+                />
               </Tab.Panel>
             ))}
           </Tab.Panels>
         </div>
       </Tab.Group>
+      <NameDialog open={open} setIsOpen={setIsOpen} />
     </React.Fragment>
   );
 }

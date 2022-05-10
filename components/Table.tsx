@@ -4,44 +4,51 @@ import {
   SortAscendingIcon,
   SwitchVerticalIcon,
 } from "@heroicons/react/outline";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelectedStudent } from "../hooks/useSelectedStudent";
 import { Student } from "../types/Students";
 
-const Table = ({ students }: { students: Student[] }) => {
+const Table = ({
+  students,
+  setIsOpen,
+}: {
+  students: Student[];
+  setIsOpen: any;
+}) => {
   let counter = 0;
 
   const [sortingMethod, setSorting] = useState("name");
+  const { setStudent } = useSelectedStudent();
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>(students);
 
-  const handleChange = (e: any) => {
-    setSorting(e.target.value);
-  };
-  console.log(sortingMethod);
-  if (sortingMethod == "grade_before") {
-    students.sort((a, b) => {
-      return b.grade_before - a.grade_before;
-    });
-  } else if (sortingMethod == "name") {
-    students.sort((a, b) => {
-      let fa = a.name.toLowerCase(),
-        fb = b.name.toLowerCase();
+  useEffect(() => {
+    setFilteredStudents([
+      ...filteredStudents.sort((a, b) => {
+        switch (sortingMethod) {
+          case "grade_before":
+            return b.grade_before - a.grade_before;
+          case "name":
+            let fa = a.name.toLowerCase(),
+              fb = b.name.toLowerCase();
 
-      if (fa < fb) {
-        return -1;
-      }
-      if (fa > fb) {
-        return 1;
-      }
-      return 0;
-    });
-  } else if (sortingMethod == "grade_after") {
-    students.sort((a, b) => {
-      return b.grade_after - a.grade_after;
-    });
-  } else {
-    students.sort((a, b) => {
-      return b.diff - a.diff;
-    });
-  }
+            if (fa < fb) {
+              return -1;
+            }
+            if (fa > fb) {
+              return 1;
+            }
+            return 0;
+          case "grade_after":
+          case "remarks":
+            return b.grade_after - a.grade_after;
+          case "+/-":
+            return b.diff - a.diff;
+          default:
+            return 0;
+        }
+      }),
+    ]);
+  }, [sortingMethod]);
 
   return (
     <div className="w-full bg-gray-50">
@@ -49,8 +56,7 @@ const Table = ({ students }: { students: Student[] }) => {
         <div className="col-span-3 ">
           <button
             type="button"
-            onClick={handleChange}
-            value="name"
+            onClick={() => setSorting("name")}
             className="flex gap-4 text-center focus:text-ocean-400 bg-transparent hover:bg-ocean-400/[0.2] text-gray-900 font-semibold  py-1 px-3 hover:-transparent rounded-full"
           >
             Name
@@ -60,18 +66,16 @@ const Table = ({ students }: { students: Student[] }) => {
           <div className="">
             <button
               type="button"
-              onClick={handleChange}
-              value="grade_before"
+              onClick={() => setSorting("grade_before")}
               className="flex gap-2 items-center focus:text-ocean-400 bg-transparent hover:bg-ocean-400/[0.2] text-gray-900 font-semibold py-1 px-3 hover:-transparent rounded-full"
             >
               Before
             </button>
           </div>
-          <div className="=">
+          <div className="">
             <button
               type="button"
-              onClick={handleChange}
-              value="+/-"
+              onClick={() => setSorting("+/-")}
               className="flex gap-2 bg-transparent focus:text-ocean-400 hover:bg-ocean-400/[0.2] text-gray-900 font-semibold py-1 px-3 hover:-transparent rounded-full"
             >
               +/-
@@ -80,8 +84,7 @@ const Table = ({ students }: { students: Student[] }) => {
           <div className="">
             <button
               type="button"
-              onClick={handleChange}
-              value="grade_after"
+              onClick={() => setSorting("grade_after")}
               className="flex gap-2 bg-transparent focus:text-ocean-400 hover:bg-ocean-400/[0.2] text-gray-900 font-semibold py-1 px-3 hover:-transparent rounded-full"
             >
               After
@@ -90,8 +93,7 @@ const Table = ({ students }: { students: Student[] }) => {
           <div className="pl-2">
             <button
               type="button"
-              onClick={handleChange}
-              value="remarks"
+              onClick={() => setSorting("remarks")}
               className="flex gap-2 bg-transparent focus:text-ocean-400 hover:bg-ocean-400/[0.2] text-gray-900 font-semibold py-1 px-3 hover:-transparent rounded-full"
             >
               Remarks
@@ -103,7 +105,7 @@ const Table = ({ students }: { students: Student[] }) => {
         <table className="w-full text-center text-black ">
           {
             <tbody className="text-lg">
-              {students.map((student) => (
+              {filteredStudents.map((student) => (
                 <tr
                   key={student.id}
                   className={
@@ -112,12 +114,16 @@ const Table = ({ students }: { students: Student[] }) => {
                       : " bg-gray-50 text-left"
                   }
                 >
-                  <th
+                  <td
+                    onClick={() => {
+                      setStudent(student);
+                      setIsOpen(true);
+                    }}
                     scope="row"
                     className="px-6 py-4 font-bold whitespace-nowrap  "
                   >
                     {student.name}
-                  </th>
+                  </td>
                   <td className="px-5 py-4">{student.grade_before}</td>
                   <td>
                     <span className="text-base">

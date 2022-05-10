@@ -1,33 +1,6 @@
 import { LinguisticVariable, Term, Rule, FIS } from "fuzzyis";
 
-// const system = new FIS("Internet Connectivity");
-// const TIP = new LinguisticVariable("tip", [0, 30]);
-// system.addOutput(TIP);
-// const FOOD = new LinguisticVariable("service", [0, 10]);
-// const SERVICE = new LinguisticVariable("food", [0, 10]);
-// system.addInput(SERVICE);
-// system.addInput(FOOD);
-// SERVICE.addTerm(new Term("poor", "gauss", [2.123, 0]));
-// SERVICE.addTerm(new Term("normal", "gauss", [2.123, 5]));
-// SERVICE.addTerm(new Term("excellent", "gauss", [2.123, 10]));
-// FOOD.addTerm(new Term("bad", "trapeze", [0, 0, 1, 3]));
-// FOOD.addTerm(new Term("good", "trapeze", [7, 9, 10, 10]));
-// TIP.addTerm(new Term("small", "triangle", [0, 5, 10]));
-// TIP.addTerm(new Term("average", "triangle", [10, 15, 20]));
-// TIP.addTerm(new Term("generous", "triangle", [20, 25, 30]));
-// system.rules = [
-//   new Rule(["poor", "bad"], ["small"], "and"),
-//   new Rule(["normal", null], ["average"], "and"),
-//   new Rule(["excellent", "good"], ["generous"], "and"),
-// ];
-// var num1 = 7;
-// var num2 = 8;
-// console.log(system.getPreciseOutput([num1, num2])[0]);
-// var stringgy = system.getPreciseOutput([num1, num2]);
-// console.log(stringgy[0] + 5);
-// return system.getPreciseOutput([num1, num2])[0];
-
-function internetInference({
+export function internetInference({
   dataValue,
   wifiValue,
 }: {
@@ -88,7 +61,7 @@ function internetInference({
   return internet;
 }
 
-function resourceInference(internetValue: number, deviceValue: number) {
+export function resourceInference(internetValue: number, deviceValue: number) {
   const system = new FIS("resource");
 
   //OUTPUT DECLARATION
@@ -135,11 +108,43 @@ function resourceInference(internetValue: number, deviceValue: number) {
     new Rule(["both", "very poor"], ["poor"], "and"),
 
     new Rule(["laptop", "very good"], ["very good"], "and"),
-    new Rule(["laptop", "good"], ["very good"], "and"),
-    new Rule(["laptop", "average"], ["good"], "and"),
-    new Rule(["laptop", "poor"], ["average"], "and"),
+    new Rule(["laptop", "good"], ["good"], "and"),
+    new Rule(["laptop", "average"], ["average"], "and"),
+    new Rule(["laptop", "poor"], ["poor"], "and"),
     new Rule(["laptop", "very poor"], ["poor"], "and"),
-  ];
-}
 
-export default internetInference;
+    new Rule(["mobile", "very good"], ["very good"], "and"),
+    new Rule(["mobile", "good"], ["good"], "and"),
+    new Rule(["mobile", "average"], ["average"], "and"),
+    new Rule(["mobile", "poor"], ["poor"], "and"),
+    new Rule(["mobile", "very poor"], ["poor"], "and"),
+
+    new Rule(["share", "very good"], ["good"], "and"),
+    new Rule(["share", "good"], ["average"], "and"),
+    new Rule(["share", "average"], ["average"], "and"),
+    new Rule(["share", "poor"], ["poor"], "and"),
+    new Rule(["share", "very poor"], ["poor"], "and"),
+
+    new Rule(["borrow", "very good"], ["average"], "and"),
+    new Rule(["borrow", "good"], ["average"], "and"),
+    new Rule(["borrow", "average"], ["poor"], "and"),
+    new Rule(["borrow", "poor"], ["poor"], "and"),
+    new Rule(["borrow", "very poor"], ["poor"], "and"),
+
+    new Rule(["rent", "very good"], ["average"], "and"),
+    new Rule(["rent", "good"], ["poor"], "and"),
+    new Rule(["rent", "average"], ["poor"], "and"),
+    new Rule(["rent", "poor"], ["poor"], "and"),
+    new Rule(["rent", "very poor"], ["very poor"], "and"),
+
+    new Rule(["no device", "very good"], ["very poor"], "and"),
+    new Rule(["no device", "good"], ["very poor"], "and"),
+    new Rule(["no device", "average"], ["very poor"], "and"),
+    new Rule(["no device", "poor"], ["very poor"], "and"),
+    new Rule(["no device", "very poor"], ["very poor"], "and"),
+  ];
+
+  var resourceResult = system.getPreciseOutput([deviceValue, internetValue]);
+
+  return resourceResult;
+}
