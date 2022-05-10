@@ -14,15 +14,18 @@
     "chart.js": "^3.7.1",
     "eslint-config-prettier": "^8.5.0",
     "fuzzyis": "^1.0.2",
-    "next": "^12.1.6",
+    "next": "12.1.0",
+    "node-xlsx": "^0.21.0",
     "prettier": "^2.6.0",
     "react": "^18.1.0",
     "react-chartjs-2": "^4.1.0",
-    "react-dom": "^18.1.0"
+    "react-dom": "17.0.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/node": "17.0.21",
     "@types/react": "17.0.41",
+    "@types/xlsx": "^0.0.36",
     "autoprefixer": "^10.4.4",
     "eslint": "8.11.0",
     "eslint-config-next": "12.1.0",
