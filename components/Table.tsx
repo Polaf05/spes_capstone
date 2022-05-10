@@ -1,9 +1,3 @@
-import {
-  ArrowSmUpIcon,
-  SelectorIcon,
-  SortAscendingIcon,
-  SwitchVerticalIcon,
-} from "@heroicons/react/outline";
 import React, { useEffect, useState } from "react";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
 import { Student } from "../types/Students";

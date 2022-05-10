@@ -6,3 +6,7 @@ export type Student = {
   remarks: string;
   diff: number;
 };
+
+export type Classroom = {
+  students: [];
+};

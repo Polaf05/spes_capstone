@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 
-const handleFile = (e: any, x: any) => {
+const handleFile = (e: any, setStudents: any) => {
   const [file] = e.target.files;
   console.log(file);
   const reader = new FileReader();
@@ -17,7 +17,7 @@ const handleFile = (e: any, x: any) => {
 
     const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
     console.log(data);
-    x(data);
+    setStudents(data);
   };
   reader.readAsBinaryString(file);
 };
