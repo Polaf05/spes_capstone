@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
+import { useClassroom } from "../hooks/useSetClassroom";
 import { Student } from "../types/Students";
 
-const Table = ({
-  students,
-  setIsOpen,
-}: {
-  students: Student[];
-  setIsOpen: any;
-}) => {
+const Table = ({ setIsOpen }: { setIsOpen: any }) => {
   let counter = 0;
 
+  const { students } = useClassroom();
+  console.log(students);
   const [sortingMethod, setSorting] = useState("name");
   const { setStudent } = useSelectedStudent();
-  const [filteredStudents, setFilteredStudents] = useState<Student[]>(students);
+  const [filteredStudents, setFilteredStudents] = useState<Student[] | null>(
+    students
+  );
 
   useEffect(() => {
     setFilteredStudents([
-      ...filteredStudents.sort((a, b) => {
+      ...filteredStudents!.sort((a, b) => {
         switch (sortingMethod) {
           case "grade_before":
             return b.grade_before - a.grade_before;
@@ -99,7 +98,7 @@ const Table = ({
         <table className="w-full text-center text-black ">
           {
             <tbody className="text-lg">
-              {filteredStudents.map((student) => (
+              {filteredStudents?.map((student) => (
                 <tr
                   key={student.id}
                   className={

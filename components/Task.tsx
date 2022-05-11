@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Table from "./Table";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import MyModal from "./PopUp";
+import { useClassroom } from "../hooks/useSetClassroom";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -15,7 +16,8 @@ export const Task = ({
   assessment: string;
   setIsOpen: any;
 }) => {
-  let students = [
+  const { students } = useClassroom();
+  let test_students = [
     {
       id: 1,
       name: "Ignacio, Franz Arvae",
@@ -23,6 +25,8 @@ export const Task = ({
       grade_after: 92.5,
       remarks: "",
       diff: 0,
+      written_works: [],
+      performance_tasks: [],
     },
     {
       id: 2,
@@ -31,6 +35,8 @@ export const Task = ({
       grade_after: 70,
       remarks: "",
       diff: 0,
+      written_works: [],
+      performance_tasks: [],
     },
     {
       id: 3,
@@ -39,6 +45,8 @@ export const Task = ({
       grade_after: 68,
       remarks: "",
       diff: 0,
+      written_works: [],
+      performance_tasks: [],
     },
     {
       id: 4,
@@ -47,6 +55,8 @@ export const Task = ({
       grade_after: 89.5,
       remarks: "",
       diff: 0,
+      written_works: [],
+      performance_tasks: [],
     },
     {
       id: 5,
@@ -55,6 +65,8 @@ export const Task = ({
       grade_after: 89.5,
       remarks: "",
       diff: 0,
+      written_works: [],
+      performance_tasks: [],
     },
     {
       id: 6,
@@ -63,6 +75,8 @@ export const Task = ({
       grade_after: 80,
       remarks: "",
       diff: 0,
+      written_works: [],
+      performance_tasks: [],
     },
     {
       id: 7,
@@ -71,6 +85,8 @@ export const Task = ({
       grade_after: 99,
       remarks: "",
       diff: 0,
+      written_works: [],
+      performance_tasks: [],
     },
     {
       id: 8,
@@ -79,12 +95,16 @@ export const Task = ({
       grade_after: 69,
       remarks: "",
       diff: 0,
+      written_works: [],
+      performance_tasks: [],
     },
   ];
 
+  let myStudents = students;
+
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   var count = [0, 0, 0, 0, 0];
-  students.forEach((student) => {
+  test_students.forEach((student) => {
     const grade_before = student.grade_before;
     const grade_after = student.grade_after;
     const diff = grade_after - grade_before;
@@ -139,7 +159,7 @@ export const Task = ({
 
       <div className="grid grid-cols-8 grid-flow-col gap-6">
         <div className="col-span-5 py-6 bg-gray-50 rounded-2xl shadow-md max-h-fit">
-          <Table setIsOpen={setIsOpen} students={students}></Table>
+          <Table setIsOpen={setIsOpen}></Table>
         </div>
         <div className="col-span-3 grid grid-rows-6">
           <div className="row-span-4 grid grid-cols-12 gap-4">

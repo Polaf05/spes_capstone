@@ -1,33 +1,42 @@
-import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import React, { useState, useEffect, useContext } from "react";
 import * as XLSX from "xlsx";
+import { useClassroom } from "../../hooks/useSetClassroom";
 
-const handleFile = (e: any, setStudents: any) => {
-  const [file] = e.target.files;
-  console.log(file);
-  const reader = new FileReader();
+const Upload = () => {
+  const { students, setStudents } = useClassroom();
+  const router = useRouter();
 
-  reader.onload = (evt: any) => {
-    const bstr = evt.target.result;
-    const wb = XLSX.read(bstr, { type: "binary" });
-    const wsname = wb.SheetNames[0];
-    const ws = wb.Sheets[wsname];
-    console.log(wb.Sheets);
-    console.log(wsname);
-    console.log(ws);
+  const handleFile = (e: any) => {
+    const [file] = e.target.files;
+    console.log("My file: " + file.name);
+    const reader = new FileReader();
 
-    const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-    console.log(data);
-    setStudents(data);
+    reader.onload = (evt: any) => {
+      const bstr = evt.target.result;
+
+      //get workbook
+      const wb = XLSX.read(bstr, { type: "binary" });
+
+      //get working sheet names
+      const wsname = wb.SheetNames[0];
+
+      //set active work sheet
+      const ws = wb.Sheets[wsname];
+      console.log(wb.Sheets);
+      console.log(wsname);
+      console.log(ws);
+
+      const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      console.log(data[0]);
+
+      if (data) {
+        let student_info = setStudents(data as any);
+        router.push("/test/table");
+      }
+    };
+    reader.readAsBinaryString(file);
   };
-  reader.readAsBinaryString(file);
-};
-
-const upload = () => {
-  const [students, setStudents] = useState(null);
-  useEffect(() => {
-    console.log(students);
-    setStudents(students);
-  }, [students]);
 
   return (
     <div>
@@ -43,17 +52,17 @@ const upload = () => {
                     name="file-upload"
                     type="file"
                     className="sr-only"
-                    onChange={(e) => handleFile(e, setStudents)}
+                    onChange={handleFile}
                   />
                 </label>
               </div>
             </div>
           </div>
-          <pre>{students ? JSON.stringify(students, null, 2) : "No file"}</pre>
         </div>
       </form>
+      <pre>{students ? JSON.stringify(students, null, 2) : "No file"}</pre>
     </div>
   );
 };
 
-export default upload;
+export default Upload;
