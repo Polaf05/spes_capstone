@@ -126,21 +126,33 @@ export function resourceInference(internetValue: number, deviceValue: number) {
     new Rule(["share", "very poor"], ["poor"], "and"),
 
     new Rule(["borrow", "very good"], ["average"], "and"),
+    new Rule(["borrow", "good"], ["average"], "and"),
+    new Rule(["borrow", "average"], ["poor"], "and"),
+    new Rule(["borrow", "poor"], ["poor"], "and"),
+    new Rule(["borrow", "very poor"], ["poor"], "and"),
+
+    new Rule(["rent", "very good"], ["average"], "and"),
+    new Rule(["rent", "good"], ["poor"], "and"),
+    new Rule(["rent", "average"], ["poor"], "and"),
+    new Rule(["rent", "poor"], ["poor"], "and"),
+    new Rule(["rent", "very poor"], ["very poor"], "and"),
+    
     new Rule(["borrow", "good"], ["poor"], "and"),
     new Rule(["borrow", "average"], ["poor"], "and"),
     new Rule(["borrow", "poor"], ["poor"], "and"),
     new Rule(["borrow", "very poor"], ["very poor"], "and"),
 
+
     new Rule(["no device", "very good"], ["very poor"], "and"),
     new Rule(["no device", "good"], ["very poor"], "and"),
     new Rule(["no device", "average"], ["very poor"], "and"),
-    new Rule(["mo device", "poor"], ["very poor"], "and"),
+    new Rule(["no device", "poor"], ["very poor"], "and"),
     new Rule(["no device", "very poor"], ["very poor"], "and"),
   ];
 
-  let resources = system.getPreciseOutput([internetValue,deviceValue]);
+  var resourceResult = system.getPreciseOutput([deviceValue, internetValue]);
 
-  return resources;
+  return resourceResult;
 }
 
 export function accessibilityInference(technologyValue: number, platformsValue: number){
