@@ -122,7 +122,6 @@ export const Task = ({
     const index = labels.indexOf(remark);
     count[index] += 1;
     student.remarks = remark;
-    student.diff = diff;
   });
 
   const data = {
