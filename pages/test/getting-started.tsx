@@ -3,9 +3,9 @@ import { UploadIcon, DownloadIcon } from "@heroicons/react/outline";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useClassroom } from "../hooks/useSetClassroom";
+import { useClassroom } from "../../hooks/useSetClassroom";
 import * as XLSX from "xlsx";
-import { Classroom, Student } from "../types/Students";
+import { Classroom, Student } from "../../types/Students";
 
 const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
