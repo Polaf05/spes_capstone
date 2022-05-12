@@ -124,7 +124,7 @@ const gettingStarted = () => {
                   your file
                 </h6>
                 {students && (
-                  <Link href={"/tasks"} passHref>
+                  <Link href={"/dev/tasks"} passHref>
                     <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
                       Continue
                     </button>
