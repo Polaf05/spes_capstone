@@ -6,12 +6,13 @@ import { useRouter } from "next/router";
 import { useClassroom } from "../../hooks/useSetClassroom";
 import * as XLSX from "xlsx";
 import { Classroom, Student } from "../../types/Students";
+import { getEmojiList } from "../api/sheets";
 
-const gettingStarted = () => {
+const gettingStarted = (emojis:any) => {
   const { students, setStudents } = useClassroom();
   const router = useRouter();
 
-  const handleFile = (e: any) => {
+  const handleFile = async (e: any) => {
     const [file] = e.target.files;
     //console.log(file);
     const reader = new FileReader();
@@ -45,7 +46,6 @@ const gettingStarted = () => {
           classroom.push(student_info);
           console.log(student_info);
         });
-
         setStudents(classroom);
       }
     };
@@ -128,8 +128,19 @@ const gettingStarted = () => {
           </div>
         </div>
       </div>
+      {JSON.stringify(emojis)}
     </React.Fragment>
   );
 };
+
+export async function getStaticProps(context : any) {
+  const emojis = await getEmojiList();
+  console.log(emojis);
+  return {
+    props: {
+      emojis: emojis, // remove sheet header
+    },
+  };
+}
 
 export default gettingStarted;
