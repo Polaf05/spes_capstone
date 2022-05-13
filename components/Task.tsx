@@ -157,9 +157,7 @@ export const Task = ({
       </div>
 
       <div className="grid grid-cols-8 grid-flow-col gap-6">
-        <div className="col-span-5 py-6 bg-gray-50 rounded-2xl shadow-md max-h-fit">
-          <Table setIsOpen={setIsOpen}></Table>
-        </div>
+        <div className="col-span-5 py-6 bg-gray-50 rounded-2xl shadow-md max-h-fit"></div>
         <div className="col-span-3 grid grid-rows-6">
           <div className="row-span-4 grid grid-cols-12 gap-4">
             <div className="col-span-6">

@@ -1,19 +1,20 @@
-import React from "react";
-import { UploadIcon, DownloadIcon } from "@heroicons/react/outline";
+import React, { useState } from "react";
+import { DownloadIcon } from "@heroicons/react/outline";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useClassroom } from "../hooks/useSetClassroom";
 import * as XLSX from "xlsx";
-import { Classroom, Student } from "../types/Students";
+import { Student } from "../types/Students";
+import { useClassroom } from "../hooks/useSetClassroom";
 
 const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
   const router = useRouter();
-
+  const [fileName, setFileName] = useState(null);
   const handleFile = (e: any) => {
     const [file] = e.target.files;
-    //console.log(file);
+    console.log(file.name);
+    setFileName(file.name);
     const reader = new FileReader();
 
     reader.onload = (evt: any) => {
@@ -55,7 +56,7 @@ const gettingStarted = () => {
     <React.Fragment>
       <div className="bg-[url('/bg-form.jpg')] bg-cover min-h-screen">
         <div className="flex justify-center">
-          <div className="flex flex-row justify-between bg-ocean-100 w-3/5  h-full my-32 rounded-xl p-20">
+          <div className="flex flex-row justify-between bg-ocean-100 w-10/12 border border-black  my-32 rounded-xl p-20 xl:w-3/5">
             <section className="grid justify-items-start w-2/3">
               <h1 className="text-2xl font-bold">Getting Started</h1>
               <section className="m-4">
@@ -69,9 +70,15 @@ const gettingStarted = () => {
                 </p>
               </section>
               <section className="m-4 space-y-4">
-                <h6 className="text-lg font-bold">
-                  Please upload your file here:
-                </h6>
+                {students ? (
+                  <h6 className="text-lg font-bold">
+                    Uploaded File: {fileName}
+                  </h6>
+                ) : (
+                  <h6 className="text-lg font-bold">
+                    Please upload your file here:
+                  </h6>
+                )}
 
                 <form action="">
                   <div>
@@ -117,7 +124,7 @@ const gettingStarted = () => {
                   your file
                 </h6>
                 {students && (
-                  <Link href={"/tasks"} passHref>
+                  <Link href={"/dev/tasks"} passHref>
                     <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
                       Continue
                     </button>

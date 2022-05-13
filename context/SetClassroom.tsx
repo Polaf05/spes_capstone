@@ -4,7 +4,7 @@ import { Student, Classroom } from "../types/Students";
 export const SetClassroomContext = createContext<Classroom>({} as Classroom);
 
 export const SetClassroomProvider: React.FC = ({ children }) => {
-  const [students, setStudents] = useState<Student[] | null>(null);
+  const [students, setStudents] = useState<Student[] | null>([] as Student[]);
 
   // on load get students
   useEffect(() => {

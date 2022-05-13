@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Tab } from "@headlessui/react";
 import { Task } from "./Task";
-import NameDialog from "./NameDialog";
+import StudentDialog from "./StudentDialog";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -62,7 +62,7 @@ export default function TasksTab() {
           </Tab.Panels>
         </div>
       </Tab.Group>
-      <NameDialog open={open} setIsOpen={setIsOpen} />
+      <StudentDialog open={open} setIsOpen={setIsOpen} />
     </React.Fragment>
   );
 }
