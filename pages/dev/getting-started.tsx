@@ -14,51 +14,58 @@ const gettingStarted = () => {
 
   const handleFile = (e: any) => {
     const [file] = e.target.files;
+    const file_name = file.name
+
     
-    const reader = new FileReader();
 
-    reader.onload = (evt: any) => {
-      const bstr = evt.target.result;
-      const wb = XLSX.read(bstr, { type: "binary" });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      //console.log(wb.Sheets);
-      //console.log(wsname);
-      //console.log(ws);
+    if (file_name.match(".xlsx")){
+        setFileName(file_name)
+        const reader = new FileReader();
 
-      const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        reader.onload = (evt: any) => {
+          const bstr = evt.target.result;
+          const wb = XLSX.read(bstr, { type: "binary" });
+          const wsname = wb.SheetNames[0];
+          const ws = wb.Sheets[wsname];
+          //console.log(wb.Sheets);
+          //console.log(wsname);
+          //console.log(ws);
 
-      if (data) {
-        let i = 0;
-        let classroom = [] as any;
-        data.forEach((item: any) => {
-          const student_info = {
-            id: i,
-            name: item[0],
-            grade_before: item[1],
-            diff: item[2],
-            grade_after: item[3],
-            remarks: item[4],
-            written_works: [],
-            performance_tasks: [],
-          } as Student;
-          i += 1;
-          classroom.push(student_info);
-          console.log(student_info);
-        });
+          const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-        setStudents(classroom);
+          if (data) {
+            let i = 0;
+            let classroom = [] as any;
+            data.forEach((item: any) => {
+              const student_info = {
+                id: i,
+                name: item[0],
+                grade_before: item[1],
+                diff: item[2],
+                grade_after: item[3],
+                remarks: item[4],
+                written_works: [],
+                performance_tasks: [],
+              } as Student;
+              i += 1;
+              classroom.push(student_info);
+              console.log(student_info);
+            });
 
-        //check for file name
-        console.log(file.name)
-        setFileName(file.name.match(".xlsx") ? file.name : null)
-        const error = fileName ? `file incompatible: ${fileName}` : null
-        console.log(fileName)
-        
-        
+            setStudents(classroom);
+          }
+        };
+        reader.readAsBinaryString(file);
+        console.log("file permitted")
+    }else{
+      setFileName(null)
+      if(students) {
+        setStudents(null)
+        localStorage.removeItem("students")
       }
-    };
-    reader.readAsBinaryString(file);
+      console.log("file denied")
+    }
+    
   };
   return (
     <React.Fragment>
@@ -131,7 +138,7 @@ const gettingStarted = () => {
                   An error message will appear here if there's a problem with
                   your file
                 </h6>
-                {students && (
+                {fileName && (
                   <Link href={"/dev/tasks"} passHref>
                     <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
                       Continue

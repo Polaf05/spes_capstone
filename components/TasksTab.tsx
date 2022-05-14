@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Tab } from "@headlessui/react";
-import { Task } from "./Task";
 import StudentDialog from "./StudentDialog";
+import { Task } from "./Task";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -50,15 +50,16 @@ export default function TasksTab() {
           </div>
 
           <Tab.Panels className="mt-2">
-            {categories.map((category, idx) => (
+            {/*categories.map((category, idx) => (
               <Tab.Panel key={idx} className="h-[80vh]">
                 <Task
                   setIsOpen={setIsOpen}
                   category={category.title}
                   assessment={category.value}
+                  classroom={}
                 />
               </Tab.Panel>
-            ))}
+            ))*/}
           </Tab.Panels>
         </div>
       </Tab.Group>

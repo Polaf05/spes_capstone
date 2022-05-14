@@ -1,129 +1,113 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Table from "./Table";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import MyModal from "./PopUp";
 import { useClassroom } from "../hooks/useSetClassroom";
+import { useSelectedStudent } from "../hooks/useSelectedStudent";
+import { Student } from "../types/Students";
+import StudentDialog from "./StudentDialog";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export const Task = ({
   category,
   assessment,
-  setIsOpen,
+  open,
+  setIsOpen
 }: {
   category: string;
   assessment: string;
   setIsOpen: any;
+  open: boolean;
 }) => {
-  const { students } = useClassroom();
-  let test_students = [
-    {
-      id: 1,
-      name: "Ignacio, Franz Arvae",
-      grade_before: 90,
-      grade_after: 92.5,
-      remarks: "",
-      diff: 0,
-      written_works: [],
-      performance_tasks: [],
-    },
-    {
-      id: 2,
-      name: "Delos Reyes, Miss U.",
-      grade_before: 70,
-      grade_after: 70,
-      remarks: "",
-      diff: 0,
-      written_works: [],
-      performance_tasks: [],
-    },
-    {
-      id: 3,
-      name: "Bato, Ogie Ralph M.",
-      grade_before: 90.3,
-      grade_after: 68,
-      remarks: "",
-      diff: 0,
-      written_works: [],
-      performance_tasks: [],
-    },
-    {
-      id: 4,
-      name: "Cruz, Crishell Vange J.",
-      grade_before: 89.6,
-      grade_after: 89.5,
-      remarks: "",
-      diff: 0,
-      written_works: [],
-      performance_tasks: [],
-    },
-    {
-      id: 5,
-      name: "Ong, Jhone Rick T.",
-      grade_before: 89.2,
-      grade_after: 89.5,
-      remarks: "",
-      diff: 0,
-      written_works: [],
-      performance_tasks: [],
-    },
-    {
-      id: 6,
-      name: "Ranada, Mark Marc R.",
-      grade_before: 80,
-      grade_after: 80,
-      remarks: "",
-      diff: 0,
-      written_works: [],
-      performance_tasks: [],
-    },
-    {
-      id: 7,
-      name: "Lee, Justine Melanie M.",
-      grade_before: 88.9,
-      grade_after: 99,
-      remarks: "",
-      diff: 0,
-      written_works: [],
-      performance_tasks: [],
-    },
-    {
-      id: 8,
-      name: "Delos Reyes, Clea Bernadette P.",
-      grade_before: 85,
-      grade_after: 69,
-      remarks: "",
-      diff: 0,
-      written_works: [],
-      performance_tasks: [],
-    },
-  ];
-
-  let myStudents = students;
-
-  const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
-  var count = [0, 0, 0, 0, 0];
-  test_students.forEach((student) => {
-    const grade_before = student.grade_before;
-    const grade_after = student.grade_after;
-    const diff = grade_after - grade_before;
-    const remark =
-      diff >= 1.2 && grade_after > 90
-        ? "Very Good"
-        : diff > 0.0 && grade_after > 85
-        ? "Good"
-        : diff >= -0.5 && grade_after > 80
-        ? "Average"
-        : diff > -0.8 || grade_after > 75
-        ? "Poor"
-        : "Very Poor";
-
-    const index = labels.indexOf(remark);
-    count[index] += 1;
-    student.remarks = remark;
-  });
-
+    const { students } = useClassroom();
+    const [sortingMethod, setSorting] = useState("");
+    const { setStudent } = useSelectedStudent();
+    const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
+  
+    useEffect(() => {
+      setFilteredStudents(students!);
+    }, [students]);
+  
+    useEffect(() => {
+      const sortedStudents = students?.sort((a, b) => {
+        switch (sortingMethod) {
+          case "Grade Before":
+            return b.grade_before - a.grade_before;
+          case "Name":
+            let fa = a.name.toLowerCase(),
+              fb = b.name.toLowerCase();
+  
+            if (fa < fb) {
+              return -1;
+            }
+            if (fa > fb) {
+              return 1;
+            }
+            return 0;
+          case "Grade After":
+          case "Remarks":
+            return b.grade_after - a.grade_after;
+          case "Adjustment Difference":
+            return b.diff - a.diff;
+          default:
+            return 0;
+        }
+      });
+  
+      console.log("here: " + sortedStudents);
+  
+      setFilteredStudents([
+        ...students!.sort((a, b) => {
+          switch (sortingMethod) {
+            case "Grade Before":
+              return b.grade_before - a.grade_before;
+            case "Name":
+              let fa = a.name.toLowerCase(),
+                fb = b.name.toLowerCase();
+  
+              if (fa < fb) {
+                return -1;
+              }
+              if (fa > fb) {
+                return 1;
+              }
+              return 0;
+            case "Grade After":
+            case "Remarks":
+              return b.grade_after - a.grade_after;
+            case "Adjustment Difference":
+              return b.diff - a.diff;
+            default:
+              return 0;
+          }
+        }),
+      ]);
+    }, [sortingMethod]);
+  
+    const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
+    var count = [0, 0, 0, 0, 0];
+    students?.forEach((student) => {
+      const grade_before = student.grade_before;
+      const grade_after = student.grade_after;
+      const diff = grade_after - grade_before;
+      const remark =
+        diff >= 1.2 && grade_after > 90
+          ? "Very Good"
+          : diff > 0.0 && grade_after > 85
+          ? "Good"
+          : diff >= -0.5 && grade_after > 80
+          ? "Average"
+          : diff > -0.8 || grade_after > 75
+          ? "Poor"
+          : "Very Poor";
+  
+      const index = labels.indexOf(remark);
+      count[index] += 1;
+    });
+  
+    
   const data = {
     labels: labels,
     datasets: [
@@ -142,66 +126,124 @@ export const Task = ({
   };
 
   return (
-    <div className="text-black bg-ocean-100 rounded-xl h-full px-10 pt-4">
-      <div className="text-4xl font-bold ">
-        Class Assessment:{" "}
-        <span
-          className={
-            assessment.match("Very Good|Good")
-              ? "text-tallano_gold-disp"
-              : "text-ocean-400"
-          }
-        >
-          {assessment}
-        </span>
+    <div className="bg-ocean-100 p-12 grid grid-cols-12 gap-4">
+      <div className="col-span-7">
+        <div className="text-2xl font-bold">
+          <h1>Clasroom Assessment: <span className={assessment === "Very Good" ? "text-legend-vgood" : assessment === "Good" ? "text-legend-good" : assessment === "Average" ? "text-legend-ave" : assessment === "Poor" ? "text-legend-poor" : "text-legend-vpoor" }>{assessment}</span></h1>
+        </div>
+        <div className="text-lg font-semibold">Sorted by: {sortingMethod ? sortingMethod : "Name"}</div>
+        <div className="w-full overflow-y-auto h-96">
+          <table className="table-fixed min-w-full rounded-md text-lg text-left border-collapse">
+            <thead className="border-b-2 bg-white sticky top-0">
+              <tr className="text-center">
+                <th className="flex flex-row pl-2">
+                  <button
+                    className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
+                    onClick={() => setSorting("Name")}
+                  >
+                    Name
+                  </button>
+                </th>
+                <th>
+                  <button
+                    className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
+                    onClick={() => setSorting("Grade Before")}
+                  >
+                    Before
+                  </button>
+                </th>
+                <th>
+                  <button
+                    className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
+                    onClick={() => setSorting("Adjustment Difference")}
+                  >
+                    +/-
+                  </button>
+                </th>
+                <th>
+                  <button
+                    className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
+                    onClick={() => setSorting("Grade After")}
+                  >
+                    After
+                  </button>
+                </th>
+                <th className="text-right">
+                  <button
+                    className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
+                    onClick={() => setSorting("Remarks")}
+                  >
+                    Remarks
+                  </button>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white">
+              {students?.map((student) => (
+                <tr
+                  className="odd:bg-yellow-50 hover:cursor-pointer text-center"
+                  onClick={() => {
+                    setStudent(student);
+                    setIsOpen(true);
+                  }}
+                >
+                  <td className="pl-4 text-left">{student.name}</td>
+                  <td>{student.grade_before}</td>
+                  <td className="text-base">({student.diff})</td>
+                  <td>{student.grade_after}</td>
+                  <td className="pr-4 text-right">{student.remarks}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      <div className="grid grid-cols-8 grid-flow-col gap-6">
-        <div className="col-span-5 py-6 bg-gray-50 rounded-2xl shadow-md max-h-fit"></div>
-        <div className="col-span-3 grid grid-rows-6">
-          <div className="row-span-4 grid grid-cols-12 gap-4">
-            <div className="col-span-6">
-              <Doughnut
-                data={data}
-                options={{
-                  plugins: {
-                    legend: {
-                      display: false,
-                    },
-                  },
-                }}
-              />
-            </div>
-            <div className="col-span-4">
-              <h6 className="text-lg font-semibold pt-3 border-b-2 border-black">
-                Legend
-              </h6>
-              <section className="mt-4">
-                <div className="flex justify-between">
-                  <p>Very Good</p>
-                  <div className="bg-legend-vgood border w-9 h-4"></div>
-                </div>
-                <div className="flex justify-between">
-                  <p>Good</p>
-                  <div className="bg-legend-good border w-9 h-4"></div>
-                </div>
-                <div className="flex justify-between">
-                  <p>Average</p>
-                  <div className="bg-legend-ave border w-9 h-4"></div>
-                </div>
-                <div className="flex justify-between">
-                  <p>Poor</p>
-                  <div className="bg-legend-poor border w-9 h-4"></div>
-                </div>
-                <div className="flex justify-between">
-                  <p>Very Poor</p>
-                  <div className="bg-legend-vpoor border w-9 h-4"></div>
-                </div>
-              </section>
-            </div>
+      <div className="col-span-5 max-h-screen">
+        <div className="flex flex-row gap-4">
+          <div className="w-48 xl:w-80">
+          <Doughnut
+            className=""
+            data={data}
+            options={{
+              plugins: {
+                legend: {
+                  display: false,
+                },
+              },
+              cutout: 70,
+            }}
+          />
           </div>
-          <div className="row-span-2 mx-6 overflow-auto max-h-52 md:overflow-auto">
-            <p className="inline-block">
+          <div className="col-span-4 w-60">
+                <h6 className="text-lg font-semibold pt-3 border-b-2 border-black">
+                  Legend
+                </h6>
+                <section className="mt-4">
+                  <div className="flex justify-between">
+                    <p>Very Good</p>
+                    <div className="bg-legend-vgood border w-9 h-4"></div>
+                  </div>
+                  <div className="flex justify-between">
+                    <p>Good</p>
+                    <div className="bg-legend-good border w-9 h-4"></div>
+                  </div>
+                  <div className="flex justify-between">
+                    <p>Average</p>
+                    <div className="bg-legend-ave border w-9 h-4"></div>
+                  </div>
+                  <div className="flex justify-between">
+                    <p>Poor</p>
+                    <div className="bg-legend-poor border w-9 h-4"></div>
+                  </div>
+                  <div className="flex justify-between">
+                    <p>Very Poor</p>
+                    <div className="bg-legend-vpoor border w-9 h-4"></div>
+                  </div>
+                </section>
+          </div>
+        </div>
+        <div className="row-span-2 mx-3 overflow-auto max-h-52 md:overflow-auto mt-10">
+            <p className="inline-block text-justify">
               Chart Description: Paragraph (Large) Lorem ipsum dolor sit amet,
               consectetuer adipiscing elit, sed diam nonummy nibh euismod
               tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
@@ -212,8 +254,12 @@ export const Task = ({
               (Large) Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
             </p>
           </div>
-        </div>
       </div>
-    </div>
+      <div className="w-96">
+        {<StudentDialog open={open} setIsOpen={setIsOpen}/>}
+      </div>
+
+      <pre>{/*students ? JSON.stringify(students, null, 2) : "No data"*/}</pre>
+      </div>
   );
 };

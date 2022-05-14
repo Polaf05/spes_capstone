@@ -7,18 +7,23 @@ import StudentDialog from "../../components/StudentDialog";
 import { useSelectedStudent } from "../../hooks/useSelectedStudent";
 import { useClassroom } from "../../hooks/useSetClassroom";
 import { Student } from "../../types/Students";
-import Table from "../test/table";
+import { Tab } from "@headlessui/react";
+import { Task } from "../../components/Task";
+
+import Image from "next/image";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
 export default function Tasks() {
   const { students } = useClassroom();
-  const [sortingMethod, setSorting] = useState("");
+  const [sortingMethod, setSorting] = useState("Name");
   const { setStudent } = useSelectedStudent();
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [open, setIsOpen] = useState<boolean>(false);
-
-  console.log("students:" + students)
 
   useEffect(() => {
     setFilteredStudents(students!);
@@ -117,99 +122,69 @@ export default function Tasks() {
       },
     ],
   };
+  const [categories] = useState([
+    {
+      title: "Overall",
+      value: "Good",
+    },
+    {
+      title: "Written Works",
+      value: "Average",
+    },
+    {
+      title: "Performance Tasks",
+      value: "Very Good",
+    },
+  ]);
 
   return (
-    <div className="bg-white h-screen grid grid-cols-12">
-      <div className="col-span-7 p-12">
-        <div className="text-2xl font-bold">
-          <h1>Clasroom Assessment:</h1>
+    <div className="bg-white max-h-screen"> 
+      <Tab.Group>
+        <div className="grid grid-cols-3 justify-between mx-10 h-20 ">
+          <div className="w-20 h-20 p-1">
+            <Image
+              src="/logo.png"
+              alt="logo picture"
+              width={100}
+              height={100}
+            />
+          </div>
+          <Tab.List className="col-span-2 flex justify-end">
+          {categories.map((category) => (
+            <Tab
+              key={category.title}
+              className={({ selected }) =>
+                classNames(
+                  "w-60 text-xl font-bold mx-2",
+                  selected
+                    ? "text-ocean-400 decoration-4 border-b-8 border-ocean-400"
+                    : ""
+                )
+              }
+            >
+            {category.title}
+          </Tab>
+        ))}
+        </Tab.List>
         </div>
-        <div className="text-lg font-semibold">Sorted by: {sortingMethod}</div>
-        <div className="w-full overflow-y-auto h-96">
-          <table className="table-fixed min-w-full rounded-md text-lg text-left border-collapse">
-            <thead className="border-b-2 bg-white sticky top-0">
-              <tr className="text-center ">
-                <th className="flex flex-row pl-2">
-                  <button
-                    className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
-                    onClick={() => setSorting("Name")}
-                  >
-                    Name
-                  </button>
-                </th>
-                <th>
-                  <button
-                    className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
-                    onClick={() => setSorting("Grade Before")}
-                  >
-                    Before
-                  </button>
-                </th>
-                <th>
-                  <button
-                    className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
-                    onClick={() => setSorting("Adjustment Difference")}
-                  >
-                    +/-
-                  </button>
-                </th>
-                <th>
-                  <button
-                    className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
-                    onClick={() => setSorting("Grade After")}
-                  >
-                    After
-                  </button>
-                </th>
-                <th>
-                  <button
-                    className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
-                    onClick={() => setSorting("Remarks")}
-                  >
-                    Remarks
-                  </button>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="">
-              {students?.map((student) => (
-                <tr
-                  className="odd:bg-yellow-50 hover:cursor-pointer text-center"
-                  onClick={() => {
-                    setStudent(student);
-                    setIsOpen(true);
-                  }}
-                >
-                  <td className="pl-4 text-left">{student.name}</td>
-                  <td>{student.grade_before}</td>
-                  <td className="text-base">({student.diff})</td>
-                  <td>{student.grade_after}</td>
-                  <td className="pr-4 text-right">{student.remarks}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div className="col-span-5 border px-12 grid grid-rows-4">
-        <div className="border pt-12 row-span-1">
-          <Doughnut
-            data={data}
-            options={{
-              plugins: {
-                legend: {
-                  display: false,
-                },
-              },
-              cutout: 150,
-            }}
-          />
-        </div>
-        <div className="row-span-1">Hakdog</div>
-      </div>
-      <StudentDialog open={open} setIsOpen={setIsOpen} />
-
-      <pre>{/*students ? JSON.stringify(students, null, 2) : "No data"*/}</pre>
+        
+        <Tab.Panels>
+        {categories.map((category, idx) => (
+          <Tab.Panel key={idx} className="h-[80vh]">
+            <Task
+              open={open}
+              setIsOpen={setIsOpen}
+              category={category.title}
+              assessment={category.value}
+            />
+          </Tab.Panel>
+        ))}
+      </Tab.Panels>
+    </Tab.Group>
+     
+     
+    
     </div>
+    
   );
 }
