@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useClassroom } from "../../hooks/useSetClassroom";
 import * as XLSX from "xlsx";
-import { Classroom, Student } from "../../types/Students";
+import { Classroom, Student, WrittenWorks } from "../../types/Students";
 import { getEmojiList } from "../api/sheets";
 
 const gettingStarted = (emojis:any) => {
@@ -20,34 +20,89 @@ const gettingStarted = (emojis:any) => {
     reader.onload = (evt: any) => {
       const bstr = evt.target.result;
       const wb = XLSX.read(bstr, { type: "binary" });
-      const wsname = wb.SheetNames[0];
+      const wsname = wb.SheetNames[1];
       const ws = wb.Sheets[wsname];
       //console.log(wb.Sheets);
       //console.log(wsname);
       //console.log(ws);
 
       const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+       //console.log(data);
 
-      if (data) {
+      //TOTAL SCORES index [9] 
+      
+      //index 15 -> total scores written
+
+      //index index 
+
+      //written task 5 -> 14
+
+      //writter percentage ->16
+      // written weighted score -> 17
+
+      // performace task -> 18 -> 27
+
+      //performance total -> 28
+
+      //performace percentage -> 29
+
+      if(data){
+        
+        let highest_score = [] as any;
         let i = 0;
-        let classroom = [] as any;
-        data.forEach((item: any) => {
-          const student_info = {
-            id: i,
-            name: item[0],
-            grade_before: item[1],
-            diff: item[2],
-            grade_after: item[3],
-            remarks: item[4],
-            written_works: [],
-            performance_tasks: [],
-          } as Student;
-          i += 1;
-          classroom.push(student_info);
-          console.log(student_info);
-        });
-        setStudents(classroom);
+
+        highest_score = data[9];
+        
+        data.forEach((item:any) => {
+
+          if(item[1] !== 0 && !isNaN(item[0])){
+
+            for(let counter = 5; counter <= 14; counter++){
+              const written_works = {
+                tasked_number: counter - 6,
+                score: item[counter],
+                task_data: {},
+              } as WrittenWorks;
+            }
+
+            const student_info = {
+                    id: i,
+                    name: item[1],
+                    grade_before: item[16],
+                    diff: item[2],
+                    grade_after: item[3],
+                    remarks: item[4],
+                    written_works: [],
+                    performance_tasks: [],
+              } as Student;
+          }
+
+        })
+
       }
+
+
+
+      // if (data) {
+      //   let i = 0;
+      //   let classroom = [] as any;
+      //   data.forEach((item: any) => {
+      //     const student_info = {
+      //       id: i,
+      //       name: item[0],
+      //       grade_before: item[1],
+      //       diff: item[2],
+      //       grade_after: item[3],
+      //       remarks: item[4],
+      //       written_works: [],
+      //       performance_tasks: [],
+      //     } as Student;
+      //     i += 1;
+      //     classroom.push(student_info);
+      //     console.log(student_info);
+      //   });
+      //   setStudents(classroom);
+      // }
     };
     reader.readAsBinaryString(file);
   };

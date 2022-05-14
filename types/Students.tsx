@@ -1,21 +1,23 @@
 import { Dispatch, SetStateAction } from "react";
 
-export type WrittenWorks = {
-  passed_tasks: string;
+export interface WrittenWorks {
+  tasked_number: number
   score: number[];
-  task_data: TaskData;
+  task_data: TaskData | null;
 };
 
-export type PerformanceTasks = {
-  passed_tasks: string;
+export interface PerformanceTasks {
+  tasked_number: number;
   score: number[];
-  task_data: TaskData;
+  task_data: TaskData | null;
 };
 
 export interface TaskData {
   fluctuation: number;
   trend: number[];
   consistency: number;
+  passed: boolean;
+  questionable: boolean;
 }
 
 export interface Student {
