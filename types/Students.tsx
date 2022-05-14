@@ -34,10 +34,3 @@ export type Classroom = {
   setStudents: Dispatch<SetStateAction<Student[] | null>>;
 };
 
-export type TestStudent = {
-  name: string;
-  before: number;
-  diff: number;
-  after: number;
-  remarks: string;
-};

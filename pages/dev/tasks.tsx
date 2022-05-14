@@ -13,14 +13,17 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function Tasks() {
   const { students } = useClassroom();
-  const [sortingMethod, setSorting] = useState("Name");
+  const [sortingMethod, setSorting] = useState("");
   const { setStudent } = useSelectedStudent();
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [open, setIsOpen] = useState<boolean>(false);
 
+  console.log("students:" + students)
+
   useEffect(() => {
     setFilteredStudents(students!);
   }, [students]);
+
   useEffect(() => {
     const sortedStudents = students?.sort((a, b) => {
       switch (sortingMethod) {
@@ -47,7 +50,7 @@ export default function Tasks() {
       }
     });
 
-    console.log(sortedStudents);
+    console.log("here: " + sortedStudents);
 
     setFilteredStudents([
       ...students!.sort((a, b) => {

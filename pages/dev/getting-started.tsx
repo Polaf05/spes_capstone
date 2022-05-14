@@ -11,10 +11,10 @@ const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
   const router = useRouter();
   const [fileName, setFileName] = useState(null);
+
   const handleFile = (e: any) => {
     const [file] = e.target.files;
-    console.log(file.name);
-    setFileName(file.name);
+    
     const reader = new FileReader();
 
     reader.onload = (evt: any) => {
@@ -48,6 +48,14 @@ const gettingStarted = () => {
         });
 
         setStudents(classroom);
+
+        //check for file name
+        console.log(file.name)
+        setFileName(file.name.match(".xlsx") ? file.name : null)
+        const error = fileName ? `file incompatible: ${fileName}` : null
+        console.log(fileName)
+        
+        
       }
     };
     reader.readAsBinaryString(file);

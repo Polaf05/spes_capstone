@@ -4,12 +4,12 @@ import { Student, Classroom } from "../types/Students";
 export const SetClassroomContext = createContext<Classroom>({} as Classroom);
 
 export const SetClassroomProvider: React.FC = ({ children }) => {
-  const [students, setStudents] = useState<Student[] | null>([] as Student[]);
+  const [students, setStudents] = useState<Student[] | null>(null);
 
   // on load get students
   useEffect(() => {
     const localStudents = localStorage.getItem("students");
-    if (localStudents) setStudents(JSON.parse(localStudents));
+    setStudents(JSON.parse(localStudents!));
   }, []);
 
   // on set student
