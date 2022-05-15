@@ -88,25 +88,11 @@ export const Task = ({
   
     const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
     var count = [0, 0, 0, 0, 0];
-    students?.forEach((student) => {
-      const grade_before = student.grade_before;
-      const grade_after = student.grade_after;
-      const diff = grade_after - grade_before;
-      const remark =
-        diff >= 1.2 && grade_after > 90
-          ? "Very Good"
-          : diff > 0.0 && grade_after > 85
-          ? "Good"
-          : diff >= -0.5 && grade_after > 80
-          ? "Average"
-          : diff > -0.8 || grade_after > 75
-          ? "Poor"
-          : "Very Poor";
-  
-      const index = labels.indexOf(remark);
-      count[index] += 1;
-    });
-  
+    
+  students?.map(student =>{
+    const i = labels.indexOf(student.remarks)
+    count[i] += 1
+  })
     
   const data = {
     labels: labels,

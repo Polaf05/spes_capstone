@@ -38,29 +38,47 @@ const StudentDialog = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-5xl h-[50vh] transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <div className="w-3/5">
-                     <Dialog.Title
-                    as="h1"
-                    className="text-2xl font-semibold leading-6 text-gray-900 w-full mb-2"
-                  >
-                    {student?.name}
-                  </Dialog.Title>
-                  <div className="font-medium border-b">Male</div>
-                  <div className="mt-2">
-                    <p className="inline-block text-justify">
-                    Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
-                    consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                    tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
-                    consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                    tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
-                    consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                    tincidunt ut laoreet dolore magna. Chart Description: Paragraph
-                    (Large) Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                    </p>
+                <Dialog.Panel className="w-full max-w-5xl h-[55vh] transform overflow-hidden rounded-2xl bg-white p-10 text-left align-middle shadow-xl transition-all">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-1">
+                      <div className="grid h-20 place-items-center">
+                       
+                        <h1 className="border col-start-2 font-bold text-lg">Final grade 
+                        </h1>
+                        
+                      </div>
+                    </div>
+                    <div className="col-span-1">
+                      <div className="grid grid-cols-2">
+                          <span className="col-span-1 border h-16 w-16 rounded-full bg-yellow-200 grid place-items-center">
+                            <h1 className="font-bold text-xl">{student?.grade_after}</h1>
+                          </span>
+                          <div className="col-span-1 flex justify-end">
+                            <Dialog.Title
+                              as="h1"
+                              className="flex justify-end text-2xl font-semibold leading-6 text-gray-900 w-full mb-2"
+                            >
+                              {student?.name}
+                            </Dialog.Title>
+                            <div className="flex justify-end font-medium border-b">Male</div>
+                          </div>
+                      </div>
+                    <div className="mt-2 h-56 overflow-y-auto border-b">
+                      <p className="inline-block text-justify">
+                      Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
+                      consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                      tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                      consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                      tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                      consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                      tincidunt ut laoreet dolore magna. Chart Description: Paragraph
+                      (Large) Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                      </p>
+                    </div>
+                    </div>
+                    
                   </div>
-                  </div>
-                  <div className="mt-4 flex justify-end">
+                  <div className="flex justify-end">
                     <button
                       type="button"
                       className="inline-flex justify-center rounded-md border border-transparent bg-ocean-100 px-4 py-2 text-base font-medium text-ocean-400 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"

@@ -2,24 +2,24 @@ import React, { useState } from "react";
 import { DownloadIcon } from "@heroicons/react/outline";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import * as XLSX from "xlsx";
 import { useClassroom } from "../../hooks/useSetClassroom";
 import { Student } from "../../types/Students";
 
+const INITIAL_MESSAGE = "An error message will appear here if there is problem with your file"
+
 const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
-  const router = useRouter();
   const [fileName, setFileName] = useState(null);
+  const [message , setMessage] = useState<string | null>(INITIAL_MESSAGE)
 
   const handleFile = (e: any) => {
     const [file] = e.target.files;
     const file_name = file.name
 
-    
-
     if (file_name.match(".xlsx")){
         setFileName(file_name)
+        setMessage("File uploaded successfully")
         const reader = new FileReader();
 
         reader.onload = (evt: any) => {
@@ -63,6 +63,8 @@ const gettingStarted = () => {
         setStudents(null)
         localStorage.removeItem("students")
       }
+      
+      setMessage("File is incompatible, system only accepts excel files with proper format")
       console.log("file denied")
     }
     
@@ -133,10 +135,9 @@ const gettingStarted = () => {
                   height={130}
                 />
               </div>
-              <div className="w-3/4 m-8 space-y-12">
-                <h6 className="text-lg font-bold inline-block">
-                  An error message will appear here if there's a problem with
-                  your file
+              <div className="w-full m-8 space-y-12">
+                <h6 className="text-base font-bold whitespace-normal">
+                  {message}
                 </h6>
                 {fileName && (
                   <Link href={"/dev/tasks"} passHref>
