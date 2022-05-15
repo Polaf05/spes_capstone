@@ -1,16 +1,28 @@
 import { Dialog, Transition } from "@headlessui/react";
+import { ArrowSmDownIcon, ArrowSmUpIcon } from "@heroicons/react/outline";
 import React, { useContext, Fragment } from "react";
 import { SelectedStudentContext } from "../context/SelectedStudent";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
 
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
 const StudentDialog = ({
   open,
   setIsOpen,
+  topStudents
 }: {
   open: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  topStudents: number[]
 }) => {
   const { student } = useSelectedStudent();
+  var diffArrow, id
+  if (student){
+    diffArrow = student.diff > 0 ? "up" : student.diff === 0 ? "neutral" : "down"
+    id = student.id
+  }
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -39,44 +51,42 @@ const StudentDialog = ({
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full max-w-5xl h-[55vh] transform overflow-hidden rounded-2xl bg-white p-10 text-left align-middle shadow-xl transition-all">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="col-span-1">
-                      <div className="grid h-20 place-items-center">
-                       
-                        <h1 className="border col-start-2 font-bold text-lg">Final grade 
-                        </h1>
-                        
-                      </div>
-                    </div>
-                    <div className="col-span-1">
-                      <div className="grid grid-cols-2">
-                          <span className="col-span-1 border h-16 w-16 rounded-full bg-yellow-200 grid place-items-center">
+                  <div className="">
+                    <div className="grid grid-cols-2">
+                        <div className="col-span-1 flex gap-4">
+                          <span className={classNames("border h-16 w-16 rounded-full grid place-items-center", student?.remarks === "Very Good" ? "bg-yellow-200" : "bg-slate-300")}>
                             <h1 className="font-bold text-xl">{student?.grade_after}</h1>
                           </span>
-                          <div className="col-span-1 flex justify-end">
-                            <Dialog.Title
-                              as="h1"
-                              className="flex justify-end text-2xl font-semibold leading-6 text-gray-900 w-full mb-2"
-                            >
-                              {student?.name}
-                            </Dialog.Title>
-                            <div className="flex justify-end font-medium border-b">Male</div>
+                          <div className="">
+                            <h1 className="font-bold text-lg">Grade After Adjustment</h1>
+                            <div className="flex place-items-center">
+                              <p className="">Grade before: {student?.grade_before}</p>
+                              {diffArrow === "up" ? <ArrowSmUpIcon className="w-5 h-5 text-green-400"/> : diffArrow === "down" ? <ArrowSmDownIcon className="w-5 h-5 text-red-400"/> : ""}
+                            </div>
                           </div>
-                      </div>
-                    <div className="mt-2 h-56 overflow-y-auto border-b">
-                      <p className="inline-block text-justify">
+                        </div>
+                        <div className="col-span-1">
+                          <Dialog.Title
+                            as="h1"
+                            className="flex justify-end text-2xl font-semibold leading-6 text-gray-900 w-full mb-2"
+                          >
+                            {student?.name}
+                          </Dialog.Title>
+                          <div className="flex justify-end font-medium border-b">Male</div>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 mt-2 h-56 overflow-y-auto border-b">
+                      <p className="">{topStudents.includes(id) ? `Top ${topStudents.indexOf(id) + 1}` : ""}</p>
+                      <p className="col-start-2 inline-block text-justify">
                       Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
                       consectetuer adipiscing elit, sed diam nonummy nibh euismod
                       tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
                       consectetuer adipiscing elit, sed diam nonummy nibh euismod
                       tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
                       consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                      tincidunt ut laoreet dolore magna. Chart Description: Paragraph
-                      (Large) Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                      tincidunt ut laoreet dolore magna.
                       </p>
                     </div>
-                    </div>
-                    
                   </div>
                   <div className="flex justify-end">
                     <button

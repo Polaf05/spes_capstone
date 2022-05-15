@@ -25,6 +25,25 @@ export const Task = ({
     const [sortingMethod, setSorting] = useState("");
     const { setStudent } = useSelectedStudent();
     const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
+    const [topStudents, setTopStudents] = useState([] as number[])
+
+
+    useEffect(()=>{
+      const toSort = students
+      const sortedStudentsBefore = toSort?.sort((a, b) => {
+        return b.grade_before - a.grade_before;
+      });
+      sortedStudentsBefore?.map(student =>{
+        
+        if (topStudents.length < 3){
+          topStudents.push(student.id)  
+        }
+        
+      })
+    
+      console.log(topStudents)
+
+    }, [students])
   
     useEffect(() => {
       setFilteredStudents(students!);
@@ -86,9 +105,8 @@ export const Task = ({
       ]);
     }, [sortingMethod]);
   
-    const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
-    var count = [0, 0, 0, 0, 0];
-    
+  const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
+  var count = [0, 0, 0, 0, 0];
   students?.map(student =>{
     const i = labels.indexOf(student.remarks)
     count[i] += 1
@@ -242,7 +260,7 @@ export const Task = ({
           </div>
       </div>
       <div className="w-96">
-        {<StudentDialog open={open} setIsOpen={setIsOpen}/>}
+        {<StudentDialog topStudents={topStudents} open={open} setIsOpen={setIsOpen}/>}
       </div>
 
       <pre>{/*students ? JSON.stringify(students, null, 2) : "No data"*/}</pre>
