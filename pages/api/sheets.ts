@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import { giveValue } from '../../lib/functions/formatting';
 export async function getEmojiList() {
   try {
     const target = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
@@ -11,19 +12,31 @@ export async function getEmojiList() {
 
     const sheets = google.sheets({ version: 'v4', auth: jwt });
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: "1MmgRrmXOXfe-KgG2Ar4PLs15GMXGB2r-pUrCKHZl8iY",
+      spreadsheetId: "1t8HF0FYxnSWSc9fauKT7iKi1xIh1LzJ1Y7It-YXvtDA",
       range: 'Form Responses 1', // sheet name
     });
 
     const rows = response.data.values;
     if (rows!.length) {
-      return rows!.map((row) => ({
-        email: row[1],
-        mobile: row[2],
-        name: row[3],
-        gender:row[4],
-      }));
-      
+      rows!.map((row) => {
+        
+
+        const survey = {
+
+            email: row[1],
+            mobile: row[2],
+            name: row[3],
+            type: row[7],
+            difficult: row[8],
+            implementation: row[9],
+            similar: row[10],
+
+        }
+
+        // console.log(giveValue(row as []));
+      });
+
+      console.log(rows);
 
     }
   } catch (err) {

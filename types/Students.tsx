@@ -1,14 +1,16 @@
 import { Dispatch, SetStateAction } from "react";
 
-export interface WrittenWorks {
+export interface WrittenTask {
   tasked_number: number
   score: number[];
   task_data: TaskData | null;
 };
 
-export interface PerformanceTasks {
+export interface PerformanceTask {
   tasked_number: number;
   score: number[];
+  percentage: number[];
+  weighted_score: number[];
   task_data: TaskData | null;
 };
 
@@ -23,12 +25,17 @@ export interface TaskData {
 export interface Student {
   id: number;
   name: string;
+  gender: string;
   grade_before: number;
   grade_after: number;
   remarks: string;
   diff: number;
-  written_works: WrittenWorks[] | null;
-  performance_tasks: PerformanceTasks[] | null;
+  written_works: WrittenTask[] | null;
+  performance_tasks: PerformanceTask[] | null;
+  written_percentage: number[];
+  written_weighted_score: number[];
+  performance_percentage: number[];
+  performance_weighted_score: number[];
 }
 
 export type Classroom = {
@@ -43,3 +50,12 @@ export type TestStudent = {
   after: number;
   remarks: string;
 };
+
+export interface ScoreTotal {
+  written_works: WrittenTask | null;
+  performance_work: PerformanceTask | null;
+  written_percentage: number[];
+  written_weighted_score: number[];
+  performance_percentage: number[];
+  performance_weighted_score: number[];
+}

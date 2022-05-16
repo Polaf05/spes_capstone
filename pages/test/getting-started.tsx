@@ -5,8 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useClassroom } from "../../hooks/useSetClassroom";
 import * as XLSX from "xlsx";
-import { Classroom, Student, WrittenWorks } from "../../types/Students";
+import { Classroom, Student,  PerformanceTask, WrittenTask, ScoreTotal } from "../../types/Students";
 import { getEmojiList } from "../api/sheets";
+import { classroom } from "googleapis/build/src/apis/classroom";
+import { getTask } from "../../lib/functions/formatting";
 
 const gettingStarted = (emojis:any) => {
   const { students, setStudents } = useClassroom();
@@ -22,12 +24,8 @@ const gettingStarted = (emojis:any) => {
       const wb = XLSX.read(bstr, { type: "binary" });
       const wsname = wb.SheetNames[1];
       const ws = wb.Sheets[wsname];
-      //console.log(wb.Sheets);
-      //console.log(wsname);
-      //console.log(ws);
 
       const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-       //console.log(data);
 
       //TOTAL SCORES index [9] 
       
@@ -51,58 +49,68 @@ const gettingStarted = (emojis:any) => {
         let highest_score = [] as any;
         let i = 0;
 
-        highest_score = data[9];
+        let male = true;
+
+        let classroom: Student[] = [];
         
-        data.forEach((item:any) => {
+        data.forEach((item:any, index:number) => {
 
-          if(item[1] !== 0 && !isNaN(item[0])){
+          if(item[1] == "MALE "){
+            male = true;
+          }
+          if(item[1] == "FEMALE "){
+            male = false;
+          }
+          
+          if(index == 9)
+          {
+              
+            let total_written_work = getTask(item as [], 5);
+            
+            let total_performance_work = getTask(item as [], 18);
 
-            for(let counter = 5; counter <= 14; counter++){
-              const written_works = {
-                tasked_number: counter - 6,
-                score: item[counter],
-                task_data: {},
-              } as WrittenWorks;
+            const score_total :ScoreTotal = {
+              written_works: total_written_work,
+              performance_work: total_performance_work,
+              written_percentage: item[16],
+              written_weighted_score: item[17],
+              performance_percentage: item[29],
+              performance_weighted_score: item[30],
             }
-
-            const student_info = {
-                    id: i,
-                    name: item[1],
-                    grade_before: item[16],
-                    diff: item[2],
-                    grade_after: item[3],
-                    remarks: item[4],
-                    written_works: [],
-                    performance_tasks: [],
-              } as Student;
+            highest_score = score_total;
           }
 
+          if(item[1] !== 0 && !isNaN(item[0])){
+            
+            let written_works = getTask(item as [], 5);
+           
+
+            let performace_works = getTask(item as [], 18);
+            
+
+            const student_info: Student = {
+                    id: i,
+                    name: item[1],
+                    gender: male ? "MALE" : "FEMALE",
+                    grade_before: item[35],
+                    diff: 0,
+                    grade_after: item[3],
+                    remarks: item[4],
+                    written_works: written_works,
+                    performance_tasks: performace_works,
+                    written_percentage: item[16],
+                    written_weighted_score: item[17],
+                    performance_percentage: item[29],
+                    performance_weighted_score: item[30],
+              };
+
+            classroom.push(student_info);
+          }
         })
 
+        console.log(highest_score);
+        console.log(classroom);
       }
-
-
-
-      // if (data) {
-      //   let i = 0;
-      //   let classroom = [] as any;
-      //   data.forEach((item: any) => {
-      //     const student_info = {
-      //       id: i,
-      //       name: item[0],
-      //       grade_before: item[1],
-      //       diff: item[2],
-      //       grade_after: item[3],
-      //       remarks: item[4],
-      //       written_works: [],
-      //       performance_tasks: [],
-      //     } as Student;
-      //     i += 1;
-      //     classroom.push(student_info);
-      //     console.log(student_info);
-      //   });
-      //   setStudents(classroom);
-      // }
     };
     reader.readAsBinaryString(file);
   };
@@ -190,7 +198,6 @@ const gettingStarted = (emojis:any) => {
 
 export async function getStaticProps(context : any) {
   const emojis = await getEmojiList();
-  console.log(emojis);
   return {
     props: {
       emojis: emojis, // remove sheet header
