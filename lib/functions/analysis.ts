@@ -1,9 +1,10 @@
-export function fluctuation(task: number[]){
+import { TaskAnalysis, TaskData } from "../../types/Students";
+
+export function fluctuation(task: TaskData[]){
 
     let trend = [];
     //wala pa akong maisip na ibang logic, antok na ako ehhh hekhek
-    let leni = [];
-    let marcos = [];
+    let questionable = [];
 
     //PASSING NOT YET SURE
     let passsing = 7.5;
@@ -11,21 +12,24 @@ export function fluctuation(task: number[]){
     let consistency = 0;
     let passed = 0;
 
-    for(let i = 0; i< task.length-1; i++){
+    for(let i = 0; i < task.length; i++){
         
         //Getting the trend
-        let sum = task[i+1] - task[i];
-        trend.push(sum);
+        if(i < task.length-1){
+            let sum = task[i+1].score - task[i].score;
+            trend.push(sum);
+            
 
-        if(sum >= 5){
-            leni.push(i);
-        }else if(sum <= -5){
-            marcos.push(i);
+            if(sum >= 5){
+                questionable.push(i+2);
+            }else if(sum <= -5){
+                questionable.push(i+2);
+            }
         }
 
         //Getting Consistency
 
-        if(task[i] >= passsing){ 
+        if(task[i].score >= passsing){ 
             consistency++;
             passed++;
         }else{
@@ -46,5 +50,15 @@ export function fluctuation(task: number[]){
 
 
     let fluctuate = sumWithInitial / trend.length;
+
+    const taskData : TaskAnalysis = {
+        fluctuation: fluctuate,
+        trend: trend,
+        consistency: streak,
+        passed: passed,
+        questionable: questionable,
+    }
+
+    return taskData;
   
 }

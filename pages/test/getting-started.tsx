@@ -5,10 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useClassroom } from "../../hooks/useSetClassroom";
 import * as XLSX from "xlsx";
-import { Classroom, Student,  PerformanceTask, WrittenTask, ScoreTotal } from "../../types/Students";
+import { Classroom, Student,  TaskData, ScoreTotal } from "../../types/Students";
 import { getEmojiList } from "../api/sheets";
 import { classroom } from "googleapis/build/src/apis/classroom";
 import { getTask } from "../../lib/functions/formatting";
+import { fluctuation } from "../../lib/functions/analysis";
 
 const gettingStarted = (emojis:any) => {
   const { students, setStudents } = useClassroom();
@@ -27,34 +28,25 @@ const gettingStarted = (emojis:any) => {
 
       const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-      //TOTAL SCORES index [9] 
-      
-      //index 15 -> total scores written
-
-      //index index 
-
-      //written task 5 -> 14
-
-      //writter percentage ->16
-      // written weighted score -> 17
-
-      // performace task -> 18 -> 27
-
-      //performance total -> 28
-
-      //performace percentage -> 29
-
+      //check if data is available
       if(data){
         
+        //Declaration of Highscores
         let highest_score = [] as any;
+        
+        //id purpose
         let i = 0;
 
+        //Gender Flag
         let male = true;
 
+        //for hook
         let classroom: Student[] = [];
         
+        //formatting
         data.forEach((item:any, index:number) => {
 
+          //change flag when it sees female
           if(item[1] == "MALE "){
             male = true;
           }
@@ -62,13 +54,16 @@ const gettingStarted = (emojis:any) => {
             male = false;
           }
           
+          //statically gets the highest posible score
           if(index == 9)
           {
               
+            //formats the task
             let total_written_work = getTask(item as [], 5);
             
             let total_performance_work = getTask(item as [], 18);
 
+            //assignmenets of scoretotal type
             const score_total :ScoreTotal = {
               written_works: total_written_work,
               performance_work: total_performance_work,
@@ -80,21 +75,25 @@ const gettingStarted = (emojis:any) => {
             highest_score = score_total;
           }
 
+          //gets the sstudents names
           if(item[1] !== 0 && !isNaN(item[0])){
             
+            //fomatting task per students
             let written_works = getTask(item as [], 5);
-           
-
             let performace_works = getTask(item as [], 18);
             
+            //gets the data analysis
+            let written_task_details = fluctuation(written_works as TaskData[]);
+            let performace_task_details = fluctuation(performace_works as TaskData[]);
 
+            //sets the studenet type for the tables
             const student_info: Student = {
                     id: i,
                     name: item[1],
                     gender: male ? "MALE" : "FEMALE",
                     grade_before: item[35],
                     diff: 0,
-                    grade_after: item[3],
+                    grade_after: 0,
                     remarks: item[4],
                     written_works: written_works,
                     performance_tasks: performace_works,
@@ -102,14 +101,17 @@ const gettingStarted = (emojis:any) => {
                     written_weighted_score: item[17],
                     performance_percentage: item[29],
                     performance_weighted_score: item[30],
+                    written_tasks_analysis:written_task_details,
+                    performace_tasks_analysis: performace_task_details,
               };
-
+            
+            //puts the students locally
             classroom.push(student_info);
           }
         })
-
-        console.log(highest_score);
-        console.log(classroom);
+        
+        //set the hooks of the information
+        setStudents(classroom);
       }
     };
     reader.readAsBinaryString(file);
@@ -206,3 +208,22 @@ export async function getStaticProps(context : any) {
 }
 
 export default gettingStarted;
+
+//legends lang nakakaalam
+
+      //TOTAL SCORES index [9] 
+      
+      //index 15 -> total scores written
+
+      //index index 
+
+      //written task 5 -> 14
+
+      //writter percentage ->16
+      // written weighted score -> 17
+
+      // performace task -> 18 -> 27
+
+      //performance total -> 28
+
+      //performace percentage -> 29

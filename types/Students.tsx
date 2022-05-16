@@ -1,25 +1,18 @@
+import { type } from "os";
 import { Dispatch, SetStateAction } from "react";
 
-export interface WrittenTask {
-  tasked_number: number
-  score: number[];
-  task_data: TaskData | null;
-};
-
-export interface PerformanceTask {
+//TASK DATA, BOTH WRITTEN AND PERFORMANCE 
+export type TaskData = {
   tasked_number: number;
-  score: number[];
-  percentage: number[];
-  weighted_score: number[];
-  task_data: TaskData | null;
+  score: number;
 };
 
-export interface TaskData {
+export type TaskAnalysis = {
   fluctuation: number;
   trend: number[];
   consistency: number;
-  passed: boolean;
-  questionable: boolean;
+  passed: number;
+  questionable: number[];
 }
 
 export interface Student {
@@ -30,12 +23,14 @@ export interface Student {
   grade_after: number;
   remarks: string;
   diff: number;
-  written_works: WrittenTask[] | null;
-  performance_tasks: PerformanceTask[] | null;
+  written_works: TaskData[] | null;
+  performance_tasks: TaskData[] | null;
   written_percentage: number[];
   written_weighted_score: number[];
   performance_percentage: number[];
   performance_weighted_score: number[];
+  written_tasks_analysis: TaskAnalysis | null;
+  performace_tasks_analysis: TaskAnalysis | null;
 }
 
 export type Classroom = {
@@ -52,10 +47,10 @@ export type TestStudent = {
 };
 
 export interface ScoreTotal {
-  written_works: WrittenTask | null;
-  performance_work: PerformanceTask | null;
-  written_percentage: number[];
-  written_weighted_score: number[];
-  performance_percentage: number[];
-  performance_weighted_score: number[];
+  written_works: TaskData[] | null;
+  performance_work: TaskData[] | null;
+  written_percentage: number;
+  written_weighted_score: number;
+  performance_percentage: number;
+  performance_weighted_score: number;
 }
