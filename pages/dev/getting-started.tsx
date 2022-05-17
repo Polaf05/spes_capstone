@@ -2,55 +2,72 @@ import React, { useState } from "react";
 import { DownloadIcon } from "@heroicons/react/outline";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import * as XLSX from "xlsx";
 import { useClassroom } from "../../hooks/useSetClassroom";
 import { Student } from "../../types/Students";
 
+const INITIAL_MESSAGE = "An error message will appear here if there is problem with your file"
+
 const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
-  const router = useRouter();
   const [fileName, setFileName] = useState(null);
+  const [message , setMessage] = useState<string | null>(INITIAL_MESSAGE)
+
   const handleFile = (e: any) => {
     const [file] = e.target.files;
-    console.log(file.name);
-    setFileName(file.name);
-    const reader = new FileReader();
+    const file_name = file.name
 
-    reader.onload = (evt: any) => {
-      const bstr = evt.target.result;
-      const wb = XLSX.read(bstr, { type: "binary" });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      //console.log(wb.Sheets);
-      //console.log(wsname);
-      //console.log(ws);
+    if (file_name.match(".xlsx")){
+        setFileName(file_name)
+        setMessage("File uploaded successfully")
+        const reader = new FileReader();
 
-      const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        reader.onload = (evt: any) => {
+          const bstr = evt.target.result;
+          const wb = XLSX.read(bstr, { type: "binary" });
+          const wsname = wb.SheetNames[0];
+          const ws = wb.Sheets[wsname];
+          //console.log(wb.Sheets);
+          //console.log(wsname);
+          //console.log(ws);
 
-      if (data) {
-        let i = 0;
-        let classroom = [] as any;
-        data.forEach((item: any) => {
-          const student_info = {
-            id: i,
-            name: item[0],
-            grade_before: item[1],
-            diff: item[2],
-            grade_after: item[3],
-            remarks: item[4],
-            written_works: [],
-            performance_tasks: [],
-          } as Student;
-          i += 1;
-          classroom.push(student_info);
-          console.log(student_info);
-        });
+          const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-        setStudents(classroom);
+          if (data) {
+            let i = 0;
+            let classroom = [] as any;
+            data.forEach((item: any) => {
+              const student_info = {
+                id: i,
+                name: item[0],
+                grade_before: item[1],
+                diff: item[2],
+                grade_after: item[3],
+                remarks: item[4],
+                written_works: [],
+                performance_tasks: [],
+              } as Student;
+              i += 1;
+              classroom.push(student_info);
+              console.log(student_info);
+            });
+
+            setStudents(classroom);
+          }
+        };
+        reader.readAsBinaryString(file);
+        console.log("file permitted")
+    }else{
+      setFileName(null)
+      if(students) {
+        setStudents(null)
+        localStorage.removeItem("students")
       }
-    };
-    reader.readAsBinaryString(file);
+      
+      setMessage("File is incompatible, system only accepts excel files with proper format")
+      console.log("file denied")
+    }
+    
   };
   return (
     <React.Fragment>
@@ -118,12 +135,11 @@ const gettingStarted = () => {
                   height={130}
                 />
               </div>
-              <div className="w-3/4 m-8 space-y-12">
-                <h6 className="text-lg font-bold inline-block">
-                  An error message will appear here if there's a problem with
-                  your file
+              <div className="w-full m-8 space-y-12">
+                <h6 className="text-base font-bold whitespace-normal">
+                  {message}
                 </h6>
-                {students && (
+                {fileName && (
                   <Link href={"/dev/tasks"} passHref>
                     <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
                       Continue
