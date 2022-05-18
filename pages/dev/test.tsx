@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from "react";
+import CarouselComponent from "../../components/Carousel";
 import { useClassroom } from "../../hooks/useSetClassroom";
 
 const Test = () => {
-  const { students } = useClassroom();
-
-  useEffect(() => {
-    console.log("Hey" + students);
-  }, []);
-
   return (
     <>
-      <pre>{students ? JSON.stringify(students, null, 2) : "No data"}</pre>
+      <CarouselComponent />
     </>
   );
 };

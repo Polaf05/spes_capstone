@@ -10,6 +10,7 @@ import { Student } from "../../types/Students";
 import { Tab } from "@headlessui/react";
 import { Task } from "../../components/Task";
 import Image from "next/image";
+import CarouselComponent from "../../components/Carousel";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 

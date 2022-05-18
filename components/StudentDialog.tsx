@@ -2,6 +2,59 @@ import { Dialog, Transition } from "@headlessui/react";
 import { ArrowSmDownIcon, ArrowSmUpIcon } from "@heroicons/react/outline";
 import React, { useContext, Fragment } from "react";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
+import { Line } from "react-chartjs-2";
+import {
+  Chart,
+  ArcElement,
+  LineElement,
+  BarElement,
+  PointElement,
+  BarController,
+  BubbleController,
+  DoughnutController,
+  LineController,
+  PieController,
+  PolarAreaController,
+  RadarController,
+  ScatterController,
+  CategoryScale,
+  LinearScale,
+  LogarithmicScale,
+  RadialLinearScale,
+  TimeScale,
+  TimeSeriesScale,
+  Decimation,
+  Filler,
+  Legend,
+  Title,
+  Tooltip,
+} from "chart.js";
+
+Chart.register(
+  ArcElement,
+  LineElement,
+  BarElement,
+  PointElement,
+  BarController,
+  BubbleController,
+  DoughnutController,
+  LineController,
+  PieController,
+  PolarAreaController,
+  RadarController,
+  ScatterController,
+  CategoryScale,
+  LinearScale,
+  LogarithmicScale,
+  RadialLinearScale,
+  TimeScale,
+  TimeSeriesScale,
+  Decimation,
+  Filler,
+  Legend,
+  Title,
+  Tooltip
+);
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -25,6 +78,39 @@ const StudentDialog = ({
       student.diff > 0 ? "up" : student.diff === 0 ? "neutral" : "down";
     id = student.id;
   }
+
+  type DataSet = {
+    label: string;
+    data: number[];
+    fill: true;
+    backgroundColor: string;
+    borderColor: string;
+  };
+
+  const labels: string[] = [];
+  const scores: number[] = [];
+  if (category === "Written Works") {
+    student?.written_works?.forEach((task) => {
+      const task_label = "Task " + task.tasked_number.toString();
+      labels.push(task_label);
+      scores.push(task.score);
+    });
+  } else if (category === "Performance Task") {
+    student?.performance_tasks?.forEach((task) => {
+      labels.push("Task " + task.tasked_number.toString());
+    });
+  }
+  const dataToRender: DataSet = {
+    label: category,
+    data: scores,
+    fill: true,
+    backgroundColor: "rgba(75,192,192,0.2)",
+    borderColor: "rgba(75,192,192,1)",
+  };
+  const dataChart = {
+    labels: labels,
+    datasets: [dataToRender],
+  };
 
   const data =
     category === "Written Works"
@@ -65,7 +151,7 @@ const StudentDialog = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-5xl h-[55vh] transform overflow-hidden rounded-2xl bg-white p-10 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-5xl h-[65vh] transform overflow-hidden rounded-2xl bg-white p-10 text-left align-middle shadow-xl transition-all">
                 <div className="">
                   <div className="grid grid-cols-2">
                     <div className="col-span-1 flex gap-4">
@@ -111,21 +197,30 @@ const StudentDialog = ({
                       </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 mt-2 h-56 overflow-y-auto border-b">
-                    <div className="">
+                  <div className="grid grid-cols-2 mt-2 h-72">
+                    <div className="overflow-auto">
                       {/* {topStudents.includes(id)
                         ? `Top ${topStudents.indexOf(id) + 1}`
                         : ""} */}
-                      {data?.map((task, idx) => (
-                        <p key={idx}>
-                          {task.tasked_number} : {task.score}
-                        </p>
-                      ))}
+                      <h4 className="pl-6 font-semibold">Written Works</h4>
+                      <Line
+                        data={dataChart}
+                        options={{
+                          scales: {
+                            y: { max: 10, min: 0, ticks: { stepSize: 2 } },
+                          },
+                          plugins: {
+                            legend: {
+                              display: false,
+                            },
+                          },
+                        }}
+                      />
                       <pre>
                         {/* {data ? JSON.stringify(data, null, 2) : "No data"} */}
                       </pre>
                     </div>
-                    <div className="col-start-2">
+                    <div className="col-start-2 overflow-y-auto">
                       <p className="inline-block text-justify">
                         Assessment: Paragraph (Large) Lorem ipsum dolor sit
                         amet, consectetuer adipiscing elit, sed diam nonummy
