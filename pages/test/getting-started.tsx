@@ -86,13 +86,13 @@ const gettingStarted = (emojis: any) => {
                 let written_works = getTask(
                   item as [],
                   5,
-                  highest_score.written_works?.length - 1,
+                  highest_score.written_works?.length! - 1,
                   false
                 );
                 let performace_works = getTask(
                   item as [],
                   18,
-                  highest_score.performance_work?.length - 1,
+                  highest_score.performance_work?.length! - 1,
                   false
                 );
 

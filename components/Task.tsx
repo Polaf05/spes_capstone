@@ -1,8 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
-import Table from "./Table";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
-import MyModal from "./PopUp";
 import { useClassroom } from "../hooks/useSetClassroom";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
 import { Student } from "../types/Students";
@@ -21,65 +19,53 @@ export const Task = ({
   setIsOpen: any;
   open: boolean;
 }) => {
-  const { students } = useClassroom();
+  const { students, setStudents } = useClassroom();
+  console.log(students);
+
   const [sortingMethod, setSorting] = useState("Name");
   const { setStudent } = useSelectedStudent();
-  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<Student[] | null>(
+    students!
+  );
   const [topStudents, setTopStudents] = useState([] as number[]);
 
   useEffect(() => {
-    const toSort = students;
-    const sortedStudentsBefore = toSort?.sort((a, b) => {
-      return b.grade_before - a.grade_before;
-    });
-    sortedStudentsBefore?.map((student) => {
-      if (topStudents.length < 3) {
-        topStudents.push(student.id);
-      }
-    });
+    if (students) {
+      setFilteredStudents([
+        ...students!.sort((a, b) => {
+          switch (sortingMethod) {
+            case "Grade Before":
+              return category === "Over All"
+                ? b.grade_before - a.grade_before
+                : category === "Written Works"
+                ? b.written_percentage - a.written_percentage
+                : b.performance_percentage - a.performance_percentage;
+            case "Name":
+              let fa = a.name.toLowerCase(),
+                fb = b.name.toLowerCase();
 
-    console.log(topStudents);
-  }, [students]);
-
-  useEffect(() => {
-    setFilteredStudents(students!);
-  }, [students]);
-
-  useEffect(() => {
-    setFilteredStudents([
-      ...students!.sort((a, b) => {
-        switch (sortingMethod) {
-          case "Grade Before":
-            return category === "Over All"
-              ? b.grade_before - a.grade_before
-              : category === "Written Works"
-              ? b.written_percentage - a.written_percentage
-              : b.performance_percentage - a.performance_percentage;
-          case "Name":
-            let fa = a.name.toLowerCase(),
-              fb = b.name.toLowerCase();
-
-            if (fa < fb) {
-              return -1;
-            }
-            if (fa > fb) {
-              return 1;
-            }
-            return 0;
-          case "Grade After":
-          case "Remarks":
-            return category === "Over All"
-              ? b.grade_after - a.grade_after
-              : category === "Written Works"
-              ? b.written_percentage - a.written_percentage
-              : b.performance_percentage - a.performance_percentage;
-          case "Adjustment Difference":
-            return b.diff - a.diff;
-          default:
-            return 0;
-        }
-      }),
-    ]);
+              if (fa < fb) {
+                return -1;
+              }
+              if (fa > fb) {
+                return 1;
+              }
+              return 0;
+            case "Grade After":
+            case "Remarks":
+              return category === "Over All"
+                ? b.grade_after - a.grade_after
+                : category === "Written Works"
+                ? b.written_percentage - a.written_percentage
+                : b.performance_percentage - a.performance_percentage;
+            case "Adjustment Difference":
+              return b.diff - a.diff;
+            default:
+              return 0;
+          }
+        }),
+      ]);
+    }
   }, [sortingMethod]);
 
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
@@ -140,6 +126,7 @@ export const Task = ({
                 <th className="flex flex-row pl-2">
                   <button
                     className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
+                    value={"Name"}
                     onClick={() => setSorting("Name")}
                   >
                     Name
@@ -181,13 +168,14 @@ export const Task = ({
             </thead>
             {/* Table Contents */}
             <tbody className="bg-white">
-              {students?.map((student) => (
+              {students?.map((student, idx) => (
                 <tr
                   className="odd:bg-yellow-50 hover:cursor-pointer text-center"
                   onClick={() => {
                     setStudent(student);
                     setIsOpen(true);
                   }}
+                  key={idx}
                 >
                   <td className="pl-4 text-left">{student.name}</td>
                   <td>
@@ -210,7 +198,6 @@ export const Task = ({
         <div className="flex flex-row gap-4">
           <div className="w-48 xl:w-80">
             <Doughnut
-              className=""
               data={data}
               options={{
                 plugins: {

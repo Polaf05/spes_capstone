@@ -1,7 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { ArrowSmDownIcon, ArrowSmUpIcon } from "@heroicons/react/outline";
 import React, { useContext, Fragment } from "react";
-import { SelectedStudentContext } from "../context/SelectedStudent";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
 
 function classNames(...classes: string[]) {
