@@ -1,26 +1,37 @@
 import { InferenceDetails, SurveyResult } from "../../types/Students";
 
 //function that dynamically formats highest posible score, written task and performance task
-export function getTask(item: [], counter: number) {
+export function getTask(
+  item: [],
+  counter: number,
+  ending: number,
+  flag: boolean
+) {
   let works = [] as any;
 
-  for (let counting = counter; counting <= counter + 9; counting++) {
+  for (let counting = counter; counting <= counter + ending; counting++) {
     const written_work = {
       tasked_number: counting - (counter - 1),
       score: item[counting],
     };
-    works.push(written_work);
+    if (flag) {
+      if (written_work.score != null) {
+        if (written_work.score != 0) {
+          works.push(written_work);
+        }
+      }
+    } else {
+      works.push(written_work);
+    }
   }
 
   return works;
 }
 
-export function giveValue(item: any, environment: any) {
+export function giveValue(item: any) {
   let wifi: Partial<InferenceDetails> = {};
   let data: Partial<InferenceDetails> = {};
   let device: Partial<InferenceDetails> = {};
-  let tech_difficulty: Partial<InferenceDetails> = {};
-  let accessible_usage: Partial<InferenceDetails> = {};
   let effect: Partial<InferenceDetails> = {};
   let similarities: Partial<InferenceDetails> = {};
 
@@ -50,7 +61,7 @@ export function giveValue(item: any, environment: any) {
     //3
     similarities.linguestic = "Quite Simiar";
     similarities.value = 3;
-  } else if (item.item.learning_performance_similarities == "Similar") {
+  } else if (item.learning_performance_similarities == "Similar") {
     //5
     similarities.linguestic = "Simiar";
     similarities.value = 5;
@@ -88,6 +99,29 @@ export function giveValue(item: any, environment: any) {
     data.value = 5;
   }
 
+  if (item.device.includes("don't have")) {
+    device.linguestic = "No Device";
+    device.value = 1;
+  } else if (item.device.includes("rent")) {
+    device.linguestic = "Renting Device";
+    device.value = 3;
+  } else if (item.device.includes("share")) {
+    device.linguestic = "Shared Device";
+    device.value = 5;
+  } else if (item.device.includes("borrow")) {
+    device.linguestic = "Borrowed Device";
+    device.value = 7;
+  } else if (item.device.includes("have a personal tablet")) {
+    device.linguestic = "Have Mobile";
+    device.value = 9;
+  } else if (item.device.includes("have a personal laptop")) {
+    device.linguestic = "Have Laptop";
+    device.value = 11;
+  } else {
+    device.linguestic = "Have Both laptop and mobile";
+    device.value = 13;
+  }
+
   const surveyData: SurveyResult = {
     email: item.email,
     mobile: item.mobile,
@@ -97,16 +131,15 @@ export function giveValue(item: any, environment: any) {
     school: item.school,
     learning_type: item.learning_type,
     learning_difficulty: item.learning_difficulty,
-    effectivity_implementation: item.effectivity_implementation as any,
-    learning_performance_similarities:
-      item.learning_performance_similarities as any,
-    environment_factors: [] as any,
-    wifi: [] as any,
-    data: [] as any,
-    device: [] as any,
-    tech_difficulty: [] as any,
+    effectivity_implementation: effect as InferenceDetails,
+    learning_performance_similarities: similarities as InferenceDetails,
+    environment_factors: item.environment_factors,
+    wifi: wifi as InferenceDetails,
+    data: data as InferenceDetails,
+    device: device as InferenceDetails,
+    tech_difficulty: item.tech_difficulty,
     platform: item.platform,
-    accessible_usage: [] as any,
+    accessible_usage: item.accessible_usage,
   };
 
   return surveyData;

@@ -72,9 +72,9 @@ export interface SurveyResult {
   wifi: InferenceDetails;
   data: InferenceDetails;
   device: InferenceDetails;
-  tech_difficulty: InferenceDetails;
+  tech_difficulty: number;
   platform: string;
-  accessible_usage: InferenceDetails;
+  accessible_usage: number;
 }
 
 export type EnvironmentFactors = {

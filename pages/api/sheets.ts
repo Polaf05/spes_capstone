@@ -1,5 +1,6 @@
 import { google } from "googleapis";
 import { giveValue } from "../../lib/functions/formatting";
+import { SurveyResult } from "../../types/Students";
 export async function getEmojiList() {
   try {
     const target = ["https://www.googleapis.com/auth/spreadsheets.readonly"];
@@ -21,21 +22,46 @@ export async function getEmojiList() {
 
     const rows = response.data.values;
     if (rows!.length) {
+      let surveyType: SurveyResult[] = [];
       rows!.shift();
 
       rows!.map((row) => {
+        const environment_factors = {
+          unwanted_noise: row[11],
+          limited_space: row[12],
+          household_chorse: row[13],
+          comfortability: row[14],
+          support: row[15],
+          internet: row[16],
+          device: row[17],
+          faculty_readiness: row[18],
+        };
+
         const survey = {
           email: row[1],
           mobile: row[2],
           name: row[3],
-          type: row[7],
-          difficult: row[8],
-          implementation: row[9],
-          similar: row[10],
+          gender: row[4],
+          grade: row[5],
+          school: row[6],
+          learning_type: row[7],
+          learning_difficulty: row[8],
+          effectivity_implementation: row[9],
+          learning_performance_similarities: row[10],
+          environment_factors: environment_factors,
+          wifi: row[19],
+          data: row[20],
+          device: row[21],
+          tech_difficulty: row[22],
+          platform: row[23],
+          accessible_usage: row[24],
         };
 
+        let surveyData = giveValue(survey);
+        surveyType.push(surveyData);
         // console.log(giveValue(row as []));
       });
+      return surveyType;
     }
   } catch (err) {
     console.log(err);
