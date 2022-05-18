@@ -110,6 +110,7 @@ const gettingStarted = (emojis: any) => {
                   performance_weighted_score: item[30],
                   written_tasks_analysis: written_task_details,
                   performace_tasks_analysis: performace_task_details,
+                  highest_posible_score: highest_score,
                 };
 
                 //puts the students locally

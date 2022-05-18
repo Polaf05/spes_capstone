@@ -19,8 +19,6 @@ export function giveValue(item: any, environment: any) {
   let wifi: Partial<InferenceDetails> = {};
   let data: Partial<InferenceDetails> = {};
   let device: Partial<InferenceDetails> = {};
-  let tech_difficulty: Partial<InferenceDetails> = {};
-  let accessible_usage: Partial<InferenceDetails> = {};
   let effect: Partial<InferenceDetails> = {};
   let similarities: Partial<InferenceDetails> = {};
 
@@ -88,6 +86,29 @@ export function giveValue(item: any, environment: any) {
     data.value = 5;
   }
 
+  if (item.device.includes("don't have")) {
+    device.linguestic = "No Device";
+    device.value = 1;
+  } else if (item.device.includes("rent")) {
+    device.linguestic = "Renting Device";
+    device.value = 3;
+  } else if (item.device.includes("share")) {
+    device.linguestic = "Shared Device";
+    device.value = 5;
+  } else if (item.device.includes("borrow")) {
+    device.linguestic = "Borrowed Device";
+    device.value = 7;
+  } else if (item.device.includes("have a personal tablet")) {
+    device.linguestic = "Have Mobile";
+    device.value = 9;
+  } else if (item.device.includes("have a personal laptop")) {
+    device.linguestic = "Have Laptop";
+    device.value = 11;
+  } else {
+    device.linguestic = "Have Both laptop and mobile";
+    device.value = 13;
+  }
+
   const surveyData: SurveyResult = {
     email: item.email,
     mobile: item.mobile,
@@ -100,13 +121,13 @@ export function giveValue(item: any, environment: any) {
     effectivity_implementation: item.effectivity_implementation as any,
     learning_performance_similarities:
       item.learning_performance_similarities as any,
-    environment_factors: [] as any,
-    wifi: [] as any,
-    data: [] as any,
-    device: [] as any,
-    tech_difficulty: [] as any,
+    environment_factors: environment,
+    wifi: wifi as InferenceDetails,
+    data: data as InferenceDetails,
+    device: device as InferenceDetails,
+    tech_difficulty: item.tech_difficulty,
     platform: item.platform,
-    accessible_usage: [] as any,
+    accessible_usage: item.accessible_usage,
   };
 
   return surveyData;

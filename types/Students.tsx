@@ -31,6 +31,7 @@ export interface Student {
   performance_weighted_score: number[];
   written_tasks_analysis: TaskAnalysis | null;
   performace_tasks_analysis: TaskAnalysis | null;
+  highest_posible_score: ScoreTotal;
 }
 
 export type Classroom = {
@@ -70,9 +71,9 @@ export interface SurveyResult {
   wifi: InferenceDetails;
   data: InferenceDetails;
   device: InferenceDetails;
-  tech_difficulty: InferenceDetails;
+  tech_difficulty: number;
   platform: string;
-  accessible_usage: InferenceDetails;
+  accessible_usage: number;
 }
 
 export type EnvironmentFactors = {
