@@ -1,5 +1,6 @@
 import { google } from "googleapis";
 import { giveValue } from "../../lib/functions/formatting";
+import { SurveyResult } from "../../types/Students";
 export async function getEmojiList() {
   try {
     const target = ["https://www.googleapis.com/auth/spreadsheets.readonly"];
@@ -21,6 +22,7 @@ export async function getEmojiList() {
 
     const rows = response.data.values;
     if (rows!.length) {
+      let surveyType: SurveyResult[] = [];
       rows!.shift();
 
       rows!.map((row) => {
@@ -55,8 +57,11 @@ export async function getEmojiList() {
           accessible_usage: row[24],
         };
 
+        let surveyData = giveValue(survey);
+        surveyType.push(surveyData);
         // console.log(giveValue(row as []));
       });
+      return surveyType;
     }
   } catch (err) {
     console.log(err);

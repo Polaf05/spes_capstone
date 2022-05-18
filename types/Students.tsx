@@ -25,10 +25,10 @@ export interface Student {
   diff: number;
   written_works: TaskData[] | null;
   performance_tasks: TaskData[] | null;
-  written_percentage: number[];
-  written_weighted_score: number[];
-  performance_percentage: number[];
-  performance_weighted_score: number[];
+  written_percentage: number;
+  written_weighted_score: number;
+  performance_percentage: number;
+  performance_weighted_score: number;
   written_tasks_analysis: TaskAnalysis | null;
   performace_tasks_analysis: TaskAnalysis | null;
   highest_posible_score: ScoreTotal;

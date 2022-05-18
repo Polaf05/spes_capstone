@@ -1,21 +1,34 @@
 import { InferenceDetails, SurveyResult } from "../../types/Students";
 
 //function that dynamically formats highest posible score, written task and performance task
-export function getTask(item: [], counter: number) {
+export function getTask(
+  item: [],
+  counter: number,
+  ending: number,
+  flag: boolean
+) {
   let works = [] as any;
 
-  for (let counting = counter; counting <= counter + 9; counting++) {
+  for (let counting = counter; counting <= counter + ending; counting++) {
     const written_work = {
       tasked_number: counting - (counter - 1),
       score: item[counting],
     };
-    works.push(written_work);
+    if (flag) {
+      if (written_work.score != null) {
+        if (written_work.score != 0) {
+          works.push(written_work);
+        }
+      }
+    } else {
+      works.push(written_work);
+    }
   }
 
   return works;
 }
 
-export function giveValue(item: any, environment: any) {
+export function giveValue(item: any) {
   let wifi: Partial<InferenceDetails> = {};
   let data: Partial<InferenceDetails> = {};
   let device: Partial<InferenceDetails> = {};
@@ -48,7 +61,7 @@ export function giveValue(item: any, environment: any) {
     //3
     similarities.linguestic = "Quite Simiar";
     similarities.value = 3;
-  } else if (item.item.learning_performance_similarities == "Similar") {
+  } else if (item.learning_performance_similarities == "Similar") {
     //5
     similarities.linguestic = "Simiar";
     similarities.value = 5;
@@ -118,10 +131,9 @@ export function giveValue(item: any, environment: any) {
     school: item.school,
     learning_type: item.learning_type,
     learning_difficulty: item.learning_difficulty,
-    effectivity_implementation: item.effectivity_implementation as any,
-    learning_performance_similarities:
-      item.learning_performance_similarities as any,
-    environment_factors: environment,
+    effectivity_implementation: effect as InferenceDetails,
+    learning_performance_similarities: similarities as InferenceDetails,
+    environment_factors: item.environment_factors,
     wifi: wifi as InferenceDetails,
     data: data as InferenceDetails,
     device: device as InferenceDetails,

@@ -39,7 +39,7 @@ const gettingStarted = (emojis: any) => {
           //check if data is available
           if (data) {
             //Declaration of Highscores
-            let highest_score = [] as any;
+            let highest_score: ScoreTotal = [] as any;
 
             //id purpose
             let i = 0;
@@ -63,9 +63,10 @@ const gettingStarted = (emojis: any) => {
               //statically gets the highest posible score
               if (index == 9) {
                 //formats the task
-                let total_written_work = getTask(item as [], 5);
+                let total_written_work = getTask(item as [], 5, 9, true);
+                console.log(total_written_work);
 
-                let total_performance_work = getTask(item as [], 18);
+                let total_performance_work = getTask(item as [], 18, 9, true);
 
                 //assignmenets of scoretotal type
                 const score_total: ScoreTotal = {
@@ -82,8 +83,18 @@ const gettingStarted = (emojis: any) => {
               //gets the sstudents names
               if (item[1] !== 0 && !isNaN(item[0])) {
                 //fomatting task per students
-                let written_works = getTask(item as [], 5);
-                let performace_works = getTask(item as [], 18);
+                let written_works = getTask(
+                  item as [],
+                  5,
+                  highest_score.written_works?.length - 1,
+                  false
+                );
+                let performace_works = getTask(
+                  item as [],
+                  18,
+                  highest_score.performance_work?.length - 1,
+                  false
+                );
 
                 //gets the data analysis
                 let written_task_details = fluctuation(
@@ -112,12 +123,12 @@ const gettingStarted = (emojis: any) => {
                   performace_tasks_analysis: performace_task_details,
                   highest_posible_score: highest_score,
                 };
-
                 //puts the students locally
                 classroom.push(student_info);
+
+                console.log(student_info);
               }
             });
-
             //set the hooks of the information
             setStudents(classroom);
           }
@@ -220,6 +231,7 @@ const gettingStarted = (emojis: any) => {
           </div>
         </div>
       </div>
+      {JSON.stringify(emojis)}
     </React.Fragment>
   );
 };
