@@ -9,7 +9,6 @@ import { useClassroom } from "../../hooks/useSetClassroom";
 import { Student } from "../../types/Students";
 import { Tab } from "@headlessui/react";
 import { Task } from "../../components/Task";
-
 import Image from "next/image";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -20,70 +19,7 @@ function classNames(...classes: string[]) {
 
 export default function Tasks() {
   const { students } = useClassroom();
-  const [sortingMethod, setSorting] = useState("Name");
-  const { setStudent } = useSelectedStudent();
-  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [open, setIsOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    setFilteredStudents(students!);
-  }, [students]);
-
-  useEffect(() => {
-    const sortedStudents = students?.sort((a, b) => {
-      switch (sortingMethod) {
-        case "Grade Before":
-          return b.grade_before - a.grade_before;
-        case "Name":
-          let fa = a.name.toLowerCase(),
-            fb = b.name.toLowerCase();
-
-          if (fa < fb) {
-            return -1;
-          }
-          if (fa > fb) {
-            return 1;
-          }
-          return 0;
-        case "Grade After":
-        case "Remarks":
-          return b.grade_after - a.grade_after;
-        case "Adjustment Difference":
-          return b.diff - a.diff;
-        default:
-          return 0;
-      }
-    });
-
-    console.log("here: " + sortedStudents);
-
-    setFilteredStudents([
-      ...students!.sort((a, b) => {
-        switch (sortingMethod) {
-          case "Grade Before":
-            return b.grade_before - a.grade_before;
-          case "Name":
-            let fa = a.name.toLowerCase(),
-              fb = b.name.toLowerCase();
-
-            if (fa < fb) {
-              return -1;
-            }
-            if (fa > fb) {
-              return 1;
-            }
-            return 0;
-          case "Grade After":
-          case "Remarks":
-            return b.grade_after - a.grade_after;
-          case "Adjustment Difference":
-            return b.diff - a.diff;
-          default:
-            return 0;
-        }
-      }),
-    ]);
-  }, [sortingMethod]);
 
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   var count = [0, 0, 0, 0, 0];
@@ -124,7 +60,7 @@ export default function Tasks() {
   };
   const [categories] = useState([
     {
-      title: "Overall",
+      title: "Over All",
       value: "Good",
     },
     {
@@ -138,7 +74,7 @@ export default function Tasks() {
   ]);
 
   return (
-    <div className="bg-white max-h-screen"> 
+    <div className="bg-white max-h-screen">
       <Tab.Group>
         <div className="grid grid-cols-3 justify-between mx-10 h-20 ">
           <div className="w-20 h-20 p-1">
@@ -150,41 +86,37 @@ export default function Tasks() {
             />
           </div>
           <Tab.List className="col-span-2 flex justify-end">
-          {categories.map((category) => (
-            <Tab
-              key={category.title}
-              className={({ selected }) =>
-                classNames(
-                  "w-60 text-xl font-bold mx-2",
-                  selected
-                    ? "text-ocean-400 decoration-4 border-b-8 border-ocean-400"
-                    : ""
-                )
-              }
-            >
-            {category.title}
-          </Tab>
-        ))}
-        </Tab.List>
+            {categories.map((category) => (
+              <Tab
+                key={category.title}
+                className={({ selected }) =>
+                  classNames(
+                    "w-60 text-xl font-bold mx-2",
+                    selected
+                      ? "text-ocean-400 decoration-4 border-b-8 border-ocean-400"
+                      : ""
+                  )
+                }
+              >
+                {category.title}
+              </Tab>
+            ))}
+          </Tab.List>
         </div>
-        
+
         <Tab.Panels>
-        {categories.map((category, idx) => (
-          <Tab.Panel key={idx} className="h-[80vh]">
-            <Task
-              open={open}
-              setIsOpen={setIsOpen}
-              category={category.title}
-              assessment={category.value}
-            />
-          </Tab.Panel>
-        ))}
-      </Tab.Panels>
-    </Tab.Group>
-     
-     
-    
+          {categories.map((category, idx) => (
+            <Tab.Panel key={idx} className="h-[80vh]">
+              <Task
+                open={open}
+                setIsOpen={setIsOpen}
+                category={category.title}
+                assessment={category.value}
+              />
+            </Tab.Panel>
+          ))}
+        </Tab.Panels>
+      </Tab.Group>
     </div>
-    
   );
 }

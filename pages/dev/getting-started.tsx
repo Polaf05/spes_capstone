@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { DownloadIcon } from "@heroicons/react/outline";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/router";
+
 import * as XLSX from "xlsx";
 import { useClassroom } from "../../hooks/useSetClassroom";
 import { Student, TaskData, ScoreTotal } from "../../types/Students";
 import { getEmojiList } from "../api/sheets";
 import { getTask } from "../../lib/functions/formatting";
 import { fluctuation } from "../../lib/functions/analysis";
+import Image from "next/image";
+import Link from "next/link";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
@@ -110,6 +110,7 @@ const gettingStarted = (emojis: any) => {
                   performance_weighted_score: item[30],
                   written_tasks_analysis: written_task_details,
                   performace_tasks_analysis: performace_task_details,
+                  highest_posible_score: highest_score,
                 };
 
                 //puts the students locally
