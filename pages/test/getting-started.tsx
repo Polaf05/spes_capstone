@@ -1,126 +1,147 @@
-import React from "react";
-import { UploadIcon, DownloadIcon } from "@heroicons/react/outline";
+import React, { useState } from "react";
+import { DownloadIcon } from "@heroicons/react/outline";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useClassroom } from "../../hooks/useSetClassroom";
 import * as XLSX from "xlsx";
-import { Classroom, Student,  TaskData, ScoreTotal } from "../../types/Students";
+import { useClassroom } from "../../hooks/useSetClassroom";
+import { Student, TaskData, ScoreTotal } from "../../types/Students";
 import { getEmojiList } from "../api/sheets";
-import { classroom } from "googleapis/build/src/apis/classroom";
 import { getTask } from "../../lib/functions/formatting";
 import { fluctuation } from "../../lib/functions/analysis";
 
-const gettingStarted = (emojis:any) => {
+const INITIAL_MESSAGE =
+  "An error message will appear here if there is problem with your file";
+
+const gettingStarted = (emojis: any) => {
   const { students, setStudents } = useClassroom();
-  const router = useRouter();
+  const [fileName, setFileName] = useState(null);
+  const [message, setMessage] = useState<string | null>(INITIAL_MESSAGE);
 
-  const handleFile = async (e: any) => {
+  const handleFile = (e: any) => {
     const [file] = e.target.files;
-    //console.log(file);
-    const reader = new FileReader();
 
-    reader.onload = (evt: any) => {
-      const bstr = evt.target.result;
-      const wb = XLSX.read(bstr, { type: "binary" });
-      const wsname = wb.SheetNames[1];
-      const ws = wb.Sheets[wsname];
+    if (file != null) {
+      const file_name = file.name;
+      if (file_name.match(".xlsx")) {
+        setFileName(file_name);
+        setMessage("File uploaded successfully");
+        const reader = new FileReader();
 
-      const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        reader.onload = (evt: any) => {
+          const bstr = evt.target.result;
+          const wb = XLSX.read(bstr, { type: "binary" });
+          const wsname = wb.SheetNames[1];
+          const ws = wb.Sheets[wsname];
 
-      //check if data is available
-      if(data){
-        
-        //Declaration of Highscores
-        let highest_score = [] as any;
-        
-        //id purpose
-        let i = 0;
+          const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-        //Gender Flag
-        let male = true;
+          //check if data is available
+          if (data) {
+            //Declaration of Highscores
+            let highest_score = [] as any;
 
-        //for hook
-        let classroom: Student[] = [];
-        
-        //formatting
-        data.forEach((item:any, index:number) => {
+            //id purpose
+            let i = 0;
 
-          //change flag when it sees female
-          if(item[1] == "MALE "){
-            male = true;
+            //Gender Flag
+            let male = true;
+
+            //for hook
+            let classroom: Student[] = [];
+
+            //formatting
+            data.forEach((item: any, index: number) => {
+              //change flag when it sees female
+              if (item[1] == "MALE ") {
+                male = true;
+              }
+              if (item[1] == "FEMALE ") {
+                male = false;
+              }
+
+              //statically gets the highest posible score
+              if (index == 9) {
+                //formats the task
+                let total_written_work = getTask(item as [], 5);
+
+                let total_performance_work = getTask(item as [], 18);
+
+                //assignmenets of scoretotal type
+                const score_total: ScoreTotal = {
+                  written_works: total_written_work,
+                  performance_work: total_performance_work,
+                  written_percentage: item[16],
+                  written_weighted_score: item[17],
+                  performance_percentage: item[29],
+                  performance_weighted_score: item[30],
+                };
+                highest_score = score_total;
+              }
+
+              //gets the sstudents names
+              if (item[1] !== 0 && !isNaN(item[0])) {
+                //fomatting task per students
+                let written_works = getTask(item as [], 5);
+                let performace_works = getTask(item as [], 18);
+
+                //gets the data analysis
+                let written_task_details = fluctuation(
+                  written_works as TaskData[]
+                );
+                let performace_task_details = fluctuation(
+                  performace_works as TaskData[]
+                );
+
+                //sets the studenet type for the tables
+                const student_info: Student = {
+                  id: i,
+                  name: item[1],
+                  gender: male ? "MALE" : "FEMALE",
+                  grade_before: item[35],
+                  diff: 0,
+                  grade_after: 0,
+                  remarks: item[4],
+                  written_works: written_works,
+                  performance_tasks: performace_works,
+                  written_percentage: item[16],
+                  written_weighted_score: item[17],
+                  performance_percentage: item[29],
+                  performance_weighted_score: item[30],
+                  written_tasks_analysis: written_task_details,
+                  performace_tasks_analysis: performace_task_details,
+                };
+
+                //puts the students locally
+                classroom.push(student_info);
+              }
+            });
+
+            //set the hooks of the information
+            setStudents(classroom);
           }
-          if(item[1] == "FEMALE "){
-            male = false;
-          }
-          
-          //statically gets the highest posible score
-          if(index == 9)
-          {
-              
-            //formats the task
-            let total_written_work = getTask(item as [], 5);
-            
-            let total_performance_work = getTask(item as [], 18);
+        };
+        reader.readAsBinaryString(file);
+        console.log("file permitted");
+      } else {
+        setFileName(null);
+        if (students) {
+          setStudents(null);
+          localStorage.removeItem("students");
+        }
 
-            //assignmenets of scoretotal type
-            const score_total :ScoreTotal = {
-              written_works: total_written_work,
-              performance_work: total_performance_work,
-              written_percentage: item[16],
-              written_weighted_score: item[17],
-              performance_percentage: item[29],
-              performance_weighted_score: item[30],
-            }
-            highest_score = score_total;
-          }
-
-          //gets the sstudents names
-          if(item[1] !== 0 && !isNaN(item[0])){
-            
-            //fomatting task per students
-            let written_works = getTask(item as [], 5);
-            let performace_works = getTask(item as [], 18);
-            
-            //gets the data analysis
-            let written_task_details = fluctuation(written_works as TaskData[]);
-            let performace_task_details = fluctuation(performace_works as TaskData[]);
-
-            //sets the studenet type for the tables
-            const student_info: Student = {
-                    id: i,
-                    name: item[1],
-                    gender: male ? "MALE" : "FEMALE",
-                    grade_before: item[35],
-                    diff: 0,
-                    grade_after: 0,
-                    remarks: item[4],
-                    written_works: written_works,
-                    performance_tasks: performace_works,
-                    written_percentage: item[16],
-                    written_weighted_score: item[17],
-                    performance_percentage: item[29],
-                    performance_weighted_score: item[30],
-                    written_tasks_analysis:written_task_details,
-                    performace_tasks_analysis: performace_task_details,
-              };
-            
-            //puts the students locally
-            classroom.push(student_info);
-          }
-        })
-        
-        //set the hooks of the information
-        setStudents(classroom);
+        setMessage(
+          "File is incompatible, system only accepts excel files with proper format"
+        );
+        console.log("file denied");
       }
-    };
-    reader.readAsBinaryString(file);
+    }
   };
   return (
     <React.Fragment>
       <div className="bg-[url('/bg-form.jpg')] bg-cover min-h-screen">
         <div className="flex justify-center">
-          <div className="flex flex-row justify-between bg-ocean-100 w-3/5  h-full my-32 rounded-xl p-20">
+          <div className="flex flex-row justify-between bg-ocean-100 w-10/12 border border-black  my-32 rounded-xl p-20 xl:w-3/5">
             <section className="grid justify-items-start w-2/3">
               <h1 className="text-2xl font-bold">Getting Started</h1>
               <section className="m-4">
@@ -134,9 +155,15 @@ const gettingStarted = (emojis:any) => {
                 </p>
               </section>
               <section className="m-4 space-y-4">
-                <h6 className="text-lg font-bold">
-                  Please upload your file here:
-                </h6>
+                {students ? (
+                  <h6 className="text-lg font-bold">
+                    Uploaded File: {fileName}
+                  </h6>
+                ) : (
+                  <h6 className="text-lg font-bold">
+                    Please upload your file here:
+                  </h6>
+                )}
 
                 <form action="">
                   <div>
@@ -176,13 +203,12 @@ const gettingStarted = (emojis:any) => {
                   height={130}
                 />
               </div>
-              <div className="w-3/4 m-8 space-y-12">
-                <h6 className="text-lg font-bold inline-block">
-                  An error message will appear here if there's a problem with
-                  your file
+              <div className="w-full m-8 space-y-12">
+                <h6 className="text-base font-bold whitespace-normal">
+                  {message}
                 </h6>
-                {students && (
-                  <Link href={"/tasks"} passHref>
+                {fileName && (
+                  <Link href={"/dev/tasks"} passHref>
                     <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
                       Continue
                     </button>
@@ -193,12 +219,11 @@ const gettingStarted = (emojis:any) => {
           </div>
         </div>
       </div>
-      {JSON.stringify(emojis)}
     </React.Fragment>
   );
 };
 
-export async function getStaticProps(context : any) {
+export async function getStaticProps(context: any) {
   const emojis = await getEmojiList();
   return {
     props: {
@@ -211,19 +236,19 @@ export default gettingStarted;
 
 //legends lang nakakaalam
 
-      //TOTAL SCORES index [9] 
-      
-      //index 15 -> total scores written
+//TOTAL SCORES index [9]
 
-      //index index 
+//index 15 -> total scores written
 
-      //written task 5 -> 14
+//index index
 
-      //writter percentage ->16
-      // written weighted score -> 17
+//written task 5 -> 14
 
-      // performace task -> 18 -> 27
+//writter percentage ->16
+// written weighted score -> 17
 
-      //performance total -> 28
+// performace task -> 18 -> 27
 
-      //performace percentage -> 29
+//performance total -> 28
+
+//performace percentage -> 29
