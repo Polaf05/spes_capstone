@@ -75,49 +75,53 @@ export default function Tasks() {
   ]);
 
   return (
-    <div className="bg-white max-h-screen">
-      <Tab.Group>
-        <div className="grid grid-cols-3 justify-between mx-10 h-20 ">
-          <div className="w-20 h-20 p-1">
-            <Image
-              src="/logo.png"
-              alt="logo picture"
-              width={100}
-              height={100}
-            />
-          </div>
-          <Tab.List className="col-span-2 flex justify-end">
-            {categories.map((category) => (
-              <Tab
-                key={category.title}
-                className={({ selected }) =>
-                  classNames(
-                    "w-60 text-xl font-bold mx-2",
-                    selected
-                      ? "text-ocean-400 decoration-4 border-b-8 border-ocean-400"
-                      : ""
-                  )
-                }
-              >
-                {category.title}
-              </Tab>
-            ))}
-          </Tab.List>
-        </div>
+    <>
+      {students && (
+        <div className="bg-white max-h-screen">
+          <Tab.Group>
+            <div className="grid grid-cols-3 justify-between mx-10 h-20 ">
+              <div className="w-20 h-20 p-1">
+                <Image
+                  src="/logo.png"
+                  alt="logo picture"
+                  width={100}
+                  height={100}
+                />
+              </div>
+              <Tab.List className="col-span-2 flex justify-end">
+                {categories.map((category) => (
+                  <Tab
+                    key={category.title}
+                    className={({ selected }) =>
+                      classNames(
+                        "w-60 text-xl font-bold mx-2",
+                        selected
+                          ? "text-ocean-400 decoration-4 border-b-8 border-ocean-400"
+                          : ""
+                      )
+                    }
+                  >
+                    {category.title}
+                  </Tab>
+                ))}
+              </Tab.List>
+            </div>
 
-        <Tab.Panels>
-          {categories.map((category, idx) => (
-            <Tab.Panel key={idx} className="h-[80vh]">
-              <Task
-                open={open}
-                setIsOpen={setIsOpen}
-                category={category.title}
-                assessment={category.value}
-              />
-            </Tab.Panel>
-          ))}
-        </Tab.Panels>
-      </Tab.Group>
-    </div>
+            <Tab.Panels>
+              {categories.map((category, idx) => (
+                <Tab.Panel key={idx} className="h-[80vh]">
+                  <Task
+                    open={open}
+                    setIsOpen={setIsOpen}
+                    category={category.title}
+                    assessment={category.value}
+                  />
+                </Tab.Panel>
+              ))}
+            </Tab.Panels>
+          </Tab.Group>
+        </div>
+      )}
+    </>
   );
 }

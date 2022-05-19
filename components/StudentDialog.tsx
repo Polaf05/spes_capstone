@@ -29,6 +29,7 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
+import Link from "next/link";
 
 Chart.register(
   ArcElement,
@@ -235,15 +236,17 @@ const StudentDialog = ({
                   </div>
                 </div>
                 <div className="flex justify-end">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-ocean-100 px-4 py-2 text-base font-medium text-ocean-400 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    onClick={() => {
-                      setIsOpen(false);
-                    }}
-                  >
-                    View Full Details
-                  </button>
+                  <Link href={"/dev/test"} passHref>
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-ocean-100 px-4 py-2 text-base font-medium text-ocean-400 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={() => {
+                        setIsOpen(false);
+                      }}
+                    >
+                      View Full Details
+                    </button>
+                  </Link>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

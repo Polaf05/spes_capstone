@@ -1,14 +1,15 @@
 import React from "react";
 import { Student } from "../types/Students";
 
-const StudentCard = (student_info: any) => {
+const StudentCard = (student: Student) => {
   return (
     <>
-      <div>
+      <div className="">
+        {student.name}
         {
-          <pre>
-            {student_info ? JSON.stringify(student_info, null, 2) : "No data"}
-          </pre>
+          // <pre>
+          //   {student_info ? JSON.stringify(student_info, null, 2) : "No data"}
+          // </pre>
         }
       </div>
     </>
