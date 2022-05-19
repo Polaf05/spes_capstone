@@ -5,6 +5,8 @@ import { useClassroom } from "../hooks/useSetClassroom";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
 import { Student } from "../types/Students";
 import StudentDialog from "./StudentDialog";
+import { useRouter } from "next/router";
+import { GetServerSideProps } from "next";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -13,22 +15,21 @@ export const Task = ({
   assessment,
   open,
   setIsOpen,
+  quarter,
 }: {
   category: string;
   assessment: string;
   setIsOpen: any;
   open: boolean;
+  quarter: number;
 }) => {
-  const { students, setStudents } = useClassroom();
-  console.log(students);
-
+  const { students } = useClassroom();
   const [sortingMethod, setSorting] = useState("Name");
   const { setStudent } = useSelectedStudent();
   const [filteredStudents, setFilteredStudents] = useState<Student[] | null>(
     students!
   );
   const [topStudents, setTopStudents] = useState([] as number[]);
-
   useEffect(() => {
     if (students) {
       setFilteredStudents([
@@ -36,10 +37,13 @@ export const Task = ({
           switch (sortingMethod) {
             case "Grade Before":
               return category === "Over All"
-                ? b.grade_before - a.grade_before
+                ? b.quarter![quarter].grade_before -
+                    a.quarter![quarter].grade_before
                 : category === "Written Works"
-                ? b.written_percentage - a.written_percentage
-                : b.performance_percentage - a.performance_percentage;
+                ? b.quarter![quarter].written_percentage -
+                  a.quarter![quarter].written_percentage
+                : b.quarter![quarter].performance_percentage -
+                  a.quarter![quarter].performance_percentage;
             case "Name":
               let fa = a.name.toLowerCase(),
                 fb = b.name.toLowerCase();
@@ -54,12 +58,15 @@ export const Task = ({
             case "Grade After":
             case "Remarks":
               return category === "Over All"
-                ? b.grade_after - a.grade_after
+                ? b.quarter![quarter].grade_after -
+                    a.quarter![quarter].grade_after
                 : category === "Written Works"
-                ? b.written_percentage - a.written_percentage
-                : b.performance_percentage - a.performance_percentage;
+                ? b.quarter![quarter].written_percentage -
+                  a.quarter![quarter].written_percentage
+                : b.quarter![quarter].performance_percentage -
+                  a.quarter![quarter].performance_percentage;
             case "Adjustment Difference":
-              return b.diff - a.diff;
+              return b.quarter![quarter].diff - a.quarter![quarter].diff;
             default:
               return 0;
           }
@@ -168,28 +175,31 @@ export const Task = ({
             </thead>
             {/* Table Contents */}
             <tbody className="bg-white">
-              {students?.map((student, idx) => (
-                <tr
-                  className="odd:bg-yellow-50 hover:cursor-pointer text-center"
-                  onClick={() => {
-                    setStudent(student);
-                    setIsOpen(true);
-                  }}
-                  key={idx}
-                >
-                  <td className="pl-4 text-left">{student.name}</td>
-                  <td>
-                    {category === "Over All"
-                      ? student.grade_before
-                      : category === "Written Works"
-                      ? student.written_percentage
-                      : student.performance_percentage}
-                  </td>
-                  <td className="text-base">({student.diff})</td>
-                  <td>{student.grade_after}</td>
-                  <td className="pr-4 text-right">{student.remarks}</td>
-                </tr>
-              ))}
+              {students &&
+                students?.map((student, idx) => (
+                  <tr
+                    className="odd:bg-yellow-50 hover:cursor-pointer text-center"
+                    onClick={() => {
+                      setStudent(student);
+                      setIsOpen(true);
+                    }}
+                    key={idx}
+                  >
+                    <td className="pl-4 text-left">{student.name}</td>
+                    <td>
+                      {category === "Over All"
+                        ? student.quarter![quarter].grade_before
+                        : category === "Written Works"
+                        ? student.quarter![quarter].written_percentage
+                        : student.quarter![quarter].performance_percentage}
+                    </td>
+                    <td className="text-base">
+                      ({student.quarter![quarter].diff})
+                    </td>
+                    <td>{student.quarter![quarter].grade_after}</td>
+                    <td className="pr-4 text-right">{student.remarks}</td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -253,6 +263,7 @@ export const Task = ({
       <div className="w-96">
         {
           <StudentDialog
+            quarter={quarter}
             category={category}
             topStudents={topStudents}
             open={open}
