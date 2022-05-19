@@ -36,7 +36,6 @@ export function giveValue(item: any) {
   let similarities: Partial<InferenceDetails> = {};
   let name: String = "";
 
-  console.log(item.wifi);
   if (item.effectivity_implementation == "Not effective") {
     //1
     effect.linguestic = "Not effective";
@@ -183,8 +182,42 @@ export function giveValue(item: any) {
   return surveyData;
 }
 
+export function getEnvironmentalData(row: any, counter: number) {
+  let environment = [];
+
+  for (let i = counter; i <= counter + 8; i++) {
+    if (row[i] == "Greatly Affecting") {
+      environment.push(4);
+    } else if (row[i] == "Affecting") {
+      environment.push(3);
+    } else if (row[i] == "Quite Affecting") {
+      environment.push(2);
+    } else if (row[i] == "Unaffecting at all") {
+      environment.push(1);
+    }
+  }
+
+  return environment;
+}
+
 export function getSurveyResults(survey_list: SurveyResult[], name: string) {
   let survey = survey_list.find((element) => element.name == name);
 
   return survey as SurveyResult;
+}
+
+export function getRemarks(grade_before: number) {
+  if (grade_before < 75) {
+    return "Very poor";
+  } else if (grade_before >= 75 && grade_before <= 80) {
+    return "Poor";
+  } else if (grade_before >= 81 && grade_before <= 85) {
+    return "Average";
+  } else if (grade_before >= 86 && grade_before <= 90) {
+    return "Good";
+  } else if (grade_before >= 91 && grade_before <= 95) {
+    return "Excellent";
+  } else if (grade_before > 95) {
+    return "Outstanding";
+  }
 }

@@ -23,6 +23,7 @@ export interface Student {
   final_grade: number;
   remarks: string;
   survey_result: SurveyResult | null;
+  inference_result: DataInference | null;
 }
 
 export interface Quarter {
@@ -93,9 +94,11 @@ export type EnvironmentFactors = {
   internet: string;
   device: string;
   faculty_readiness: string;
+  value: number[];
 };
 
 export interface DataInference {
+  experience: InferenceDetails;
   internet: InferenceDetails;
   resource: InferenceDetails;
   accessibility: InferenceDetails;
