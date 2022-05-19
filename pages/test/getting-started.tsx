@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import * as XLSX from "xlsx";
 import { useClassroom } from "../../hooks/useSetClassroom";
-import { Student, TaskData, ScoreTotal } from "../../types/Students";
+import { Student, TaskData, ScoreTotal, Quarter } from "../../types/Students";
 import { getEmojiList } from "../api/sheets";
-import { getTask } from "../../lib/functions/formatting";
+import { getSurveyResults, getTask } from "../../lib/functions/formatting";
 import { fluctuation } from "../../lib/functions/analysis";
 
 const INITIAL_MESSAGE =
@@ -17,6 +17,7 @@ const gettingStarted = (emojis: any) => {
   const { students, setStudents } = useClassroom();
   const [fileName, setFileName] = useState(null);
   const [message, setMessage] = useState<string | null>(INITIAL_MESSAGE);
+  const { emojis: surveyResults } = emojis;
 
   const handleFile = (e: any) => {
     const [file] = e.target.files;
@@ -31,107 +32,161 @@ const gettingStarted = (emojis: any) => {
         reader.onload = (evt: any) => {
           const bstr = evt.target.result;
           const wb = XLSX.read(bstr, { type: "binary" });
-          const wsname = wb.SheetNames[1];
-          const ws = wb.Sheets[wsname];
+          const wsname = wb.SheetNames;
 
-          const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+          let classroom: Student[] = [];
 
-          //check if data is available
-          if (data) {
-            //Declaration of Highscores
-            let highest_score: ScoreTotal = [] as any;
+          let students = [] as any;
 
-            //id purpose
-            let i = 0;
+          let quarter = [] as any;
 
-            //Gender Flag
-            let male = true;
+          let finals = [] as any;
 
-            //for hook
-            let classroom: Student[] = [];
+          wsname.map((value, index) => {
+            if (index != wsname.length - 1) {
+              const ws = wb.Sheets[value];
+              const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-            //formatting
-            data.forEach((item: any, index: number) => {
-              //change flag when it sees female
-              if (item[1] == "MALE ") {
-                male = true;
+              if (index == 0) {
+                if (data) {
+                  //id purpose
+                  let i = 0;
+
+                  //Gender Flag
+                  let male = true;
+
+                  data.forEach((item: any) => {
+                    if (item[1] == "MALE ") {
+                      male = true;
+                    }
+                    if (item[1] == "FEMALE ") {
+                      male = false;
+                    }
+
+                    if (item[1] != null && !isNaN(item[0])) {
+                      const student_info = {
+                        id: i,
+                        name: item[1],
+                        gender: male ? "MALE" : "FEMALE",
+                      };
+
+                      students.push(student_info);
+                      i++;
+                    }
+                  });
+                }
+              } else if (index > 0 && index < 5) {
+                if (data) {
+                  let highest_score = [] as any;
+
+                  let quarters = [] as any;
+                  let i = 0;
+
+                  data.forEach((item: any, counter: number) => {
+                    if (counter == 9) {
+                      //formats the task
+                      let total_written_work = getTask(item as [], 5, 9, true);
+
+                      let total_performance_work = getTask(
+                        item as [],
+                        18,
+                        9,
+                        true
+                      );
+
+                      //assignmenets of scoretotal type
+                      const score_total: ScoreTotal = {
+                        written_works: total_written_work,
+                        performance_work: total_performance_work,
+                        written_percentage: item[16],
+                        written_weighted_score: item[17],
+                        performance_percentage: item[29],
+                        performance_weighted_score: item[30],
+                      };
+                      highest_score = score_total;
+                    }
+                    if (item[1] !== 0 && !isNaN(item[0])) {
+                      //fomatting task per students
+                      let written_works = getTask(
+                        item as [],
+                        5,
+                        highest_score.written_works?.length! - 1,
+                        false
+                      );
+                      let performace_works = getTask(
+                        item as [],
+                        18,
+                        highest_score.performance_work?.length! - 1,
+                        false
+                      );
+
+                      //gets the data analysis
+                      let written_task_details = fluctuation(
+                        written_works as TaskData[]
+                      );
+                      let performace_task_details = fluctuation(
+                        performace_works as TaskData[]
+                      );
+
+                      const quarter_grade: Quarter = {
+                        id: i,
+                        grade_before: item[35],
+                        diff: 90 - item[35],
+                        grade_after: 90,
+                        remarks: item[4],
+                        written_works: written_works,
+                        performance_tasks: performace_works,
+                        written_percentage: item[16],
+                        written_weighted_score: item[17],
+                        performance_percentage: item[29],
+                        performance_weighted_score: item[30],
+                        written_tasks_analysis: written_task_details,
+                        performace_tasks_analysis: performace_task_details,
+                        highest_posible_score: highest_score,
+                      };
+                      i++;
+                      quarters.push(quarter_grade);
+                    }
+                  });
+                  quarter.push(quarters);
+                }
+              } else if (index == 5) {
+                let i = 0;
+                data.forEach((item: any, counter: number) => {
+                  if (item[1] !== 0 && !isNaN(item[0])) {
+                    const finalRating = {
+                      id: i,
+                      final_grade: item[21],
+                      remarks: item[25],
+                    };
+                    i++;
+                    finals.push(finalRating);
+                  }
+                });
               }
-              if (item[1] == "FEMALE ") {
-                male = false;
-              }
+            }
+          });
 
-              //statically gets the highest posible score
-              if (index == 9) {
-                //formats the task
-                let total_written_work = getTask(item as [], 5, 9, true);
-                console.log(total_written_work);
-
-                let total_performance_work = getTask(item as [], 18, 9, true);
-
-                //assignmenets of scoretotal type
-                const score_total: ScoreTotal = {
-                  written_works: total_written_work,
-                  performance_work: total_performance_work,
-                  written_percentage: item[16],
-                  written_weighted_score: item[17],
-                  performance_percentage: item[29],
-                  performance_weighted_score: item[30],
-                };
-                highest_score = score_total;
-              }
-
-              //gets the sstudents names
-              if (item[1] !== 0 && !isNaN(item[0])) {
-                //fomatting task per students
-                let written_works = getTask(
-                  item as [],
-                  5,
-                  highest_score.written_works?.length! - 1,
-                  false
-                );
-                let performace_works = getTask(
-                  item as [],
-                  18,
-                  highest_score.performance_work?.length! - 1,
-                  false
-                );
-
-                //gets the data analysis
-                let written_task_details = fluctuation(
-                  written_works as TaskData[]
-                );
-                let performace_task_details = fluctuation(
-                  performace_works as TaskData[]
-                );
-
-                //sets the studenet type for the tables
-                const student_info: Student = {
-                  id: i,
-                  name: item[1],
-                  gender: male ? "MALE" : "FEMALE",
-                  grade_before: item[35],
-                  diff: 0,
-                  grade_after: 0,
-                  remarks: item[4],
-                  written_works: written_works,
-                  performance_tasks: performace_works,
-                  written_percentage: item[16],
-                  written_weighted_score: item[17],
-                  performance_percentage: item[29],
-                  performance_weighted_score: item[30],
-                  written_tasks_analysis: written_task_details,
-                  performace_tasks_analysis: performace_task_details,
-                  highest_posible_score: highest_score,
-                };
-                //puts the students locally
-                classroom.push(student_info);
-
-                console.log(student_info);
-              }
+          students.map((item: any, index: number) => {
+            let quarter_grade: Quarter[] = [];
+            quarter.map((quart: any) => {
+              quarter_grade.push(quart[index]);
             });
-            //set the hooks of the information
-            setStudents(classroom);
-          }
+
+            let survey = getSurveyResults(surveyResults, item.name);
+            const student_info: Student = {
+              id: item.id,
+              name: item.name,
+              gender: item.gender,
+              quarter: quarter_grade,
+              final_grade: finals[index].final_grade,
+              remarks: finals[index].remarks,
+              survey_result: survey,
+            };
+            console.log(student_info);
+            classroom.push(student_info);
+          });
+          setStudents(classroom);
         };
         reader.readAsBinaryString(file);
         console.log("file permitted");
