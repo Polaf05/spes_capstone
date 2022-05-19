@@ -34,6 +34,7 @@ export function giveValue(item: any) {
   let device: Partial<InferenceDetails> = {};
   let effect: Partial<InferenceDetails> = {};
   let similarities: Partial<InferenceDetails> = {};
+  let name: String = "";
 
   if (item.effectivity_implementation == "Not effective") {
     //1
@@ -122,10 +123,46 @@ export function giveValue(item: any) {
     device.value = 13;
   }
 
+  if (item.name.includes(",")) {
+    let nname = "";
+    if (item.name.includes(", ")) {
+      nname = item.name.replace(",", "");
+    } else {
+      nname = item.name.replace(",", " ");
+    }
+
+    nname = nname.replace(/[&\/\\#,+()$~%.'":*?<>{}.]/g, "");
+    nname = nname.replace(/\s+/g, " ").trim();
+    nname = nname.toUpperCase();
+
+    let namesplit = nname.split(" ");
+
+    if (namesplit[namesplit.length - 1].length == 1) {
+      namesplit = namesplit.slice(0, -1);
+    }
+    let fullname = namesplit.join(" ");
+
+    name = fullname;
+  } else {
+    let nname = item.name;
+    nname = nname.replace(/[&\/\\#,+()$~%.'":*?<>{}.]/g, "");
+    nname = nname.replace(/\s+/g, " ").trim();
+    nname = nname.toUpperCase();
+
+    let namesplit = nname.split(" ");
+
+    if (namesplit[namesplit.length - 1].length == 1) {
+      namesplit = namesplit.slice(0, -1);
+    }
+    let fullname = namesplit.join(" ");
+
+    name = fullname;
+  }
+
   const surveyData: SurveyResult = {
     email: item.email,
     mobile: item.mobile,
-    name: item.name,
+    name: name as string,
     gender: item.gender,
     grade: item.grade,
     school: item.school,
@@ -143,4 +180,10 @@ export function giveValue(item: any) {
   };
 
   return surveyData;
+}
+
+export function getSurveyResults(survey_list: SurveyResult[], name: string) {
+  let survey = survey_list.find((element) => element.name == name);
+
+  return survey as SurveyResult;
 }

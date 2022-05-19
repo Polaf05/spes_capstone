@@ -19,6 +19,14 @@ export interface Student {
   id: number;
   name: string;
   gender: string;
+  quarter: Quarter[] | null;
+  final_grade: number;
+  remarks: string;
+  survey_result: SurveyResult | null;
+}
+
+export interface Quarter {
+  id: number;
   grade_before: number;
   grade_after: number;
   remarks: string;
