@@ -54,13 +54,15 @@ export async function getEmojiList() {
             effectivity_implementation: row[9],
             learning_performance_similarities: row[10],
             environment_factors: environment_factors,
-            wifi: row[19],
-            data: row[20],
-            device: row[21],
-            tech_difficulty: row[22],
-            platform: row[23],
-            accessible_usage: row[24],
+            wifi: row[20],
+            data: row[21],
+            device: row[22],
+            tech_difficulty: row[23],
+            platform: row[24],
+            accessible_usage: row[25],
           };
+
+          console.log(survey);
 
           let surveyData = giveValue(survey);
           surveyType.push(surveyData);
