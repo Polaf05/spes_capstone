@@ -36,6 +36,7 @@ export function giveValue(item: any) {
   let similarities: Partial<InferenceDetails> = {};
   let name: String = "";
 
+  console.log(item.wifi);
   if (item.effectivity_implementation == "Not effective") {
     //1
     effect.linguestic = "Not effective";
@@ -56,48 +57,48 @@ export function giveValue(item: any) {
 
   if (item.learning_performance_similarities == "Not Similar") {
     //1
-    similarities.linguestic = "Not Simiar";
+    similarities.linguestic = "Not Similar";
     similarities.value = 1;
   } else if (item.learning_performance_similarities == "Quite Similar") {
     //3
-    similarities.linguestic = "Quite Simiar";
+    similarities.linguestic = "Quite Similar";
     similarities.value = 3;
   } else if (item.learning_performance_similarities == "Similar") {
     //5
-    similarities.linguestic = "Simiar";
+    similarities.linguestic = "Similar";
     similarities.value = 5;
   } else {
     //7
-    similarities.linguestic = "More than Simiar";
+    similarities.linguestic = "More than Similar";
     similarities.value = 7;
   }
 
-  if (item.wifi.includes("excellent")) {
+  if (item.wifi.includes("have an excellent")) {
     //1
     wifi.linguestic = "Good";
-    wifi.value = 1;
-  } else if (item.wifi.includes("slow")) {
+    wifi.value = 5;
+  } else if (item.wifi.includes("slow and sometimes intermittent")) {
     //3
     wifi.linguestic = "Bad";
     wifi.value = 3;
   } else {
     //5
     wifi.linguestic = "No Wifi Connection";
-    wifi.value = 5;
+    wifi.value = 1;
   }
 
-  if (item.data.includes("excellent")) {
+  if (item.data.includes("have an excellent")) {
     //1
     data.linguestic = "Good";
-    data.value = 1;
-  } else if (item.data.includes("slow")) {
+    data.value = 5;
+  } else if (item.data.includes("slow and sometimes intermittent")) {
     //3
     data.linguestic = "Bad";
     data.value = 3;
   } else {
     //5
     data.linguestic = "No Data Connection";
-    data.value = 5;
+    data.value = 1;
   }
 
   if (item.device.includes("don't have")) {
