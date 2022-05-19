@@ -44,7 +44,6 @@ export interface Quarter {
 
 export type Classroom = {
   students: Student[] | null;
-  score_total: ScoreTotal | null;
   setStudents: Dispatch<SetStateAction<Student[] | null>>;
 };
 

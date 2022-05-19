@@ -8,8 +8,10 @@ export const SetClassroomProvider: React.FC = ({ children }) => {
 
   // on load get students
   useEffect(() => {
+    // const students = getInitialState();
+    // setStudents(students);
     const localStudents = localStorage.getItem("students");
-    setStudents(JSON.parse(localStudents!));
+    if (localStudents) setStudents(JSON.parse(localStudents));
   }, []);
 
   // on set student
