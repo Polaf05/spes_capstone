@@ -1,5 +1,9 @@
 import { google } from "googleapis";
-import { giveValue } from "../../lib/functions/formatting";
+import { getEnvironmentData } from "worker_threads";
+import {
+  getEnvironmentalData,
+  giveValue,
+} from "../../lib/functions/formatting";
 import { SurveyResult } from "../../types/Students";
 export async function getEmojiList() {
   try {
@@ -31,6 +35,8 @@ export async function getEmojiList() {
           flag = false;
         }
         if (flag) {
+          let environment_value = getEnvironmentalData(row, 11);
+
           const environment_factors = {
             unwanted_noise: row[11],
             limited_space: row[12],
@@ -40,6 +46,7 @@ export async function getEmojiList() {
             internet: row[16],
             device: row[17],
             faculty_readiness: row[18],
+            value: environment_value,
           };
 
           const survey = {
@@ -61,8 +68,6 @@ export async function getEmojiList() {
             platform: row[24],
             accessible_usage: row[25],
           };
-
-          console.log(survey);
 
           let surveyData = giveValue(survey);
           surveyType.push(surveyData);

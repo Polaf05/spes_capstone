@@ -7,8 +7,13 @@ import * as XLSX from "xlsx";
 import { useClassroom } from "../../hooks/useSetClassroom";
 import { Student, TaskData, ScoreTotal, Quarter } from "../../types/Students";
 import { getEmojiList } from "../api/sheets";
-import { getSurveyResults, getTask } from "../../lib/functions/formatting";
+import {
+  getRemarks,
+  getSurveyResults,
+  getTask,
+} from "../../lib/functions/formatting";
 import { fluctuation } from "../../lib/functions/analysis";
+import { inferenceData } from "../../lib/functions/fuzzyis";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
@@ -128,12 +133,14 @@ const gettingStarted = (emojis: any) => {
                         performace_works as TaskData[]
                       );
 
+                      let remarks = getRemarks(item[35]);
+
                       const quarter_grade: Quarter = {
                         id: i,
                         grade_before: item[35],
                         diff: 90 - item[35],
                         grade_after: 90,
-                        remarks: item[4],
+                        remarks: remarks as string,
                         written_works: written_works,
                         performance_tasks: performace_works,
                         written_percentage: item[16],
@@ -174,6 +181,9 @@ const gettingStarted = (emojis: any) => {
             });
 
             let survey = getSurveyResults(surveyResults, item.name);
+
+            let inference_data = inferenceData(survey);
+
             const student_info: Student = {
               id: item.id,
               name: item.name,
@@ -182,6 +192,7 @@ const gettingStarted = (emojis: any) => {
               final_grade: finals[index].final_grade,
               remarks: finals[index].remarks,
               survey_result: survey,
+              inference_result: inference_data,
             };
             console.log(student_info);
             classroom.push(student_info);
@@ -286,7 +297,6 @@ const gettingStarted = (emojis: any) => {
           </div>
         </div>
       </div>
-      {JSON.stringify(emojis)}
     </React.Fragment>
   );
 };
