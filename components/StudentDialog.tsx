@@ -62,11 +62,13 @@ function classNames(...classes: string[]) {
 }
 
 const StudentDialog = ({
+  quarter,
   category,
   open,
   setIsOpen,
   topStudents,
 }: {
+  quarter: number;
   category: string;
   open: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -76,10 +78,13 @@ const StudentDialog = ({
   let diffArrow, id: number;
   if (student) {
     diffArrow =
-      student.diff > 0 ? "up" : student.diff === 0 ? "neutral" : "down";
+      student.quarter![quarter].diff > 0
+        ? "up"
+        : student.quarter![quarter].diff === 0
+        ? "neutral"
+        : "down";
     id = student.id;
   }
-
   type DataSet = {
     label: string;
     data: number[];
@@ -91,13 +96,13 @@ const StudentDialog = ({
   const labels: string[] = [];
   const scores: number[] = [];
   if (category === "Written Works") {
-    student?.written_works?.forEach((task) => {
+    student?.quarter![quarter].written_works?.forEach((task) => {
       const task_label = "Task " + task.tasked_number.toString();
       labels.push(task_label);
       scores.push(task.score);
     });
   } else if (category === "Performance Task") {
-    student?.performance_tasks?.forEach((task) => {
+    student?.quarter![quarter].performance_tasks?.forEach((task) => {
       labels.push("Task " + task.tasked_number.toString());
     });
   }
@@ -115,9 +120,9 @@ const StudentDialog = ({
 
   const data =
     category === "Written Works"
-      ? student?.written_works
+      ? student?.quarter![quarter].written_works
       : category === "Performance Tasks"
-      ? student?.performance_tasks
+      ? student?.quarter![quarter].performance_tasks
       : null;
 
   return (
@@ -165,7 +170,7 @@ const StudentDialog = ({
                         )}
                       >
                         <h1 className="font-bold text-xl">
-                          {student?.grade_after}
+                          {student?.quarter![quarter].grade_after}
                         </h1>
                       </span>
                       <div className="">
@@ -174,7 +179,8 @@ const StudentDialog = ({
                         </h1>
                         <div className="flex place-items-center">
                           <p className="">
-                            Grade before: {student?.grade_before}
+                            Grade before:{" "}
+                            {student?.quarter![quarter].grade_before}
                           </p>
                           {diffArrow === "up" ? (
                             <ArrowSmUpIcon className="w-5 h-5 text-green-400" />
@@ -192,9 +198,10 @@ const StudentDialog = ({
                         className="flex justify-end text-2xl font-semibold leading-6 text-gray-900 w-full mb-2"
                       >
                         {student?.name}
+                        {student?.id}
                       </Dialog.Title>
                       <div className="flex justify-end font-medium border-b">
-                        Male
+                        {student?.gender}
                       </div>
                     </div>
                   </div>
@@ -203,7 +210,7 @@ const StudentDialog = ({
                       {/* {topStudents.includes(id)
                         ? `Top ${topStudents.indexOf(id) + 1}`
                         : ""} */}
-                      <h4 className="pl-6 font-semibold">Written Works</h4>
+                      <h4 className="pl-6 font-semibold">{category}</h4>
                       <Line
                         data={dataChart}
                         options={{

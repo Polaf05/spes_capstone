@@ -1,16 +1,14 @@
 import { SelectorIcon } from "@heroicons/react/outline";
 import React, { useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
-
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import StudentDialog from "../../components/StudentDialog";
-import { useSelectedStudent } from "../../hooks/useSelectedStudent";
-import { useClassroom } from "../../hooks/useSetClassroom";
-import { Student } from "../../types/Students";
-import { Tab } from "@headlessui/react";
-import { Task } from "../../components/Task";
 import Image from "next/image";
-import CarouselComponent from "../../components/Carousel";
+import { useClassroom } from "../../../hooks/useSetClassroom";
+import { Tab } from "@headlessui/react";
+import { Task } from "../../../components/Task";
+import { useRouter } from "next/router";
+import { stringify } from "querystring";
+import { GetServerSideProps } from "next";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -18,14 +16,24 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Tasks() {
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const { quarter } = query;
+
+  return {
+    props: {
+      quarter: Number(quarter),
+    },
+  };
+};
+
+export default function Tasks({ quarter }: { quarter: number }) {
   const { students } = useClassroom();
+  console.log(students);
   const [open, setIsOpen] = useState<boolean>(false);
 
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   var count = [0, 0, 0, 0, 0];
-  /*
-  students?.forEach((student) => {
+  /* students?.forEach((student) => {
     const grade_before = student.grade_before;
     const grade_after = student.grade_after;
     const diff = grade_after - grade_before;
@@ -42,8 +50,7 @@ export default function Tasks() {
 
     const index = labels.indexOf(remark);
     count[index] += 1;
-  });
-  */
+  });*/
 
   const data = {
     labels: labels,
@@ -113,11 +120,11 @@ export default function Tasks() {
               {categories.map((category, idx) => (
                 <Tab.Panel key={idx} className="h-[80vh]">
                   <Task
-                    quarter={quarter - 1}
                     open={open}
                     setIsOpen={setIsOpen}
                     category={category.title}
                     assessment={category.value}
+                    quarter={quarter - 1}
                   />
                 </Tab.Panel>
               ))}
