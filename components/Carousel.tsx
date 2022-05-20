@@ -14,6 +14,7 @@ const CarouselComponent = () => {
   const { students } = useClassroom();
   const { student, setStudent } = useSelectedStudent();
   const [page, setPage] = useState<string | null>(null);
+
   const [id, setId] = useState<number>(student?.id);
   const [length] = useState<number>(students?.length);
   const router = useRouter();
@@ -25,15 +26,22 @@ const CarouselComponent = () => {
     const localStudent = localStorage.getItem("student");
     if (!localStudent) router.back();
     if (localStudent) setStudent(JSON.parse(localStudent));
+    let i = 0;
+    students?.forEach((s) => {
+      console.log(`[${i}]id:  ${s.id}`);
+      if (s.id === id) setId(i);
+      i += 1;
+    });
   }, []);
 
   useEffect(() => {
     if (student) {
-      console.log(id);
-      const myStudent: any = students?.forEach((student) => {
-        if (student.id === id) return student;
-      });
-      setStudent(myStudent);
+      // console.log(id);
+      // const student: any = students?.forEach((student) => {
+      //   if (student.id === id) return student;
+      // });
+      const student = students![id];
+      setStudent(student);
     }
   }, [id]);
 
@@ -47,11 +55,11 @@ const CarouselComponent = () => {
                 {
                   <button
                     className={classNames(
-                      "grid place-content-center w-16 h-16 rounded-full bg-ocean-200",
+                      "grid place-content-center w-16 h-16 rounded-full bg-ocean-200 opacity-90 hover:opacity-100",
                       student.id === 0 ? "cursor-not-allowed opacity-50" : ""
                     )}
                     onClick={() => {
-                      setId(id - 1);
+                      if (student.id > 0) setId(id - 1);
                     }}
                   >
                     <ChevronLeftIcon className="w-10" />
@@ -63,13 +71,13 @@ const CarouselComponent = () => {
                 {
                   <button
                     className={classNames(
-                      "grid place-content-center w-16 h-16 rounded-full bg-ocean-200",
+                      "grid place-content-center w-16 h-16 rounded-full bg-ocean-200 opacity-90 hover:opacity-100",
                       student.id === length - 1
                         ? "cursor-not-allowed opacity-50"
                         : ""
                     )}
                     onClick={() => {
-                      setId(id + 1);
+                      if (student.id < length - 1) setId(id + 1);
                     }}
                   >
                     <ChevronRightIcon className="w-10" />
