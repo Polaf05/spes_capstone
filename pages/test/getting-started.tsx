@@ -182,7 +182,9 @@ const gettingStarted = (emojis: any) => {
 
             let survey = getSurveyResults(surveyResults, item.name);
 
-            let inference_data = inferenceData(survey);
+            console.log(survey);
+
+            //let inference_data = inferenceData(survey);
 
             const student_info: Student = {
               id: item.id,
@@ -191,8 +193,10 @@ const gettingStarted = (emojis: any) => {
               quarter: quarter_grade,
               final_grade: finals[index].final_grade,
               remarks: finals[index].remarks,
-              survey_result: survey,
-              inference_result: inference_data,
+              survey_result: survey == undefined ? ([] as any) : survey,
+              //inference_result: inference_data,
+              inference_result:
+                survey == undefined ? ([] as any) : inferenceData(survey),
             };
             console.log(student_info);
             classroom.push(student_info);
