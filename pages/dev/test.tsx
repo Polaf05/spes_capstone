@@ -4,7 +4,10 @@ import CarouselComponent from "../../components/Carousel";
 const Test = () => {
   return (
     <>
-      <CarouselComponent />
+      <div className="px-10 h-screen">
+        <div>Student Information</div>
+        <CarouselComponent />
+      </div>
     </>
   );
 };
