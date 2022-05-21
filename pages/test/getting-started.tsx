@@ -11,8 +11,9 @@ import {
   getRemarks,
   getSurveyResults,
   getTask,
+  getWeighted,
 } from "../../lib/functions/formatting";
-import { fluctuation } from "../../lib/functions/analysis";
+import { fluctuation, getRanking } from "../../lib/functions/analysis";
 import { inferenceData } from "../../lib/functions/fuzzyis";
 
 const INITIAL_MESSAGE =
@@ -82,7 +83,7 @@ const gettingStarted = (emojis: any) => {
                 }
               } else if (index > 0 && index < 5) {
                 if (data) {
-                  let highest_score = [] as any;
+                  let highest_score: ScoreTotal;
 
                   let quarters = [] as any;
                   let i = 0;
@@ -90,13 +91,20 @@ const gettingStarted = (emojis: any) => {
                   data.forEach((item: any, counter: number) => {
                     if (counter == 9) {
                       //formats the task
-                      let total_written_work = getTask(item as [], 5, 9, true);
+                      let total_written_work = getTask(
+                        item as [],
+                        5,
+                        9,
+                        true,
+                        data[9] as []
+                      );
 
                       let total_performance_work = getTask(
                         item as [],
                         18,
                         9,
-                        true
+                        true,
+                        data[9] as []
                       );
 
                       //assignmenets of scoretotal type
@@ -116,21 +124,26 @@ const gettingStarted = (emojis: any) => {
                         item as [],
                         5,
                         highest_score.written_works?.length! - 1,
-                        false
+                        false,
+                        data[9] as []
                       );
+
                       let performace_works = getTask(
                         item as [],
                         18,
                         highest_score.performance_work?.length! - 1,
-                        false
+                        false,
+                        data[9] as []
                       );
 
                       //gets the data analysis
                       let written_task_details = fluctuation(
-                        written_works as TaskData[]
+                        written_works as TaskData[],
+                        highest_score.written_works!
                       );
                       let performace_task_details = fluctuation(
-                        performace_works as TaskData[]
+                        performace_works as TaskData[],
+                        highest_score.performance_work!
                       );
 
                       let remarks = getRemarks(item[35]);
@@ -143,13 +156,25 @@ const gettingStarted = (emojis: any) => {
                         remarks: remarks as string,
                         written_works: written_works,
                         performance_tasks: performace_works,
-                        written_percentage: item[16],
-                        written_weighted_score: item[17],
-                        performance_percentage: item[29],
-                        performance_weighted_score: item[30],
+                        written_percentage: getWeighted(
+                          item[16],
+                          highest_score.written_percentage
+                        ),
+                        written_weighted_score: getWeighted(
+                          item[17],
+                          highest_score.performance_weighted_score
+                        ), // 17
+                        performance_percentage: getWeighted(
+                          item[29],
+                          highest_score.performance_percentage
+                        ), // 29
+                        performance_weighted_score: getWeighted(
+                          item[30],
+                          highest_score.performance_weighted_score
+                        ), // 30
                         written_tasks_analysis: written_task_details,
                         performace_tasks_analysis: performace_task_details,
-                        highest_posible_score: highest_score,
+                        ranking: 0,
                       };
                       i++;
                       quarters.push(quarter_grade);
@@ -182,10 +207,6 @@ const gettingStarted = (emojis: any) => {
 
             let survey = getSurveyResults(surveyResults, item.name);
 
-            console.log(survey);
-
-            //let inference_data = inferenceData(survey);
-
             const student_info: Student = {
               id: item.id,
               name: item.name,
@@ -197,11 +218,14 @@ const gettingStarted = (emojis: any) => {
               //inference_result: inference_data,
               inference_result:
                 survey == undefined ? ([] as any) : inferenceData(survey),
+              ranking: null,
             };
             console.log(student_info);
             classroom.push(student_info);
           });
-          setStudents(classroom);
+
+          let class_list = getRanking(classroom);
+          setStudents(class_list);
         };
         reader.readAsBinaryString(file);
         console.log("file permitted");
@@ -290,7 +314,7 @@ const gettingStarted = (emojis: any) => {
                   {message}
                 </h6>
                 {fileName && (
-                  <Link href={"/dev/tasks"} passHref>
+                  <Link href={"/dev/dashboard"} passHref>
                     <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
                       Continue
                     </button>

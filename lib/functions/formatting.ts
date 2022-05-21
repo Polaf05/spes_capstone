@@ -1,11 +1,16 @@
-import { InferenceDetails, SurveyResult } from "../../types/Students";
+import {
+  InferenceDetails,
+  scoreData,
+  SurveyResult,
+} from "../../types/Students";
 
 //function that dynamically formats highest posible score, written task and performance task
 export function getTask(
   item: [],
   counter: number,
   ending: number,
-  flag: boolean
+  flag: boolean,
+  posible: []
 ) {
   let works = [] as any;
 
@@ -13,6 +18,8 @@ export function getTask(
     const written_work = {
       tasked_number: counting - (counter - 1),
       score: item[counting],
+      highest_posible_score: flag ? item[counting] : posible[counting],
+      passing_score: flag ? 0 : Math.floor((posible[counting] / 4) * 3),
     };
     if (flag) {
       if (written_work.score != null) {
@@ -28,6 +35,15 @@ export function getTask(
   return works;
 }
 
+export function getWeighted(score: number, posible: number) {
+  const scores: scoreData = {
+    score: score,
+    highest_posible_score: posible,
+  };
+
+  return scores;
+}
+
 export function giveValue(item: any) {
   let wifi: Partial<InferenceDetails> = {};
   let data: Partial<InferenceDetails> = {};
@@ -38,88 +54,88 @@ export function giveValue(item: any) {
 
   if (item.effectivity_implementation == "Not effective") {
     //1
-    effect.linguestic = "Not effective";
+    effect.linguistic = "Not effective";
     effect.value = 1;
   } else if (item.effectivity_implementation == "Quite effective") {
     //3
-    effect.linguestic = "Quite effective";
+    effect.linguistic = "Quite effective";
     effect.value = 3;
   } else if (item.effectivity_implementation == "Effective") {
     //5
-    effect.linguestic = "Effective";
+    effect.linguistic = "Effective";
     effect.value = 5;
   } else {
     //7
-    effect.linguestic = "Very effective";
+    effect.linguistic = "Very effective";
     effect.value = 7;
   }
 
   if (item.learning_performance_similarities == "Not Similar") {
     //1
-    similarities.linguestic = "Not Similar";
+    similarities.linguistic = "Not Similar";
     similarities.value = 1;
   } else if (item.learning_performance_similarities == "Quite Similar") {
     //3
-    similarities.linguestic = "Quite Similar";
+    similarities.linguistic = "Quite Similar";
     similarities.value = 3;
   } else if (item.learning_performance_similarities == "Similar") {
     //5
-    similarities.linguestic = "Similar";
+    similarities.linguistic = "Similar";
     similarities.value = 5;
   } else {
     //7
-    similarities.linguestic = "More than Similar";
+    similarities.linguistic = "More than Similar";
     similarities.value = 7;
   }
 
   if (item.wifi.includes("have an excellent")) {
     //1
-    wifi.linguestic = "Good";
+    wifi.linguistic = "Good";
     wifi.value = 5;
   } else if (item.wifi.includes("slow and sometimes intermittent")) {
     //3
-    wifi.linguestic = "Bad";
+    wifi.linguistic = "Bad";
     wifi.value = 3;
   } else {
     //5
-    wifi.linguestic = "No Wifi Connection";
+    wifi.linguistic = "No Wifi Connection";
     wifi.value = 1;
   }
 
   if (item.data.includes("have an excellent")) {
     //1
-    data.linguestic = "Good";
+    data.linguistic = "Good";
     data.value = 5;
   } else if (item.data.includes("slow and sometimes intermittent")) {
     //3
-    data.linguestic = "Bad";
+    data.linguistic = "Bad";
     data.value = 3;
   } else {
     //5
-    data.linguestic = "No Data Connection";
+    data.linguistic = "No Data Connection";
     data.value = 1;
   }
 
   if (item.device.includes("don't have")) {
-    device.linguestic = "No Device";
+    device.linguistic = "No Device";
     device.value = 1;
   } else if (item.device.includes("rent")) {
-    device.linguestic = "Renting Device";
+    device.linguistic = "Renting Device";
     device.value = 3;
   } else if (item.device.includes("share")) {
-    device.linguestic = "Shared Device";
+    device.linguistic = "Shared Device";
     device.value = 5;
   } else if (item.device.includes("borrow")) {
-    device.linguestic = "Borrowed Device";
+    device.linguistic = "Borrowed Device";
     device.value = 7;
   } else if (item.device.includes("have a personal tablet")) {
-    device.linguestic = "Have Mobile";
+    device.linguistic = "Have Mobile";
     device.value = 9;
   } else if (item.device.includes("have a personal laptop")) {
-    device.linguestic = "Have Laptop";
+    device.linguistic = "Have Laptop";
     device.value = 11;
   } else {
-    device.linguestic = "Have Both laptop and mobile";
+    device.linguistic = "Have Both laptop and mobile";
     device.value = 13;
   }
 

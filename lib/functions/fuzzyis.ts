@@ -397,22 +397,22 @@ export function environmentalFactors(envVariables: number[]) {
 
   let average = sum / envVariables.length;
 
-  let linguestic = "";
+  let linguistic = "";
 
   if (average >= 1) {
-    linguestic = "very poor";
+    linguistic = "very poor";
   } else if (average > 1 && average <= 2) {
-    linguestic = "poor";
+    linguistic = "poor";
   } else if (average > 2 && average <= 3) {
-    linguestic = "average";
+    linguistic = "average";
   } else if (average > 3 && average <= 4) {
-    linguestic = "good";
+    linguistic = "good";
   } else if (average > 4) {
-    linguestic = "very good";
+    linguistic = "very good";
   }
   const env: InferenceDetails = {
     value: average,
-    linguestic: linguestic,
+    linguistic: linguistic,
   };
 
   return env;
@@ -544,7 +544,7 @@ export function getInferenceValue(inference: number) {
 
   const data: InferenceDetails = {
     value: inference,
-    linguestic: values,
+    linguistic: values,
   };
 
   return data;
