@@ -5,14 +5,22 @@ import { Dispatch, SetStateAction } from "react";
 export type TaskData = {
   tasked_number: number;
   score: number;
+  highest_posible_score: number;
+  passing_score: number;
+};
+
+export type scoreData = {
+  score: number;
+  highest_posible_score: number;
 };
 
 export type TaskAnalysis = {
   fluctuation: number;
   trend: number[];
-  consistency: number;
-  passed: number;
-  questionable: number[];
+  consistency: number[];
+  passed: number[];
+  plunge_task: number[];
+  surge_task: number[];
 };
 
 export interface Student {
@@ -24,6 +32,7 @@ export interface Student {
   remarks: string;
   survey_result: SurveyResult | null;
   inference_result: DataInference | null;
+  ranking: number | null;
 }
 
 export interface Quarter {
@@ -34,13 +43,13 @@ export interface Quarter {
   diff: number;
   written_works: TaskData[] | null;
   performance_tasks: TaskData[] | null;
-  written_percentage: number;
-  written_weighted_score: number;
-  performance_percentage: number;
-  performance_weighted_score: number;
+  written_percentage: scoreData | null;
+  written_weighted_score: scoreData | null;
+  performance_percentage: scoreData | null;
+  performance_weighted_score: scoreData | null;
   written_tasks_analysis: TaskAnalysis | null;
   performace_tasks_analysis: TaskAnalysis | null;
-  highest_posible_score: ScoreTotal;
+  ranking: number | null;
 }
 
 export type Classroom = {
@@ -109,5 +118,5 @@ export interface DataInference {
 
 export type InferenceDetails = {
   value: number;
-  linguestic: string;
+  linguistic: string;
 };
