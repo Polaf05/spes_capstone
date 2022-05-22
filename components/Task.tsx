@@ -40,10 +40,10 @@ export const Task = ({
                 ? b.quarter![quarter].grade_before -
                     a.quarter![quarter].grade_before
                 : category === "Written Works"
-                ? b.quarter![quarter].written_percentage -
-                  a.quarter![quarter].written_percentage
-                : b.quarter![quarter].performance_percentage -
-                  a.quarter![quarter].performance_percentage;
+                ? b.quarter![quarter].written_percentage?.score! -
+                  a.quarter![quarter].written_percentage?.score!
+                : b.quarter![quarter].performance_percentage?.score! -
+                  a.quarter![quarter].performance_percentage?.score!;
             case "Name":
               let fa = a.name.toLowerCase(),
                 fb = b.name.toLowerCase();
@@ -61,10 +61,10 @@ export const Task = ({
                 ? b.quarter![quarter].grade_after -
                     a.quarter![quarter].grade_after
                 : category === "Written Works"
-                ? b.quarter![quarter].written_percentage -
-                  a.quarter![quarter].written_percentage
-                : b.quarter![quarter].performance_percentage -
-                  a.quarter![quarter].performance_percentage;
+                ? b.quarter![quarter].written_percentage?.score! -
+                  a.quarter![quarter].written_percentage?.score!
+                : b.quarter![quarter].performance_percentage?.score! -
+                  a.quarter![quarter].performance_percentage?.score!;
             case "Adjustment Difference":
               return b.quarter![quarter].diff - a.quarter![quarter].diff;
             default:
@@ -190,8 +190,9 @@ export const Task = ({
                       {category === "Over All"
                         ? student.quarter![quarter].grade_before
                         : category === "Written Works"
-                        ? student.quarter![quarter].written_percentage
-                        : student.quarter![quarter].performance_percentage}
+                        ? student.quarter![quarter].written_percentage?.score
+                        : student.quarter![quarter].performance_percentage
+                            ?.score}
                     </td>
                     <td className="text-base">
                       ({student.quarter![quarter].diff})
