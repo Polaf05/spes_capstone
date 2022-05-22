@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import { useSelectedStudent } from "../../../../hooks/useSelectedStudent";
 import {
   Chart,
@@ -81,10 +81,34 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   const { student } = useSelectedStudent();
   const my_student = student?.quarter![quarter - 1]!;
 
-  //get all quarter grades
+  //get all quarter grades and average rank
   const quarter_data: number[] = [];
-  for (let i = 0; i < 4; i++)
+  let sum = 0,
+    ww_sum = 0,
+    pt_sum = 0;
+
+  for (let i = 0; i < 4; i++) {
     quarter_data.push(student?.quarter![i].grade_before!);
+    sum += student?.quarter![i].ranking!;
+    ww_sum += student?.quarter![i].written_percentage?.score!;
+    pt_sum += student?.quarter![i].performance_percentage?.score!;
+  }
+
+  const ave_rank: number = sum / 4;
+  const ave_ww_percentage: number = Number((ww_sum / 4).toFixed(1));
+  const ave_pt_percentage: number = Number((pt_sum / 4).toFixed(1));
+  let better_at: string = "";
+  let margin: number = 0;
+  if (ave_pt_percentage === ave_ww_percentage) {
+    better_at = "good with both Written Works and Performance Tasks";
+  } else if (ave_pt_percentage > ave_ww_percentage) {
+    better_at = "better in Performance Tasks";
+    margin = ave_pt_percentage - ave_ww_percentage;
+  } else {
+    better_at = "better in Written Works";
+    margin = ave_ww_percentage - ave_pt_percentage;
+  }
+
   const quarter_dataset: DataSet[] = [
     {
       label: "Quarter Grade",
@@ -152,6 +176,27 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     ptasks.push(-1);
   }
 
+  const [categories, setCategories] = useState({
+    q1: {
+      title: "Quarter 1",
+      selected: true,
+    },
+    q2: {
+      title: "Quarter 2",
+      selected: false,
+    },
+    q3: {
+      title: "Quarter 3",
+      selected: false,
+    },
+    q4: {
+      title: "Quarter 4",
+      selected: false,
+    },
+  });
+
+  const handleEvent = () => {};
+
   return (
     <>
       {/* Header */}
@@ -173,8 +218,8 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
         </div>
       </div>
       {/* General Section */}
-      <div className="bg-ocean-100 h-[110vh]">
-        <div className="mx-12 py-10">
+      <div className="bg-ocean-100 h-fit">
+        <div className="mx-12 py-8">
           <h3 className="text-justify mb-4">
             Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
             consectetuer adipiscing elit, sed diam nonummy nibh euismod
@@ -201,7 +246,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 <CardInfo
                   className="col-span-4 w-full h-fit px-4 py-2 bg-tallano_gold-100 rounded-l-xl"
                   title={"Written Works"}
-                  value={96}
+                  value={ave_ww_percentage}
                 >
                   <div className="font-light text-[0.8rem]">
                     <h5 className="flex justify-between">
@@ -225,7 +270,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 <CardInfo
                   className="col-span-3 w-full h-fit px-4 py-2 bg-neutral-50 rounded-r-xl"
                   title={"Performance Tasks"}
-                  value={88}
+                  value={ave_pt_percentage}
                 >
                   <div className="text-[0.8rem]">
                     <h5 className="font-semibold">1st</h5>
@@ -255,29 +300,64 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                       <h2 className="border-t-2 border-black font-semibold text-base">
                         Class Rank:
                       </h2>
-                      <h2 className="font-bold text-xl">1</h2>
+                      <h2 className="font-bold text-xl">{quarter.ranking}</h2>
                     </div>
                   </div>
                 ))}
               </div>
               <div className="mt-2">
                 <h6>
-                  Average Grade: <span className="font-bold">89.5</span> ,
-                  Average Rank: <span className="font-bold">2</span>
+                  Average Grade:{" "}
+                  <span className="font-bold">{my_student.grade_before}</span> ,
+                  Average Rank: <span className="font-bold">{ave_rank}</span>
                 </h6>
                 <h6>
-                  Performs better in{" "}
-                  <span className="font-bold">written works</span> with a margin
-                  of +8
+                  Performs {better_at} with a margin of {`(+${margin})`}
                 </h6>
               </div>
             </div>
           </div>
         </div>
-        <div className="mx-12"></div>
+        <div className="flex justify-end">
+          <div
+            className={classNames(
+              "px-12 pt-4 pb-1 text-xl rounded-t-xl",
+              "bg-white",
+              ""
+            )}
+          >
+            Quarter 1
+          </div>
+          {/*               
+          {Object.keys(categories).map((category, idx) => (
+            <div
+              key={idx}
+              className={classNames(
+                "px-12 pt-4 pb-1 text-xl rounded-t-xl",
+                (categories as any)[category].selected ? "bg-white" : ""
+              )}
+            >
+              <button
+                onClick={() => {
+                  setCategories({
+                    ...categories,
+                    [category]: {
+                      title: (categories as any)[category].title,
+                      selected: true,
+                    },
+                    // category.selected: true;
+                  });
+                }}
+              >
+                {(categories as any)[category].title}
+              </button>
+            </div>
+          ))} */}
+        </div>
       </div>
       {/* Quarter Section */}
       <div className="mx-12 my-10 h-[90vh]">
+        <div className=" bg-ocean-100"></div>
         <div className="mb-4 grid grid-cols-3">
           {/* Grade Component 
           <div className="col-span-1 flex justify-end gap-4">
