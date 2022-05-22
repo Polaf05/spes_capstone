@@ -1,4 +1,3 @@
-import { type } from "os";
 import { Dispatch, SetStateAction } from "react";
 
 //TASK DATA, BOTH WRITTEN AND PERFORMANCE
@@ -7,6 +6,8 @@ export type TaskData = {
   score: number;
   highest_posible_score: number;
   passing_score: number;
+  status: string;
+  ranking: number;
 };
 
 export type scoreData = {
@@ -18,7 +19,6 @@ export type TaskAnalysis = {
   fluctuation: number;
   trend: number[];
   consistency: number[];
-  passed: number[];
   plunge_task: number[];
   surge_task: number[];
 };

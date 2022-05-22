@@ -1,3 +1,4 @@
+import { count } from "console";
 import { Student, TaskAnalysis, TaskData } from "../../types/Students";
 
 export function fluctuation(task: TaskData[], posible: TaskData[]) {
@@ -10,7 +11,6 @@ export function fluctuation(task: TaskData[], posible: TaskData[]) {
   let passsing = 7.5;
   let streak = 0;
   let consistency = 0;
-  let passed: number[] = [];
 
   let consistent: number[] = [];
   let temp_consistent: number[] = [];
@@ -39,7 +39,6 @@ export function fluctuation(task: TaskData[], posible: TaskData[]) {
 
     if (percent[i] >= passsing) {
       consistency++;
-      passed.push(i + 1);
       temp_consistent.push(i + 1);
     } else {
       if (consistency > streak) {
@@ -64,7 +63,6 @@ export function fluctuation(task: TaskData[], posible: TaskData[]) {
     fluctuation: fluctuate,
     trend: trend,
     consistency: consistent,
-    passed: passed,
     plunge_task: plunge,
     surge_task: surge,
   };
@@ -72,12 +70,76 @@ export function fluctuation(task: TaskData[], posible: TaskData[]) {
   return taskData;
 }
 
-export function getRanking(classroom: Student[]) {
+export function getRanking(classroom: Student[], task_length: any) {
   let class_list;
   for (let i = 0; i < 4; i++) {
+    for (
+      let counting = 0;
+      counting < task_length[i].written_works.length;
+      counting++
+    ) {
+      class_list = classroom.sort(
+        (a, b) =>
+          b.quarter![i].written_works![counting].score -
+          a.quarter![i].written_works![counting].score
+      );
+
+      let group: any = [];
+      let j = 0;
+      class_list.map((student, index, class_list) => {
+        let points = 0;
+        if (!group[student.quarter![i].written_works![counting].score]) {
+          group[student.quarter![i].written_works![counting].score] = [];
+          j = index + 1;
+          points = j;
+        } else {
+          points = j + 0.5;
+
+          class_list[index - 1].quarter![i].written_works![counting].ranking =
+            points;
+        }
+        group[student.quarter![i].written_works![counting].score].push(student);
+        student.quarter![i].written_works![counting].ranking = points;
+      });
+    }
+
+    for (
+      let counting = 0;
+      counting < task_length[i].performance_work.length;
+      counting++
+    ) {
+      class_list = classroom.sort(
+        (a, b) =>
+          b.quarter![i].performance_tasks![counting].score -
+          a.quarter![i].performance_tasks![counting].score
+      );
+
+      let group: any = [];
+      let j = 0;
+      class_list.map((student, index, class_list) => {
+        let points = 0;
+        if (!group[student.quarter![i].performance_tasks![counting].score]) {
+          group[student.quarter![i].performance_tasks![counting].score] = [];
+          j = index + 1;
+          points = j;
+        } else {
+          points = j + 0.5;
+
+          class_list[index - 1].quarter![i].performance_tasks![
+            counting
+          ].ranking = points;
+        }
+        group[student.quarter![i].performance_tasks![counting].score].push(
+          student
+        );
+        student.quarter![i].performance_tasks![counting].ranking = points;
+      });
+    }
+
     class_list = classroom.sort(
       (a, b) => b.quarter![i].grade_before - a.quarter![i].grade_before
     );
+
     let group: any = [];
     let j = 0;
     class_list.map((student, index, class_list) => {
@@ -115,3 +177,5 @@ export function getRanking(classroom: Student[]) {
 
   return class_list;
 }
+
+export function rank() {}
