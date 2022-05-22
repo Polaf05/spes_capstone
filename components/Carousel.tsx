@@ -48,15 +48,17 @@ const CarouselComponent = () => {
   return (
     <>
       {student && (
-        <div className="h-screen border p-10 ">
+        <div className="h-[80vh]">
           <div className="w-full h-full bg-ocean-100 rounded-3xl">
             <div className="grid grid-cols-12 h-full place-content-center">
-              <div className="col-span-2 boder">
+              <div className="col-span-2">
                 {
                   <button
                     className={classNames(
-                      "grid place-content-center w-16 h-16 rounded-full bg-ocean-200 opacity-90 hover:opacity-100",
-                      student.id === 0 ? "cursor-not-allowed opacity-50" : ""
+                      "grid place-content-center w-16 h-16 rounded-full bg-ocean-200 opacity-90",
+                      student.id === 0
+                        ? "cursor-not-allowed opacity-50"
+                        : " hover:opacity-100"
                     )}
                     onClick={() => {
                       if (student.id > 0) setId(id - 1);
@@ -66,15 +68,18 @@ const CarouselComponent = () => {
                   </button>
                 }
               </div>
-              <div className="col-span-8 border">{student.name}</div>
+              <div className="col-span-8 border">
+                {student.name}
+                <div>{}</div>
+              </div>
               <div className="col-span-2 border flex justify-end">
                 {
                   <button
                     className={classNames(
-                      "grid place-content-center w-16 h-16 rounded-full bg-ocean-200 opacity-90 hover:opacity-100",
+                      "grid place-content-center w-16 h-16 rounded-full bg-ocean-200 opacity-90",
                       student.id === length - 1
                         ? "cursor-not-allowed opacity-50"
-                        : ""
+                        : " hover:opacity-100"
                     )}
                     onClick={() => {
                       if (student.id < length - 1) setId(id + 1);

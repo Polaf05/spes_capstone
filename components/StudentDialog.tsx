@@ -76,6 +76,7 @@ const StudentDialog = ({
 }) => {
   const { student } = useSelectedStudent();
   let diffArrow, id: number;
+
   if (student) {
     diffArrow =
       student.quarter![quarter].diff > 0
@@ -85,6 +86,7 @@ const StudentDialog = ({
         : "down";
     id = student.id;
   }
+
   type DataSet = {
     label: string;
     data: number[];
@@ -92,7 +94,6 @@ const StudentDialog = ({
     backgroundColor: string;
     borderColor: string;
   };
-
   const labels: string[] = [];
   const scores: number[] = [];
   if (category === "Written Works") {
@@ -103,7 +104,9 @@ const StudentDialog = ({
     });
   } else if (category === "Performance Task") {
     student?.quarter![quarter].performance_tasks?.forEach((task) => {
-      labels.push("Task " + task.tasked_number.toString());
+      const task_label = "Task " + task.tasked_number.toString();
+      labels.push(task_label);
+      scores.push(task.score);
     });
   }
   const dataToRender: DataSet = {
@@ -198,7 +201,6 @@ const StudentDialog = ({
                         className="flex justify-end text-2xl font-semibold leading-6 text-gray-900 w-full mb-2"
                       >
                         {student?.name}
-                        {student?.id}
                       </Dialog.Title>
                       <div className="flex justify-end font-medium border-b">
                         {student?.gender}
@@ -243,7 +245,7 @@ const StudentDialog = ({
                   </div>
                 </div>
                 <div className="flex justify-end">
-                  <Link href={"/dev/test"} passHref>
+                  <Link href={`/dev/${quarter + 1}/${student?.id}`} passHref>
                     <button
                       type="button"
                       className="inline-flex justify-center rounded-md border border-transparent bg-ocean-100 px-4 py-2 text-base font-medium text-ocean-400 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
