@@ -20,6 +20,14 @@ export function getTask(
       score: item[counting],
       highest_posible_score: flag ? item[counting] : posible[counting],
       passing_score: flag ? 0 : Math.floor((posible[counting] / 4) * 3),
+      ranking: 0,
+      status: flag
+        ? "NO DATA"
+        : getStatus(
+            item[counting],
+            posible[counting],
+            Math.floor((posible[counting] / 4) * 3)
+          ),
     };
     if (flag) {
       if (written_work.score != null) {
@@ -33,6 +41,26 @@ export function getTask(
   }
 
   return works;
+}
+
+export function getStatus(
+  score: number,
+  highest_posible_score: number,
+  passing_score: number
+) {
+  if (score == highest_posible_score) {
+    return "Perfect";
+  } else if (score >= passing_score) {
+    return "Passed";
+  } else if (score >= passing_score - 2 && score < passing_score) {
+    return "Considerable";
+  } else if (score < passing_score - 2 && score > 0) {
+    return "Failed";
+  } else if (score == 0) {
+    return "Zero";
+  } else {
+    return "??";
+  }
 }
 
 export function getWeighted(score: number, posible: number) {
