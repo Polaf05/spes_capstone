@@ -37,7 +37,7 @@ export interface Student {
 
 export interface DataSet {
   label: string;
-  data: number[];
+  data: any[];
   fill: true;
   backgroundColor: string;
   borderColor: string;

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelectedStudent } from "../../../../hooks/useSelectedStudent";
 import {
   Chart,
@@ -30,11 +30,17 @@ import {
 import { GetServerSideProps } from "next";
 import { Bar, Line } from "react-chartjs-2";
 import { StarIcon } from "@heroicons/react/solid";
-import { CheckCircleIcon, CheckIcon, XIcon } from "@heroicons/react/outline";
+import { CheckIcon, XIcon } from "@heroicons/react/outline";
 import BarChart from "../../../../components/BarChart";
 import { DataSet, Student } from "../../../../types/Students";
 import CardInfo from "../../../../components/CardInfo";
 import { useClassroom } from "../../../../hooks/useSetClassroom";
+import {
+  CircularProgressbar,
+  CircularProgressbarWithChildren,
+  buildStyles,
+} from "react-circular-progressbar";
+import { tasks } from "googleapis/build/src/apis/tasks";
 
 Chart.register(
   ArcElement,
@@ -79,123 +85,189 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   const { students } = useClassroom();
   const { student } = useSelectedStudent();
-  const my_student = student?.quarter![quarter - 1]!;
+  const [myStudent, setMyStudent] = useState(student?.quarter![quarter - 1]!);
+  //set quarter page to render
+  const [quar, setQuar] = useState<number>(quarter - 1);
+  const myquar = ["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"];
 
   //get all quarter grades and average rank
   const quarter_data: number[] = [];
   let sum = 0,
-    ww_sum = 0,
-    pt_sum = 0;
+    ww_qsum = 0,
+    pt_qsum = 0,
+    ww_sum: number[] = [],
+    hps_ww: number[] = [],
+    pt_sum: number[] = [],
+    hps_pt: number[] = [];
 
   for (let i = 0; i < 4; i++) {
     quarter_data.push(student?.quarter![i].grade_before!);
     sum += student?.quarter![i].ranking!;
-    ww_sum += student?.quarter![i].written_percentage?.score!;
-    pt_sum += student?.quarter![i].performance_percentage?.score!;
+    ww_qsum += student?.quarter![i].written_percentage?.score!;
+    pt_qsum += student?.quarter![i].performance_percentage?.score!;
+
+    let w = 0,
+      hw = 0,
+      hp = 0,
+      p = 0;
+    student?.quarter![i].written_works?.map((task) => {
+      w += task.score;
+      hw += task.highest_posible_score;
+    });
+    student?.quarter![i].performance_tasks?.map((task) => {
+      p += task.score;
+      hp += task.highest_posible_score;
+    });
+
+    //score / total score
+    ww_sum.push(w);
+    hps_ww.push(hw);
+    pt_sum.push(p);
+    hps_pt.push(hp);
   }
 
+  const ww_labels: string[] = [];
+  const ww_scores: string[] = [];
+  const pt_labels: string[] = [];
+  const pt_scores: string[] = [];
+
+  // get all passed scores
+  interface TaskDataScores {
+    ww: {
+      score_sum: number;
+      total_item: number;
+      passed: number;
+      total: number;
+      percentage: number;
+    };
+    pt: {
+      score_sum: number;
+      total_item: number;
+      passed: number;
+      total: number;
+      percentage: number;
+    };
+    better_at: string;
+  }
+  // get task data
+  let tdata: TaskDataScores = {
+    ww: {
+      score_sum: ww_sum[quar],
+      total_item: hps_ww[quar],
+      passed: 0,
+      total: myStudent.written_works?.length!,
+      percentage: 0,
+    },
+    pt: {
+      score_sum: pt_sum[quar],
+      total_item: hps_pt[quar],
+      passed: 0,
+      total: myStudent.performance_tasks?.length!,
+      percentage: 0,
+    },
+    better_at: "",
+  };
+
+  myStudent.written_works?.forEach((task) => {
+    const task_label = "Task " + task.tasked_number.toString();
+    ww_labels.push(task_label);
+    ww_scores.push(task.status);
+    tdata.ww.passed += task.status.match(/Passed|Perfect/g) ? 1 : 0;
+  });
+  myStudent.performance_tasks?.forEach((task) => {
+    const task_label = "Task " + task.tasked_number.toString();
+    pt_labels.push(task_label);
+    pt_scores.push(task.status);
+    tdata.pt.passed += task.status.match(/Passed|Perfect/g) ? 1 : 0;
+  });
+
+  // calculate task percentage
+
+  tdata.ww.percentage = Number(
+    ((tdata.ww.score_sum / tdata.ww.total_item) * 100).toFixed(1)
+  );
+  tdata.pt.percentage = Number(
+    ((tdata.pt.score_sum / tdata.pt.total_item) * 100).toFixed(1)
+  );
+  const tdiff = tdata.pt.percentage - tdata.ww.percentage;
+  const feedback: string =
+    tdiff > 2
+      ? ` better at Performance Tasks with a margin of (+${tdiff}).`
+      : tdiff > 0
+      ? ` slightly better at Performance Tasks with a margin of (+${tdiff}).`
+      : tdiff === 0
+      ? ` good at both Written Works and Performance Tasks with a margin of (+${tdiff}).`
+      : tdiff > -1
+      ? ` slightly better at Written Works with a margin of (+${tdiff})`
+      : ` better at Written Tasks with a margin of (+${tdiff * -1})`;
+
   const ave_rank: number = sum / 4;
-  const ave_ww_percentage: number = Number((ww_sum / 4).toFixed(1));
-  const ave_pt_percentage: number = Number((pt_sum / 4).toFixed(1));
+  const ave_ww_60: number = Number((ww_qsum / 4).toFixed(1));
+  const ave_pt_60: number = Number((pt_qsum / 4).toFixed(1));
   let better_at: string = "";
   let margin: number = 0;
-  if (ave_pt_percentage === ave_ww_percentage) {
+  if (ave_pt_60 === ave_ww_60) {
     better_at = "good with both Written Works and Performance Tasks";
-  } else if (ave_pt_percentage > ave_ww_percentage) {
+  } else if (ave_pt_60 > ave_ww_60) {
     better_at = "better in Performance Tasks";
-    margin = ave_pt_percentage - ave_ww_percentage;
+    margin = ave_pt_60 - ave_ww_60;
   } else {
     better_at = "better in Written Works";
-    margin = ave_ww_percentage - ave_pt_percentage;
+    margin = ave_ww_60 - ave_pt_60;
   }
+
+  margin = Number(margin.toFixed(1));
 
   const quarter_dataset: DataSet[] = [
     {
       label: "Quarter Grade",
       data: quarter_data,
       fill: true,
-      backgroundColor: "rgba(75,192,192,0.8)",
-      borderColor: "rgba(75,192,192,1)",
+      backgroundColor: "#FFF598",
+      borderColor: "#FFF598",
     },
     {
       label: "Average Grade",
       data: [80, 85, 82, 80],
       fill: true,
-      backgroundColor: "rgba(128,0,128, 0.2)",
-      borderColor: "rgba(139,0,139,1)",
+      backgroundColor: "#63C7FF",
+      borderColor: "#63C7FF",
     },
   ];
 
   let diffArrow, stud_id: number;
   if (student) {
     diffArrow =
-      my_student.diff > 0 ? "up" : my_student.diff === 0 ? "neutral" : "down";
+      myStudent.diff > 0 ? "up" : myStudent.diff === 0 ? "neutral" : "down";
   }
-
-  const ww_labels: string[] = [];
-  const ww_scores: number[] = [];
-  const pt_labels: string[] = [];
-  const pt_scores: number[] = [];
-
-  my_student.written_works?.forEach((task) => {
-    const task_label = "Task " + task.tasked_number.toString();
-    const score = (task.score / task.highest_posible_score) * 100;
-    ww_labels.push(task_label);
-    ww_scores.push(score);
-  });
-  my_student.performance_tasks?.forEach((task) => {
-    const task_label = "Task " + task.tasked_number.toString();
-    const score = (task.score / task.highest_posible_score) * 100;
-    pt_labels.push(task_label);
-    pt_scores.push(score);
-  });
 
   const dataToRender: DataSet[] = [
     {
       label: "Written Works",
       data: ww_scores,
       fill: true,
-      backgroundColor: "rgba(75,192,192,0.2)",
-      borderColor: "rgba(75,192,192,1)",
+      backgroundColor: "rgba(75,192,192,0)",
+      borderColor: "#FFF598",
     },
     {
       label: "Performance Task",
       data: pt_scores,
       fill: true,
-      backgroundColor: "rgba(128,0,128, 0.2)",
-      borderColor: "rgba(139,0,139,1)",
+      backgroundColor: "rgba(128,0,128, 0)",
+      borderColor: "#63C7FF",
     },
   ];
 
-  const wworks: number[] = ww_scores;
-  const ptasks: number[] = pt_scores;
+  const wworks: string[] = ww_scores;
+  const ptasks: string[] = pt_scores;
   for (let i = wworks.length; i < 10; i++) {
-    wworks.push(-1);
+    wworks.push("no data");
   }
   for (let i = ptasks.length; i < 10; i++) {
-    ptasks.push(-1);
+    ptasks.push("no data");
   }
 
-  const [categories, setCategories] = useState({
-    q1: {
-      title: "Quarter 1",
-      selected: true,
-    },
-    q2: {
-      title: "Quarter 2",
-      selected: false,
-    },
-    q3: {
-      title: "Quarter 3",
-      selected: false,
-    },
-    q4: {
-      title: "Quarter 4",
-      selected: false,
-    },
-  });
-
-  const handleEvent = () => {};
+  const percentage: number = 0;
 
   return (
     <>
@@ -229,7 +301,9 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
             consectetuer adipiscing elit, sed diam nonummy nibh euismod
             tincidunt ut laoreet dolore magna.
           </h3>
-          <h2 className="font-bold text-2xl">Grades:</h2>
+          <h2 className="font-bold text-2xl">
+            Final Grade: {student?.final_grade}
+          </h2>
           {/* Bar Chart */}
           <div className="grid grid-cols-9 h-fit gap-4">
             <div className="col-span-5 bg-neutral-50 p-4 rounded-xl">
@@ -246,7 +320,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 <CardInfo
                   className="col-span-4 w-full h-fit px-4 py-2 bg-tallano_gold-100 rounded-l-xl"
                   title={"Written Works"}
-                  value={ave_ww_percentage}
+                  value={ave_ww_60}
                 >
                   <div className="font-light text-[0.8rem]">
                     <h5 className="flex justify-between">
@@ -258,7 +332,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                       <span className="font-semibold">2nd</span>
                     </h5>
                     <h5 className="flex justify-between">
-                      Surpassed students in percentage:
+                      Surpassed students in 60:
                       <span className="font-semibold">91%</span>
                     </h5>
                     <h5 className="flex justify-between">
@@ -270,7 +344,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 <CardInfo
                   className="col-span-3 w-full h-fit px-4 py-2 bg-neutral-50 rounded-r-xl"
                   title={"Performance Tasks"}
-                  value={ave_pt_percentage}
+                  value={ave_pt_60}
                 >
                   <div className="text-[0.8rem]">
                     <h5 className="font-semibold">1st</h5>
@@ -280,7 +354,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                   </div>
                 </CardInfo>
               </div>
-              <div className="flex h-40 gap-2">
+              <div className="flex justify-center gap-4 h-40 mb-4">
                 {student?.quarter?.map((quarter, idx) => (
                   <div
                     className={classNames(
@@ -305,129 +379,133 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                   </div>
                 ))}
               </div>
-              <div className="mt-2">
-                <h6>
-                  Average Grade:{" "}
-                  <span className="font-bold">{my_student.grade_before}</span> ,
-                  Average Rank: <span className="font-bold">{ave_rank}</span>
-                </h6>
+
+              <div className="text-sm flex justify-between border-t border-neutral-300">
                 <h6>
                   Performs {better_at} with a margin of {`(+${margin})`}
+                </h6>
+                <h6>
+                  Average Rank: <span className="font-bold">{ave_rank}</span>
                 </h6>
               </div>
             </div>
           </div>
         </div>
+        {/* Toggle Quarter */}
         <div className="flex justify-end">
-          <div
-            className={classNames(
-              "px-12 pt-4 pb-1 text-xl rounded-t-xl",
-              "bg-white",
-              ""
-            )}
-          >
-            Quarter 1
-          </div>
-          {/*               
-          {Object.keys(categories).map((category, idx) => (
+          {myquar.map((quarter, idx) => (
             <div
               key={idx}
               className={classNames(
                 "px-12 pt-4 pb-1 text-xl rounded-t-xl",
-                (categories as any)[category].selected ? "bg-white" : ""
+                quar === idx ? "bg-white" : ""
               )}
             >
               <button
                 onClick={() => {
-                  setCategories({
-                    ...categories,
-                    [category]: {
-                      title: (categories as any)[category].title,
-                      selected: true,
-                    },
-                    // category.selected: true;
-                  });
+                  setQuar(idx);
+                  setMyStudent(student?.quarter![idx]!);
                 }}
               >
-                {(categories as any)[category].title}
+                {myquar[idx]}
               </button>
             </div>
-          ))} */}
+          ))}
         </div>
       </div>
       {/* Quarter Section */}
       <div className="mx-12 my-10 h-[90vh]">
-        <div className=" bg-ocean-100"></div>
-        <div className="mb-4 grid grid-cols-3">
-          {/* Grade Component 
-          <div className="col-span-1 flex justify-end gap-4">
-            <div className="flex flex-col place-content-center">
-              <h1 className="text-lg font-semibold">Suggested Grade:</h1>
-              <h3 className="text-base">
-                Grade Before:{" "}
-                <span className="font-bold">{my_student.grade_before}</span>
-              </h3>
-              <div className="flex justify-between">
-                <h3>
-                  Class Ranking: <span className="font-bold">1</span>
+        <div className="h-full">
+          <div className="grid grid-cols-2">
+            <div>
+              <h1 className="font-bold text-2xl">Performance Analysis</h1>
+              <h3>{myquar[quar]} Evaluation</h3>
+            </div>
+            {/* Grade Component */}
+            <div className="col-span-1 flex justify-end gap-4">
+              <div className="flex flex-col place-content-center">
+                <h1 className="text-lg font-semibold">Quarter Grade:</h1>
+                <h3 className="text-base">
+                  Suggested Grade:{" "}
+                  <span className="font-bold">{myStudent.grade_before}</span>
                 </h3>
-                <StarIcon className="h-5" />
+                <div className="flex gap-3">
+                  <h3>
+                    Class Ranking:{" "}
+                    <span className="font-bold">{myStudent.ranking}</span>
+                  </h3>
+                  {myStudent.ranking! <= 4 && (
+                    <StarIcon className="h-5 text-tallano_gold-300" />
+                  )}
+                </div>
+              </div>
+              <div className="grid place-content-center">
+                <div className="grid place-content-center w-28 h-28 rounded-full bg-tallano_gold-200">
+                  <h1 className="font-bold text-3xl">
+                    {myStudent.grade_before}
+                  </h1>
+                </div>
               </div>
             </div>
-            <div className="grid place-content-center">
-              <div className="grid place-content-center w-28 h-28 rounded-full bg-ocean-100">
-                <h1 className="font-bold text-3xl">{my_student.grade_after}</h1>
-              </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4 mx-4 py-6 h-fit">
+            {/* Line Chart */}
+            <div>
+              <Line
+                data={{
+                  labels:
+                    ww_labels.length >= pt_labels.length
+                      ? ww_labels
+                      : pt_labels,
+                  datasets: dataToRender,
+                }}
+                options={{
+                  scales: {
+                    y: { max: 100, min: 0, ticks: { stepSize: 20 } },
+                  },
+                  plugins: {
+                    legend: {
+                      display: true,
+                    },
+                  },
+                }}
+              />
+              <p className="text-sm text-neutral-500">Fluctuation:</p>
             </div>
-          </div> */}
-        </div>
-        {/* <div className="grid grid-cols-9 h-fit gap-4">
-          <div className="col-span-6">
-            <BarChart
-              labels={
-                ww_labels.length >= pt_labels.length ? ww_labels : pt_labels
-              }
-              datasets={dataToRender}
-            />
-            <p className="text-sm text-neutral-500">Fluctuation:</p>
+            {/* Line Chart Assessment */}
+            <div className="h-[45vh] overflow-x-auto px-3">
+              <h5 className="text-justify">
+                Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna.Assessment: Paragraph (Large)
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore
+                magna.Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna.Assessment: Paragraph (Large)
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+              </h5>
+            </div>
           </div>
-          <div className="col-span-3 h-[60vh] overflow-x-auto px-3">
-            <h5 className="text-justify text-lg">
-              Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
-              consectetuer adipiscing elit, sed diam nonummy nibh euismod
-              tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
-              consectetuer adipiscing elit, sed diam nonummy nibh euismod
-              tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
-              consectetuer adipiscing elit, sed diam nonummy nibh euismod
-              tincidunt ut laoreet dolore magna.Assessment: Paragraph (Large)
-              Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
-              nonummy nibh euismod tincidunt ut laoreet dolore magna. Lorem
-              ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
-              nonummy nibh euismod tincidunt ut laoreet dolore magna. Lorem
-              ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
-              nonummy nibh euismod tincidunt ut laoreet dolore magna.Assessment:
-              Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
-              adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-              laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-              adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-              laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-              adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-              laoreet dolore magna.Assessment: Paragraph (Large) Lorem ipsum
-              dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
-              nibh euismod tincidunt ut laoreet dolore magna. Lorem ipsum dolor
-              sit amet, consectetuer adipiscing elit, sed diam nonummy nibh
-              euismod tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit
-              amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod
-              tincidunt ut laoreet dolore magna.
-            </h5>
-          </div>
-        </div> */}
-      </div>
-      <div className=" h-[100vh]">
-        <div className="mx-12 py-12 h-full">
-          <h1 className="font-bold text-2xl">Performance Analysis</h1>
-          <div className="grid grid-cols-2 gap-4 mx-4 py-6 h-full">
-            <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-9 gap-4 mx-4 py-6 h-fit">
+            <div className="col-span-4">
               {/* Best Performance Section */}
               <div className="">
                 <h3 className="text-lg font-semibold">Best Performance</h3>
@@ -453,13 +531,13 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                   <h6>Written Works</h6>
                   <div className="flex gap-2">
                     {wworks.map((task) =>
-                      task === 100 ? (
+                      task === "Perfect" ? (
                         <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
                           <StarIcon className="text-tallano_gold-300" />
                         </div>
-                      ) : task === -1 ? (
+                      ) : task === "no data" ? (
                         <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
-                      ) : task >= 75 ? (
+                      ) : task === "Passed" ? (
                         <div className="w-14 h-14 border-4 rounded-full border-green-300">
                           <CheckIcon className="text-green-300" />
                         </div>
@@ -475,13 +553,13 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                   <h6>Performance Tasks</h6>
                   <div className="flex gap-2">
                     {ptasks.map((task) =>
-                      task === 100 ? (
+                      task === "Perfect" ? (
                         <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
                           <StarIcon className="text-tallano_gold-300" />
                         </div>
-                      ) : task === -1 ? (
+                      ) : task === "no data" ? (
                         <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
-                      ) : task >= 75 ? (
+                      ) : task === "Passed" ? (
                         <div className="w-14 h-14 border-4 rounded-full border-green-300">
                           <CheckIcon className="text-green-300" />
                         </div>
@@ -495,10 +573,76 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 </div>
               </div>
             </div>
-            <div className="border"></div>
+            <div className="col-span-5 grid grid-cols-2 gap-3 p-4">
+              <div>
+                <div className="relative">
+                  <div className="z-40 absolute inset-0 flex justify-center items-center">
+                    <div className="flex flex-col justify-center items-center">
+                      <h2 className="font-bold text-3xl">
+                        {tdata.ww.percentage}%
+                      </h2>
+                      <h3 className="text-lg font-semibold">Written Works</h3>
+                    </div>
+                  </div>
+                  <CircularProgressbar
+                    className="rounded-full z-0"
+                    value={tdata.ww.percentage}
+                    strokeWidth={13}
+                    styles={buildStyles({
+                      pathTransition:
+                        tdata.ww.percentage == 0
+                          ? "none"
+                          : "stroke-dashoffset 0.5s ease 0s",
+                      pathColor: "#FFF598",
+                      trailColor: "#F5F6FA",
+                      strokeLinecap: "round",
+                      rotation: 0.5 + (1 - tdata.ww.percentage / 100) / 2,
+                    })}
+                  />
+                </div>
+                <div>
+                  {tdata.ww.passed} out of {tdata.ww.total} - Scored{" "}
+                  {tdata.ww.score_sum} out of {tdata.ww.total_item}
+                </div>
+              </div>
+              <div>
+                <div className="relative">
+                  <div className="z-40 absolute inset-0 flex justify-center items-center">
+                    <div className="flex flex-col justify-center items-center">
+                      <h2 className="font-bold text-3xl">
+                        {tdata.pt.percentage}%
+                      </h2>
+                      <h3 className="text-lg font-semibold">
+                        Performance Tasks
+                      </h3>
+                    </div>
+                  </div>
+                  <CircularProgressbar
+                    className="rounded-full z-0"
+                    value={tdata.pt.percentage}
+                    strokeWidth={13}
+                    styles={buildStyles({
+                      pathTransition:
+                        tdata.pt.percentage == 0
+                          ? "none"
+                          : "stroke-dashoffset 0.5s ease 0s",
+                      pathColor: "#63C7FF",
+                      trailColor: "#F5F6FA",
+                      strokeLinecap: "round",
+                      rotation: 0.5 + (1 - tdata.pt.percentage / 100) / 2,
+                    })}
+                  />
+                </div>
+                <div>
+                  {tdata.pt.passed} out of {tdata.pt.total} - Scored{" "}
+                  {tdata.pt.score_sum} out of {tdata.pt.total_item}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      <div className="h-[100vh]"></div>
     </>
   );
 };

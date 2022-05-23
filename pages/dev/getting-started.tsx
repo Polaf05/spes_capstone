@@ -48,6 +48,8 @@ const gettingStarted = (emojis: any) => {
 
           let finals = [] as any;
 
+          let task_length = [] as any;
+
           wsname.map((value, index) => {
             if (index != wsname.length - 1) {
               const ws = wb.Sheets[value];
@@ -117,6 +119,7 @@ const gettingStarted = (emojis: any) => {
                         performance_weighted_score: item[30],
                       };
                       highest_score = score_total;
+                      task_length.push(highest_score);
                     }
                     if (item[1] !== 0 && !isNaN(item[0])) {
                       //fomatting task per students
@@ -223,8 +226,8 @@ const gettingStarted = (emojis: any) => {
             console.log(student_info);
             classroom.push(student_info);
           });
-
-          let class_list = getRanking(classroom);
+          let class_list = getRanking(classroom, task_length);
+          console.log(class_list);
           setStudents(class_list);
         };
         reader.readAsBinaryString(file);
@@ -247,7 +250,7 @@ const gettingStarted = (emojis: any) => {
     <React.Fragment>
       <div className="bg-[url('/bg-form.jpg')] bg-cover min-h-screen">
         <div className="flex justify-center">
-          <div className="flex flex-row justify-between bg-ocean-100 w-10/12 border border-black  my-32 rounded-xl p-20 xl:w-3/5">
+          <div className="flex flex-row justify-between bg-ocean-100 w-10/12  my-32 rounded-xl p-20 xl:w-3/5">
             <section className="grid justify-items-start w-2/3">
               <h1 className="text-2xl font-bold">Getting Started</h1>
               <section className="m-4">
