@@ -34,6 +34,7 @@ import { CheckIcon, XIcon } from "@heroicons/react/outline";
 import BarChart from "../../../../components/BarChart";
 import { DataSet, Student } from "../../../../types/Students";
 import CardInfo from "../../../../components/CardInfo";
+import CircularProgress from "../../../../components/CircularProgress";
 import { useClassroom } from "../../../../hooks/useSetClassroom";
 import {
   CircularProgressbar,
@@ -41,6 +42,7 @@ import {
   buildStyles,
 } from "react-circular-progressbar";
 import { tasks } from "googleapis/build/src/apis/tasks";
+import { Router, useRouter } from "next/router";
 
 Chart.register(
   ArcElement,
@@ -82,13 +84,85 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     },
   };
 };
+// methods
+const getIndexOfMaxNumber = (arr: any[]) => arr.indexOf(Math.max(...arr));
+const getIndexOfMinNumber = (arr: any[]) => arr.indexOf(Math.min(...arr));
+const addOrdinal = (n: number) =>
+  `${n}${[, "st", "nd", "rd"][(n % 100 >> 3) ^ 1 && n % 10] || "th"}`;
+const generateFeedback = (option: any, diff: any) => {
+  switch (option) {
+    case "better at":
+      return diff > 2
+        ? ` better at Performance Tasks with a margin of (+${diff}).`
+        : diff > 0
+        ? ` slightly better at Performance Tasks with a margin of (+${diff}).`
+        : diff === 0
+        ? ` good at both Written Works and Performance Tasks with a margin of (+${diff}).`
+        : diff > -1
+        ? ` slightly better at Written Works with a margin of (+${diff})`
+        : ` better at Written Tasks with a margin of (+${diff * -1})`;
+    default:
+      return null;
+  }
+};
+const getTask = (option: any, arr: number[]) => {
+  switch (option) {
+    case "best":
+      return getIndexOfMaxNumber(arr);
+    default:
+      return null;
+  }
+};
+
 const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   const { students } = useClassroom();
-  const { student } = useSelectedStudent();
-  const [myStudent, setMyStudent] = useState(student?.quarter![quarter - 1]!);
+  const { student, setStudent } = useSelectedStudent();
+  const router = useRouter();
   //set quarter page to render
   const [quar, setQuar] = useState<number>(quarter - 1);
   const myquar = ["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"];
+
+  //set data of student for the quarter
+  const [myStudent, setMyStudent] = useState(student?.quarter![quarter - 1]!);
+
+  // TO FIX : REFRESH PAGE
+
+  //set quarter data
+  const quarter_grades = {
+    written_works:
+      // grade pct
+      [
+        student?.quarter![0].written_percentage!.score,
+        student?.quarter![1].written_percentage!.score,
+        student?.quarter![2].written_percentage!.score,
+        student?.quarter![3].written_percentage!.score,
+      ],
+    performance_tasks:
+      //grade pct
+      [
+        student?.quarter![0].performance_percentage!.score,
+        student?.quarter![1].performance_percentage!.score,
+        student?.quarter![2].performance_percentage!.score,
+        student?.quarter![3].performance_percentage!.score,
+      ],
+  };
+
+  // get best quarter - written works
+  const ww_best_quarter = addOrdinal(
+    getIndexOfMaxNumber(quarter_grades.written_works) + 1
+  );
+  // get best quarter - performance tasks
+  const pt_best_quarter = addOrdinal(
+    getIndexOfMaxNumber(quarter_grades.performance_tasks) + 1
+  );
+  // get underperformed quarter - written works
+  const ww_underperformed_quarter = addOrdinal(
+    getIndexOfMinNumber(quarter_grades.written_works) + 1
+  );
+  // get underperformed quarter - performance tasks
+  const pt_underperformed_quarter = addOrdinal(
+    getIndexOfMinNumber(quarter_grades.performance_tasks) + 1
+  );
 
   //get all quarter grades and average rank
   const quarter_data: number[] = [];
@@ -103,19 +177,25 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   for (let i = 0; i < 4; i++) {
     quarter_data.push(student?.quarter![i].grade_before!);
     sum += student?.quarter![i].ranking!;
-    ww_qsum += student?.quarter![i].written_percentage?.score!;
-    pt_qsum += student?.quarter![i].performance_percentage?.score!;
+    let scr = student?.quarter![i].written_percentage?.score!;
+    ww_qsum += scr != undefined ? scr : 0;
+    scr = student?.quarter![i].performance_percentage?.score!;
+    pt_qsum += scr != undefined ? scr : 0;
 
     let w = 0,
       hw = 0,
       hp = 0,
       p = 0;
     student?.quarter![i].written_works?.map((task) => {
-      w += task.score;
+      if (task.score != undefined) {
+        w += task.score;
+      }
       hw += task.highest_posible_score;
     });
     student?.quarter![i].performance_tasks?.map((task) => {
-      p += task.score;
+      if (task.score != undefined) {
+        p += task.score;
+      }
       hp += task.highest_posible_score;
     });
 
@@ -134,6 +214,14 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   // get all passed scores
   interface TaskDataScores {
     ww: {
+      raw_scores: {
+        score: any[];
+        pct: any[];
+        hp: any[];
+      };
+      scores: number[];
+      hp_scores: number[];
+      scores_pct: number[];
       score_sum: number;
       total_item: number;
       passed: number;
@@ -141,6 +229,14 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
       percentage: number;
     };
     pt: {
+      raw_scores: {
+        score: any[];
+        pct: any[];
+        hp: any[];
+      };
+      scores: number[];
+      hp_scores: number[];
+      scores_pct: number[];
       score_sum: number;
       total_item: number;
       passed: number;
@@ -152,6 +248,14 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   // get task data
   let tdata: TaskDataScores = {
     ww: {
+      raw_scores: {
+        score: [],
+        pct: [],
+        hp: [],
+      },
+      scores: [],
+      hp_scores: [],
+      scores_pct: [],
       score_sum: ww_sum[quar],
       total_item: hps_ww[quar],
       passed: 0,
@@ -159,6 +263,14 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
       percentage: 0,
     },
     pt: {
+      raw_scores: {
+        score: [],
+        pct: [],
+        hp: [],
+      },
+      scores: [],
+      hp_scores: [],
+      scores_pct: [],
       score_sum: pt_sum[quar],
       total_item: hps_pt[quar],
       passed: 0,
@@ -172,17 +284,51 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     const task_label = "Task " + task.tasked_number.toString();
     ww_labels.push(task_label);
     ww_scores.push(task.status);
+    const score = task.score;
+    if (score != undefined) {
+      tdata.ww.scores.push(score);
+      tdata.ww.hp_scores.push(task.highest_posible_score);
+      const pct = (score / task.highest_posible_score) * 100;
+      tdata.ww.scores_pct.push(pct);
+      tdata.ww.raw_scores.score.push(score);
+      tdata.ww.raw_scores.pct.push(pct);
+    } else {
+      tdata.ww.raw_scores.score.push(-1);
+      tdata.ww.raw_scores.pct.push(-1);
+    }
+
+    tdata.ww.raw_scores.hp.push(task.highest_posible_score);
     tdata.ww.passed += task.status.match(/Passed|Perfect/g) ? 1 : 0;
   });
+
   myStudent.performance_tasks?.forEach((task) => {
     const task_label = "Task " + task.tasked_number.toString();
     pt_labels.push(task_label);
     pt_scores.push(task.status);
+    const score = task.score;
+    if (score != undefined) {
+      tdata.pt.scores.push(score);
+      tdata.pt.hp_scores.push(task.highest_posible_score);
+      const pct = (score / task.highest_posible_score) * 100;
+
+      tdata.pt.raw_scores.score.push(score);
+      tdata.pt.scores_pct.push(pct);
+      tdata.pt.raw_scores.pct.push(pct);
+    } else {
+      tdata.pt.raw_scores.score.push(-1);
+      tdata.pt.raw_scores.pct.push(-1);
+    }
+    tdata.pt.raw_scores.hp.push(task.highest_posible_score);
     tdata.pt.passed += task.status.match(/Passed|Perfect/g) ? 1 : 0;
   });
 
-  // calculate task percentage
+  // get best written task accomplished
+  let ww_best_task: number | null = getTask("best", tdata.ww.raw_scores.pct);
 
+  //get best performance task accomplished
+  let pt_best_task: number | null = getTask("best", tdata.pt.raw_scores.pct);
+
+  // calculate task percentage
   tdata.ww.percentage = Number(
     ((tdata.ww.score_sum / tdata.ww.total_item) * 100).toFixed(1)
   );
@@ -190,30 +336,24 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     ((tdata.pt.score_sum / tdata.pt.total_item) * 100).toFixed(1)
   );
   const tdiff = tdata.pt.percentage - tdata.ww.percentage;
-  const feedback: string =
-    tdiff > 2
-      ? ` better at Performance Tasks with a margin of (+${tdiff}).`
-      : tdiff > 0
-      ? ` slightly better at Performance Tasks with a margin of (+${tdiff}).`
-      : tdiff === 0
-      ? ` good at both Written Works and Performance Tasks with a margin of (+${tdiff}).`
-      : tdiff > -1
-      ? ` slightly better at Written Works with a margin of (+${tdiff})`
-      : ` better at Written Tasks with a margin of (+${tdiff * -1})`;
+  const feedback: string | null = generateFeedback(
+    "better at",
+    Number(tdiff.toFixed(1))
+  );
 
-  const ave_rank: number = sum / 4;
-  const ave_ww_60: number = Number((ww_qsum / 4).toFixed(1));
-  const ave_pt_60: number = Number((pt_qsum / 4).toFixed(1));
+  const ave_rank: string = (sum / 4).toFixed(2);
+  const ave_ww_pct: number = Number((ww_qsum / 4).toFixed(1));
+  const ave_pt_pct: number = Number((pt_qsum / 4).toFixed(1));
   let better_at: string = "";
   let margin: number = 0;
-  if (ave_pt_60 === ave_ww_60) {
+  if (ave_pt_pct === ave_ww_pct) {
     better_at = "good with both Written Works and Performance Tasks";
-  } else if (ave_pt_60 > ave_ww_60) {
+  } else if (ave_pt_pct > ave_ww_pct) {
     better_at = "better in Performance Tasks";
-    margin = ave_pt_60 - ave_ww_60;
+    margin = ave_pt_pct - ave_ww_pct;
   } else {
     better_at = "better in Written Works";
-    margin = ave_ww_60 - ave_pt_60;
+    margin = ave_ww_pct - ave_pt_pct;
   }
 
   margin = Number(margin.toFixed(1));
@@ -244,14 +384,14 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   const dataToRender: DataSet[] = [
     {
       label: "Written Works",
-      data: ww_scores,
+      data: tdata.ww.raw_scores.pct,
       fill: true,
       backgroundColor: "rgba(75,192,192,0)",
       borderColor: "#FFF598",
     },
     {
       label: "Performance Task",
-      data: pt_scores,
+      data: tdata.pt.raw_scores.pct,
       fill: true,
       backgroundColor: "rgba(128,0,128, 0)",
       borderColor: "#63C7FF",
@@ -320,19 +460,21 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 <CardInfo
                   className="col-span-4 w-full h-fit px-4 py-2 bg-tallano_gold-100 rounded-l-xl"
                   title={"Written Works"}
-                  value={ave_ww_60}
+                  value={ave_ww_pct}
                 >
                   <div className="font-light text-[0.8rem]">
                     <h5 className="flex justify-between">
                       Quarter with highest grade:
-                      <span className="font-semibold">1st</span>
+                      <span className="font-semibold">{ww_best_quarter}</span>
                     </h5>
                     <h5 className="flex justify-between">
                       Quarter with lowest grade:
-                      <span className="font-semibold">2nd</span>
+                      <span className="font-semibold">
+                        {ww_underperformed_quarter}
+                      </span>
                     </h5>
                     <h5 className="flex justify-between">
-                      Surpassed students in 60:
+                      Surpassed students in:
                       <span className="font-semibold">91%</span>
                     </h5>
                     <h5 className="flex justify-between">
@@ -344,11 +486,13 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 <CardInfo
                   className="col-span-3 w-full h-fit px-4 py-2 bg-neutral-50 rounded-r-xl"
                   title={"Performance Tasks"}
-                  value={ave_pt_60}
+                  value={ave_pt_pct}
                 >
                   <div className="text-[0.8rem]">
-                    <h5 className="font-semibold">1st</h5>
-                    <h5 className="font-semibold">2nd</h5>
+                    <h5 className="font-semibold">{pt_best_quarter}</h5>
+                    <h5 className="font-semibold">
+                      {pt_underperformed_quarter}
+                    </h5>
                     <h5 className="font-semibold">91%</h5>
                     <h5 className="font-semibold">2</h5>
                   </div>
@@ -381,9 +525,8 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
               </div>
 
               <div className="text-sm flex justify-between border-t border-neutral-300">
-                <h6>
-                  Performs {better_at} with a margin of {`(+${margin})`}
-                </h6>
+                <h6>Performs {feedback}</h6>
+
                 <h6>
                   Average Rank: <span className="font-bold">{ave_rank}</span>
                 </h6>
@@ -506,51 +649,82 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
           </div>
           <div className="grid grid-cols-9 gap-4 mx-4 py-6 h-fit">
             <div className="col-span-4">
-              {/* Best Performance Section */}
+              {/* Top Performance Section */}
               <div className="">
-                <h3 className="text-lg font-semibold">Best Performance</h3>
+                <h3 className="text-lg font-semibold">Top Performance</h3>
                 <div className="grid grid-cols-2 gap-2 mt-4">
                   <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between">
-                    <h6 className="px-4 ">Written Work 2:</h6>
+                    <h6 className="px-4 ">Written Work {ww_best_task! + 1}:</h6>
                     <div className="flex justify-end">
-                      <h1 className="font-bold text-xl px-6">10/10</h1>
+                      <h1 className="font-bold text-xl px-6">
+                        {tdata.ww.raw_scores.score[ww_best_task!]} /{" "}
+                        {tdata.ww.raw_scores.hp[ww_best_task!]}
+                      </h1>
                     </div>
                   </div>
                   <div className=" h-24 bg-ocean-100 py-2 rounded-3xl flex flex-col justify-between">
-                    <h6 className="px-4">Performance Task 1:</h6>
+                    <h6 className="px-4">
+                      Performance Task {pt_best_task! + 1} :
+                    </h6>
                     <div className="flex justify-end px-6">
-                      <h1 className="font-bold text-xl">18/20</h1>
+                      <h1 className="font-bold text-xl">
+                        {tdata.pt.raw_scores.score[pt_best_task!]} /{" "}
+                        {tdata.pt.raw_scores.hp[pt_best_task!]}
+                      </h1>
                     </div>
                   </div>
                 </div>
               </div>
               {/* Tasks Streak */}
-              <div className="">
-                <h3 className="text-lg font-semibold">Tasks Record</h3>
-                <div>
-                  <h6>Written Works</h6>
+              <div className="mt-4">
+                <div className="border-b-2 pb-3">
+                  <div className="flex justify-between">
+                    <h6>Written Works: </h6>
+                    <h6>
+                      <span className="font-bold">{tdata.ww.passed}</span> of{" "}
+                      <span className="font-bold">{tdata.ww.total}</span> task/s
+                      passed.
+                    </h6>
+                  </div>
                   <div className="flex gap-2">
                     {wworks.map((task) =>
                       task === "Perfect" ? (
                         <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
                           <StarIcon className="text-tallano_gold-300" />
                         </div>
-                      ) : task === "no data" ? (
-                        <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
+                      ) : task === "??" ? (
+                        <div className="flex justify-center items-center w-14 h-14 bg-neutral-50 border-4 rounded-full">
+                          <h1 className="text-sm">No data</h1>
+                        </div>
                       ) : task === "Passed" ? (
                         <div className="w-14 h-14 border-4 rounded-full border-green-300">
                           <CheckIcon className="text-green-300" />
                         </div>
-                      ) : (
+                      ) : task === "Failed" ? (
                         <div className="w-14 h-14 border-4 border-red-300 rounded-full">
                           <XIcon className="text-red-300" />
                         </div>
+                      ) : task === "Considerable" ? (
+                        <div className="flex justify-center items-center w-14 h-14 border-4 border-orange-300 rounded-full">
+                          <h1 className="text-2xl font-bold text-orange-300">
+                            C
+                          </h1>
+                        </div>
+                      ) : (
+                        <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
                       )
                     )}
                   </div>
                 </div>
-                <div>
-                  <h6>Performance Tasks</h6>
+                <div className="mt-3">
+                  <div className="flex justify-between">
+                    <h6>Performance Tasks: </h6>
+                    <h6>
+                      <span className="font-bold">{tdata.pt.passed}</span> of{" "}
+                      <span className="font-bold">{tdata.pt.total}</span> task/s
+                      passed.
+                    </h6>
+                  </div>
                   <div className="flex gap-2">
                     {ptasks.map((task) =>
                       task === "Perfect" ? (
@@ -582,27 +756,16 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                         {tdata.ww.percentage}%
                       </h2>
                       <h3 className="text-lg font-semibold">Written Works</h3>
+                      <p className="text-base">
+                        Scored {tdata.ww.score_sum} out of {tdata.ww.total_item}
+                      </p>
                     </div>
                   </div>
-                  <CircularProgressbar
-                    className="rounded-full z-0"
+                  <CircularProgress
                     value={tdata.ww.percentage}
-                    strokeWidth={13}
-                    styles={buildStyles({
-                      pathTransition:
-                        tdata.ww.percentage == 0
-                          ? "none"
-                          : "stroke-dashoffset 0.5s ease 0s",
-                      pathColor: "#FFF598",
-                      trailColor: "#F5F6FA",
-                      strokeLinecap: "round",
-                      rotation: 0.5 + (1 - tdata.ww.percentage / 100) / 2,
-                    })}
+                    pathColor="#FFF598"
+                    strokeWidth={8}
                   />
-                </div>
-                <div>
-                  {tdata.ww.passed} out of {tdata.ww.total} - Scored{" "}
-                  {tdata.ww.score_sum} out of {tdata.ww.total_item}
                 </div>
               </div>
               <div>
@@ -615,27 +778,16 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                       <h3 className="text-lg font-semibold">
                         Performance Tasks
                       </h3>
+                      <p className="text-base">
+                        Scored {tdata.pt.score_sum} out of {tdata.pt.total_item}
+                      </p>
                     </div>
                   </div>
-                  <CircularProgressbar
-                    className="rounded-full z-0"
+                  <CircularProgress
                     value={tdata.pt.percentage}
-                    strokeWidth={13}
-                    styles={buildStyles({
-                      pathTransition:
-                        tdata.pt.percentage == 0
-                          ? "none"
-                          : "stroke-dashoffset 0.5s ease 0s",
-                      pathColor: "#63C7FF",
-                      trailColor: "#F5F6FA",
-                      strokeLinecap: "round",
-                      rotation: 0.5 + (1 - tdata.pt.percentage / 100) / 2,
-                    })}
+                    pathColor="#63C7FF"
+                    strokeWidth={8}
                   />
-                </div>
-                <div>
-                  {tdata.pt.passed} out of {tdata.pt.total} - Scored{" "}
-                  {tdata.pt.score_sum} out of {tdata.pt.total_item}
                 </div>
               </div>
             </div>
