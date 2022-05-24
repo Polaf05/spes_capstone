@@ -430,7 +430,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
         </div>
       </div>
       {/* General Section */}
-      <div className="bg-ocean-100 h-fit">
+      <div className="bg-ocean-100 h-[110vh] flex flex-col justify-between">
         <div className="mx-12 py-8">
           <h3 className="text-justify mb-4">
             Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
@@ -525,7 +525,9 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
               </div>
 
               <div className="text-sm flex justify-between border-t border-neutral-300">
-                <h6>Performs {feedback}</h6>
+                <h6>
+                  Performs {better_at} with a margin of (+{margin})
+                </h6>
 
                 <h6>
                   Average Rank: <span className="font-bold">{ave_rank}</span>
@@ -747,8 +749,22 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 </div>
               </div>
             </div>
-            <div className="col-span-5 grid grid-cols-2 gap-3 p-4">
-              <div>
+            <div
+              className={classNames("col-span-5 grid grid-cols-10 gap-3 p-4")}
+            >
+              <div
+                className={classNames(
+                  myStudent.written_weighted_score?.highest_posible_score! >
+                    myStudent.performance_weighted_score?.highest_posible_score!
+                    ? "col-span-6"
+                    : myStudent.performance_weighted_score
+                        ?.highest_posible_score! >
+                      myStudent.written_weighted_score?.highest_posible_score!
+                    ? "col-span-4"
+                    : "col-span-5"
+                )}
+              >
+                {/* Written Works Circular Progress */}
                 <div className="relative">
                   <div className="z-40 absolute inset-0 flex justify-center items-center">
                     <div className="flex flex-col justify-center items-center">
@@ -767,8 +783,46 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                     strokeWidth={8}
                   />
                 </div>
+                <div className={"w-40"}>
+                  <div className="relative">
+                    <div className="z-40 absolute inset-0 flex justify-center items-center">
+                      <div className="flex flex-col justify-center items-center">
+                        <h2 className="font-bold text-xl">
+                          {tdata.ww.percentage}%
+                        </h2>
+                        <h3 className="text-[0.8rem] font-semibold">
+                          Surpassed
+                        </h3>
+                        <p className="text-[0.6rem]">
+                          {tdata.ww.score_sum} out of {tdata.ww.total_item}{" "}
+                          students
+                        </p>
+                      </div>
+                    </div>
+                    <CircularProgress
+                      value={tdata.ww.percentage}
+                      pathColor="#FFF598"
+                      strokeWidth={10}
+                    />
+                  </div>
+                </div>
               </div>
-              <div>
+              <div
+                className={classNames(
+                  myStudent.written_weighted_score?.highest_posible_score! >
+                    myStudent.performance_weighted_score?.highest_posible_score!
+                    ? "col-span-4"
+                    : myStudent.performance_weighted_score
+                        ?.highest_posible_score! >
+                      myStudent.written_weighted_score?.highest_posible_score!
+                    ? "col-span-6"
+                    : "col-span-5"
+                )}
+              >
+                <h1>
+                  {myStudent.written_weighted_score?.highest_posible_score!}
+                </h1>
+                {/* Performance Tasks Circular Progress */}
                 <div className="relative">
                   <div className="z-40 absolute inset-0 flex justify-center items-center">
                     <div className="flex flex-col justify-center items-center">
