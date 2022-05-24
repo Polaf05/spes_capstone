@@ -29,7 +29,6 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 export default function Tasks({ quarter }: { quarter: number }) {
   const { students } = useClassroom();
   const [open, setIsOpen] = useState<boolean>(false);
-
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   var count = [0, 0, 0, 0, 0];
   /* students?.forEach((student) => {
