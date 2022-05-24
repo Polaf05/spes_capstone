@@ -1,7 +1,7 @@
 import { count } from "console";
 import { Student, TaskAnalysis, TaskData } from "../../types/Students";
 
-export function fluctuation(task: TaskData[], posible: TaskData[]) {
+export function fluctuation(task: TaskData[], possible: TaskData[]) {
   let trend = [];
   //wala pa akong maisip na ibang logic, antok na ako ehhh hekhek
   let surge = [];
@@ -17,7 +17,7 @@ export function fluctuation(task: TaskData[], posible: TaskData[]) {
   let percent: number[] = [];
 
   for (let i = 0; i < task.length; i++) {
-    let percentage = (task[i].score / posible[i].score) * 10;
+    let percentage = (task[i].score / possible[i].score) * 10;
 
     percent.push(percentage);
   }
@@ -157,13 +157,15 @@ export function getRanking(classroom: Student[], task_length: any) {
       student.quarter![i].ranking = points;
     });
   }
-  class_list = classroom.sort((a, b) => b.final_grade - a.final_grade);
+  class_list = classroom.sort(
+    (a, b) => b.final_grade_before - a.final_grade_after
+  );
   let group: any = [];
   let j = 0;
   class_list.map((student, index, class_list) => {
     let points = 0;
-    if (!group[student.final_grade]) {
-      group[student.final_grade] = [];
+    if (!group[student.final_grade_before]) {
+      group[student.final_grade_before] = [];
       j = index + 1;
       points = j;
     } else {
@@ -171,7 +173,7 @@ export function getRanking(classroom: Student[], task_length: any) {
 
       class_list[index - 1].ranking = points;
     }
-    group[student.final_grade].push(student);
+    group[student.final_grade_before].push(student);
     student.ranking = points;
   });
 

@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction } from "react";
 export type TaskData = {
   tasked_number: number;
   score: number;
-  highest_posible_score: number;
+  highest_possible_score: number;
   passing_score: number;
   status: string;
   ranking: number;
@@ -12,7 +12,7 @@ export type TaskData = {
 
 export type scoreData = {
   score: number;
-  highest_posible_score: number;
+  highest_possible_score: number;
 };
 
 export type TaskAnalysis = {
@@ -28,7 +28,8 @@ export interface Student {
   name: string;
   gender: string;
   quarter: Quarter[] | null;
-  final_grade: number;
+  final_grade_before: number;
+  final_grade_after: number;
   remarks: string;
   survey_result: SurveyResult | null;
   inference_result: DataInference | null;

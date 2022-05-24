@@ -4,13 +4,13 @@ import {
   SurveyResult,
 } from "../../types/Students";
 
-//function that dynamically formats highest posible score, written task and performance task
+//function that dynamically formats highest possible score, written task and performance task
 export function getTask(
   item: [],
   counter: number,
   ending: number,
   flag: boolean,
-  posible: []
+  possible: []
 ) {
   let works = [] as any;
 
@@ -18,15 +18,15 @@ export function getTask(
     const written_work = {
       tasked_number: counting - (counter - 1),
       score: item[counting],
-      highest_posible_score: flag ? item[counting] : posible[counting],
-      passing_score: flag ? 0 : Math.floor((posible[counting] / 4) * 3),
+      highest_possible_score: flag ? item[counting] : possible[counting],
+      passing_score: flag ? 0 : Math.floor((possible[counting] / 4) * 3),
       ranking: 0,
       status: flag
         ? "NO DATA"
         : getStatus(
             item[counting],
-            posible[counting],
-            Math.floor((posible[counting] / 4) * 3)
+            possible[counting],
+            Math.floor((possible[counting] / 4) * 3)
           ),
     };
     if (flag) {
@@ -45,10 +45,10 @@ export function getTask(
 
 export function getStatus(
   score: number,
-  highest_posible_score: number,
+  highest_possible_score: number,
   passing_score: number
 ) {
-  if (score == highest_posible_score) {
+  if (score == highest_possible_score) {
     return "Perfect";
   } else if (score >= passing_score) {
     return "Passed";
@@ -63,10 +63,10 @@ export function getStatus(
   }
 }
 
-export function getWeighted(score: number, posible: number) {
+export function getWeighted(score: number, possible: number) {
   const scores: scoreData = {
     score: score,
-    highest_posible_score: posible,
+    highest_possible_score: possible,
   };
 
   return scores;
@@ -83,88 +83,88 @@ export function giveValue(item: any) {
   if (item.effectivity_implementation == "Not effective") {
     //1
     effect.linguistic = "Not effective";
-    effect.value = 1;
+    effect.value = 0;
   } else if (item.effectivity_implementation == "Quite effective") {
     //3
     effect.linguistic = "Quite effective";
-    effect.value = 3;
+    effect.value = 3.334;
   } else if (item.effectivity_implementation == "Effective") {
     //5
     effect.linguistic = "Effective";
-    effect.value = 5;
+    effect.value = 6.667;
   } else {
     //7
     effect.linguistic = "Very effective";
-    effect.value = 7;
+    effect.value = 10;
   }
 
   if (item.learning_performance_similarities == "Not Similar") {
     //1
     similarities.linguistic = "Not Similar";
-    similarities.value = 1;
+    similarities.value = 0;
   } else if (item.learning_performance_similarities == "Quite Similar") {
     //3
     similarities.linguistic = "Quite Similar";
-    similarities.value = 3;
+    similarities.value = 3.334;
   } else if (item.learning_performance_similarities == "Similar") {
     //5
     similarities.linguistic = "Similar";
-    similarities.value = 5;
+    similarities.value = 6.667;
   } else {
     //7
     similarities.linguistic = "More than Similar";
-    similarities.value = 7;
+    similarities.value = 10;
   }
 
   if (item.wifi.includes("have an excellent")) {
     //1
     wifi.linguistic = "Good";
-    wifi.value = 5;
+    wifi.value = 10;
   } else if (item.wifi.includes("slow and sometimes intermittent")) {
     //3
     wifi.linguistic = "Bad";
-    wifi.value = 3;
+    wifi.value = 5;
   } else {
     //5
     wifi.linguistic = "No Wifi Connection";
-    wifi.value = 1;
+    wifi.value = 0;
   }
 
   if (item.data.includes("have an excellent")) {
     //1
     data.linguistic = "Good";
-    data.value = 5;
+    data.value = 10;
   } else if (item.data.includes("slow and sometimes intermittent")) {
     //3
     data.linguistic = "Bad";
-    data.value = 3;
+    data.value = 5;
   } else {
     //5
     data.linguistic = "No Data Connection";
-    data.value = 1;
+    data.value = 0;
   }
 
   if (item.device.includes("don't have")) {
     device.linguistic = "No Device";
-    device.value = 1;
+    device.value = 0;
   } else if (item.device.includes("rent")) {
     device.linguistic = "Renting Device";
-    device.value = 3;
+    device.value = 2.334;
   } else if (item.device.includes("share")) {
     device.linguistic = "Shared Device";
-    device.value = 5;
+    device.value = 4.666;
   } else if (item.device.includes("borrow")) {
     device.linguistic = "Borrowed Device";
     device.value = 7;
   } else if (item.device.includes("have a personal tablet")) {
     device.linguistic = "Have Mobile";
-    device.value = 9;
+    device.value = 9.334;
   } else if (item.device.includes("have a personal laptop")) {
     device.linguistic = "Have Laptop";
-    device.value = 11;
+    device.value = 11.67;
   } else {
     device.linguistic = "Have Both laptop and mobile";
-    device.value = 13;
+    device.value = 14;
   }
 
   if (item.name.includes(",")) {
@@ -253,15 +253,13 @@ export function getSurveyResults(survey_list: SurveyResult[], name: string) {
 export function getRemarks(grade_before: number) {
   if (grade_before < 75) {
     return "Very poor";
-  } else if (grade_before >= 75 && grade_before <= 80) {
+  } else if (grade_before >= 75 && grade_before <= 82) {
     return "Poor";
-  } else if (grade_before >= 81 && grade_before <= 85) {
+  } else if (grade_before >= 82 && grade_before <= 89) {
     return "Average";
-  } else if (grade_before >= 86 && grade_before <= 90) {
+  } else if (grade_before >= 89 && grade_before <= 96) {
     return "Good";
-  } else if (grade_before >= 91 && grade_before <= 95) {
-    return "Excellent";
-  } else if (grade_before > 95) {
-    return "Outstanding";
+  } else if (grade_before > 96) {
+    return "Very Good";
   }
 }
