@@ -99,14 +99,16 @@ const StudentDialog = ({
   if (category === "Written Works") {
     student?.quarter![quarter].written_works?.forEach((task) => {
       const task_label = "Task " + task.tasked_number.toString();
+      const score = (task.score / task.highest_posible_score) * 100;
       labels.push(task_label);
-      scores.push(task.score);
+      scores.push(score);
     });
-  } else if (category === "Performance Task") {
+  } else if (category === "Performance Tasks") {
     student?.quarter![quarter].performance_tasks?.forEach((task) => {
       const task_label = "Task " + task.tasked_number.toString();
+      const score = (task.score / task.highest_posible_score) * 100;
       labels.push(task_label);
-      scores.push(task.score);
+      scores.push(score);
     });
   }
   const dataToRender: DataSet = {
@@ -217,7 +219,7 @@ const StudentDialog = ({
                         data={dataChart}
                         options={{
                           scales: {
-                            y: { max: 10, min: 0, ticks: { stepSize: 2 } },
+                            y: { max: 100, min: 0, ticks: { stepSize: 20 } },
                           },
                           plugins: {
                             legend: {

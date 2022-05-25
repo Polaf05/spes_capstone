@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelectedStudent } from "../../../../hooks/useSelectedStudent";
 import {
   Chart,
@@ -28,9 +28,21 @@ import {
   Tooltip,
 } from "chart.js";
 import { GetServerSideProps } from "next";
-import { Line } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import { StarIcon } from "@heroicons/react/solid";
-import { CheckCircleIcon, CheckIcon, XIcon } from "@heroicons/react/outline";
+import { CheckIcon, XIcon } from "@heroicons/react/outline";
+import BarChart from "../../../../components/BarChart";
+import { DataSet, Student } from "../../../../types/Students";
+import CardInfo from "../../../../components/CardInfo";
+import CircularProgress from "../../../../components/CircularProgress";
+import { useClassroom } from "../../../../hooks/useSetClassroom";
+import {
+  CircularProgressbar,
+  CircularProgressbarWithChildren,
+  buildStyles,
+} from "react-circular-progressbar";
+import { tasks } from "googleapis/build/src/apis/tasks";
+import { Router, useRouter } from "next/router";
 
 Chart.register(
   ArcElement,
@@ -58,6 +70,10 @@ Chart.register(
   Tooltip
 );
 
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { quarter, id } = query;
   console.log(query);
@@ -68,73 +84,330 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     },
   };
 };
+// methods
+const getIndexOfMaxNumber = (arr: any[]) => arr.indexOf(Math.max(...arr));
+const getIndexOfMinNumber = (arr: any[]) => arr.indexOf(Math.min(...arr));
+const addOrdinal = (n: number) =>
+  `${n}${[, "st", "nd", "rd"][(n % 100 >> 3) ^ 1 && n % 10] || "th"}`;
+const generateFeedback = (option: any, diff: any) => {
+  switch (option) {
+    case "better at":
+      return diff > 2
+        ? ` better at Performance Tasks with a margin of (+${diff}).`
+        : diff > 0
+        ? ` slightly better at Performance Tasks with a margin of (+${diff}).`
+        : diff === 0
+        ? ` good at both Written Works and Performance Tasks with a margin of (+${diff}).`
+        : diff > -1
+        ? ` slightly better at Written Works with a margin of (+${diff})`
+        : ` better at Written Tasks with a margin of (+${diff * -1})`;
+    default:
+      return null;
+  }
+};
+const getTask = (option: any, arr: number[]) => {
+  switch (option) {
+    case "best":
+      return getIndexOfMaxNumber(arr);
+    default:
+      return null;
+  }
+};
 
 const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
-  const { student } = useSelectedStudent();
+  const { students } = useClassroom();
+  const { student, setStudent } = useSelectedStudent();
+  const router = useRouter();
+  //set quarter page to render
+  const [quar, setQuar] = useState<number>(quarter - 1);
+  const myquar = ["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"];
 
-  let diffArrow, stud_id: number;
+  //set data of student for the quarter
+  const [myStudent, setMyStudent] = useState(student?.quarter![quarter - 1]!);
 
-  if (student) {
-    diffArrow =
-      student.quarter![quarter].diff > 0
-        ? "up"
-        : student.quarter![quarter].diff === 0
-        ? "neutral"
-        : "down";
+  // TO FIX : REFRESH PAGE
+
+  //set quarter data
+  const quarter_grades = {
+    written_works:
+      // grade pct
+      [
+        student?.quarter![0].written_percentage!.score,
+        student?.quarter![1].written_percentage!.score,
+        student?.quarter![2].written_percentage!.score,
+        student?.quarter![3].written_percentage!.score,
+      ],
+    performance_tasks:
+      //grade pct
+      [
+        student?.quarter![0].performance_percentage!.score,
+        student?.quarter![1].performance_percentage!.score,
+        student?.quarter![2].performance_percentage!.score,
+        student?.quarter![3].performance_percentage!.score,
+      ],
+  };
+
+  // get best quarter - written works
+  const ww_best_quarter = addOrdinal(
+    getIndexOfMaxNumber(quarter_grades.written_works) + 1
+  );
+  // get best quarter - performance tasks
+  const pt_best_quarter = addOrdinal(
+    getIndexOfMaxNumber(quarter_grades.performance_tasks) + 1
+  );
+  // get underperformed quarter - written works
+  const ww_underperformed_quarter = addOrdinal(
+    getIndexOfMinNumber(quarter_grades.written_works) + 1
+  );
+  // get underperformed quarter - performance tasks
+  const pt_underperformed_quarter = addOrdinal(
+    getIndexOfMinNumber(quarter_grades.performance_tasks) + 1
+  );
+
+  //get all quarter grades and average rank
+  const quarter_data: number[] = [];
+  let sum = 0,
+    ww_qsum = 0,
+    pt_qsum = 0,
+    ww_sum: number[] = [],
+    hps_ww: number[] = [],
+    pt_sum: number[] = [],
+    hps_pt: number[] = [];
+
+  for (let i = 0; i < 4; i++) {
+    quarter_data.push(student?.quarter![i].grade_before!);
+    sum += student?.quarter![i].ranking!;
+    let scr = student?.quarter![i].written_percentage?.score!;
+    ww_qsum += scr != undefined ? scr : 0;
+    scr = student?.quarter![i].performance_percentage?.score!;
+    pt_qsum += scr != undefined ? scr : 0;
+
+    let w = 0,
+      hw = 0,
+      hp = 0,
+      p = 0;
+    student?.quarter![i].written_works?.map((task) => {
+      if (task.score != undefined) {
+        w += task.score;
+      }
+      hw += task.highest_posible_score;
+    });
+    student?.quarter![i].performance_tasks?.map((task) => {
+      if (task.score != undefined) {
+        p += task.score;
+      }
+      hp += task.highest_posible_score;
+    });
+
+    //score / total score
+    ww_sum.push(w);
+    hps_ww.push(hw);
+    pt_sum.push(p);
+    hps_pt.push(hp);
   }
 
-  type DataSet = {
-    label: string;
-    data: number[];
-    fill: true;
-    backgroundColor: string;
-    borderColor: string;
-  };
   const ww_labels: string[] = [];
-  const ww_scores: number[] = [];
+  const ww_scores: string[] = [];
   const pt_labels: string[] = [];
-  const pt_scores: number[] = [];
+  const pt_scores: string[] = [];
 
-  student?.quarter![quarter].written_works?.forEach((task) => {
+  // get all passed scores
+  interface TaskDataScores {
+    ww: {
+      raw_scores: {
+        score: any[];
+        pct: any[];
+        hp: any[];
+      };
+      scores: number[];
+      hp_scores: number[];
+      scores_pct: number[];
+      score_sum: number;
+      total_item: number;
+      passed: number;
+      total: number;
+      percentage: number;
+    };
+    pt: {
+      raw_scores: {
+        score: any[];
+        pct: any[];
+        hp: any[];
+      };
+      scores: number[];
+      hp_scores: number[];
+      scores_pct: number[];
+      score_sum: number;
+      total_item: number;
+      passed: number;
+      total: number;
+      percentage: number;
+    };
+    better_at: string;
+  }
+  // get task data
+  let tdata: TaskDataScores = {
+    ww: {
+      raw_scores: {
+        score: [],
+        pct: [],
+        hp: [],
+      },
+      scores: [],
+      hp_scores: [],
+      scores_pct: [],
+      score_sum: ww_sum[quar],
+      total_item: hps_ww[quar],
+      passed: 0,
+      total: myStudent.written_works?.length!,
+      percentage: 0,
+    },
+    pt: {
+      raw_scores: {
+        score: [],
+        pct: [],
+        hp: [],
+      },
+      scores: [],
+      hp_scores: [],
+      scores_pct: [],
+      score_sum: pt_sum[quar],
+      total_item: hps_pt[quar],
+      passed: 0,
+      total: myStudent.performance_tasks?.length!,
+      percentage: 0,
+    },
+    better_at: "",
+  };
+
+  myStudent.written_works?.forEach((task) => {
     const task_label = "Task " + task.tasked_number.toString();
     ww_labels.push(task_label);
-    ww_scores.push(task.score);
+    ww_scores.push(task.status);
+    const score = task.score;
+    if (score != undefined) {
+      tdata.ww.scores.push(score);
+      tdata.ww.hp_scores.push(task.highest_posible_score);
+      const pct = (score / task.highest_posible_score) * 100;
+      tdata.ww.scores_pct.push(pct);
+      tdata.ww.raw_scores.score.push(score);
+      tdata.ww.raw_scores.pct.push(pct);
+    } else {
+      tdata.ww.raw_scores.score.push(-1);
+      tdata.ww.raw_scores.pct.push(-1);
+    }
+
+    tdata.ww.raw_scores.hp.push(task.highest_posible_score);
+    tdata.ww.passed += task.status.match(/Passed|Perfect/g) ? 1 : 0;
   });
-  student?.quarter![quarter].performance_tasks?.forEach((task) => {
+
+  myStudent.performance_tasks?.forEach((task) => {
     const task_label = "Task " + task.tasked_number.toString();
     pt_labels.push(task_label);
-    pt_scores.push(task.score);
+    pt_scores.push(task.status);
+    const score = task.score;
+    if (score != undefined) {
+      tdata.pt.scores.push(score);
+      tdata.pt.hp_scores.push(task.highest_posible_score);
+      const pct = (score / task.highest_posible_score) * 100;
+
+      tdata.pt.raw_scores.score.push(score);
+      tdata.pt.scores_pct.push(pct);
+      tdata.pt.raw_scores.pct.push(pct);
+    } else {
+      tdata.pt.raw_scores.score.push(-1);
+      tdata.pt.raw_scores.pct.push(-1);
+    }
+    tdata.pt.raw_scores.hp.push(task.highest_posible_score);
+    tdata.pt.passed += task.status.match(/Passed|Perfect/g) ? 1 : 0;
   });
+
+  // get best written task accomplished
+  let ww_best_task: number | null = getTask("best", tdata.ww.raw_scores.pct);
+
+  //get best performance task accomplished
+  let pt_best_task: number | null = getTask("best", tdata.pt.raw_scores.pct);
+
+  // calculate task percentage
+  tdata.ww.percentage = Number(
+    ((tdata.ww.score_sum / tdata.ww.total_item) * 100).toFixed(1)
+  );
+  tdata.pt.percentage = Number(
+    ((tdata.pt.score_sum / tdata.pt.total_item) * 100).toFixed(1)
+  );
+  const tdiff = tdata.pt.percentage - tdata.ww.percentage;
+  const feedback: string | null = generateFeedback(
+    "better at",
+    Number(tdiff.toFixed(1))
+  );
+
+  const ave_rank: string = (sum / 4).toFixed(2);
+  const ave_ww_pct: number = Number((ww_qsum / 4).toFixed(1));
+  const ave_pt_pct: number = Number((pt_qsum / 4).toFixed(1));
+  let better_at: string = "";
+  let margin: number = 0;
+  if (ave_pt_pct === ave_ww_pct) {
+    better_at = "good with both Written Works and Performance Tasks";
+  } else if (ave_pt_pct > ave_ww_pct) {
+    better_at = "better in Performance Tasks";
+    margin = ave_pt_pct - ave_ww_pct;
+  } else {
+    better_at = "better in Written Works";
+    margin = ave_ww_pct - ave_pt_pct;
+  }
+
+  margin = Number(margin.toFixed(1));
+
+  const quarter_dataset: DataSet[] = [
+    {
+      label: "Quarter Grade",
+      data: quarter_data,
+      fill: true,
+      backgroundColor: "#FFF598",
+      borderColor: "#FFF598",
+    },
+    {
+      label: "Average Grade",
+      data: [80, 85, 82, 80],
+      fill: true,
+      backgroundColor: "#63C7FF",
+      borderColor: "#63C7FF",
+    },
+  ];
+
+  let diffArrow, stud_id: number;
+  if (student) {
+    diffArrow =
+      myStudent.diff > 0 ? "up" : myStudent.diff === 0 ? "neutral" : "down";
+  }
 
   const dataToRender: DataSet[] = [
     {
       label: "Written Works",
-      data: ww_scores,
+      data: tdata.ww.raw_scores.pct,
       fill: true,
-      backgroundColor: "rgba(75,192,192,0.2)",
-      borderColor: "rgba(75,192,192,1)",
+      backgroundColor: "rgba(75,192,192,0)",
+      borderColor: "#FFF598",
     },
     {
       label: "Performance Task",
-      data: pt_scores,
+      data: tdata.pt.raw_scores.pct,
       fill: true,
-      backgroundColor: "rgba(128,0,128, 0.2)",
-      borderColor: "rgba(139,0,139,1)",
+      backgroundColor: "rgba(128,0,128, 0)",
+      borderColor: "#63C7FF",
     },
   ];
-  const dataChart = {
-    labels: ww_labels.length > pt_labels.length ? ww_labels : pt_labels,
-    datasets: dataToRender,
-  };
 
-  const wworks = [70, 85, 80, 100, 95];
-  const ptasks = [85, 95, 65];
+  const wworks: string[] = ww_scores;
+  const ptasks: string[] = pt_scores;
   for (let i = wworks.length; i < 10; i++) {
-    wworks.push(-1);
+    wworks.push("no data");
   }
   for (let i = ptasks.length; i < 10; i++) {
-    ptasks.push(-1);
+    ptasks.push("no data");
   }
+
+  const percentage: number = 0;
 
   return (
     <>
@@ -144,149 +417,325 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
           <Image src="/logo.png" alt="logo picture" width={100} height={100} />
         </div>
       </div>
-      {/* General Section */}
-      <div className="mx-12 my-10 h-[90vh]">
-        <div className="mb-4 grid grid-cols-3">
-          <div className="col-span-2">
-            <h1 className=" text-xl">Student Evaluation</h1>
-            <h1 className="font-bold font-poppins text-3xl">{student?.name}</h1>
-            <h6>{student?.gender}</h6>
-          </div>
-          <div className="col-span-1 flex justify-end gap-4">
-            <div className="flex flex-col place-content-center">
-              <h1 className="text-lg font-semibold">Suggested Grade:</h1>
-              <h3 className="text-base">
-                Grade Before:{" "}
-                <span className="font-bold">
-                  {student?.quarter![quarter].grade_before}
-                </span>
-              </h3>
-              <div className="flex justify-between">
-                <h3>
-                  Class Ranking: <span className="font-bold">1</span>
-                </h3>
-                <StarIcon className="h-5" />
-              </div>
-            </div>
-            <div className="grid place-content-center">
-              <div className="grid place-content-center w-28 h-28 rounded-full bg-ocean-100">
-                <h1 className="font-bold text-3xl">
-                  {student?.quarter![quarter].grade_after}
-                </h1>
-              </div>
-            </div>
-          </div>
+      <div className="mx-12 mt-10 mb-4 grid grid-cols-3">
+        <div className="col-span-2">
+          <h1 className=" text-xl">Student Evaluation</h1>
+          <h1 className="font-bold font-poppins text-4xl">{student?.name}</h1>
+          <h6>{student?.gender}</h6>
         </div>
-        <div className="grid grid-cols-9 h-fit gap-4">
-          <div className="col-span-6">
-            <Line
-              className="border-b pb-2"
-              data={dataChart}
-              options={{
-                scales: {
-                  y: { max: 10, min: 0, ticks: { stepSize: 2 } },
-                },
-                plugins: {
-                  legend: {
-                    display: true,
-                    position: "top",
-                  },
-                },
-              }}
-            />
-            <p className="text-sm text-neutral-500">Fluctuation:</p>
-          </div>
-          <div className="col-span-3 h-[60vh] overflow-x-auto px-3">
-            <h5 className="text-justify text-lg">
-              Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
-              consectetuer adipiscing elit, sed diam nonummy nibh euismod
-              tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
-              consectetuer adipiscing elit, sed diam nonummy nibh euismod
-              tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
-              consectetuer adipiscing elit, sed diam nonummy nibh euismod
-              tincidunt ut laoreet dolore magna.Assessment: Paragraph (Large)
-              Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
-              nonummy nibh euismod tincidunt ut laoreet dolore magna. Lorem
-              ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
-              nonummy nibh euismod tincidunt ut laoreet dolore magna. Lorem
-              ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
-              nonummy nibh euismod tincidunt ut laoreet dolore magna.Assessment:
-              Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
-              adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-              laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-              adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-              laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-              adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-              laoreet dolore magna.Assessment: Paragraph (Large) Lorem ipsum
-              dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
-              nibh euismod tincidunt ut laoreet dolore magna. Lorem ipsum dolor
-              sit amet, consectetuer adipiscing elit, sed diam nonummy nibh
-              euismod tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit
-              amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod
-              tincidunt ut laoreet dolore magna.
-            </h5>
-          </div>
+        <div className="flex justify-end place-content-center">
+          <h1 className="font-bold text-tallano_gold-300 text-3xl">
+            {student?.remarks}
+          </h1>
         </div>
       </div>
-      <div className=" h-[100vh]">
-        <div className="mx-12 py-12 h-full">
-          <h1 className="font-bold text-2xl">Performance Analysis</h1>
-          <div className="grid grid-cols-2 gap-4 mx-4 py-6 h-full">
-            <div className="flex flex-col gap-4">
-              {/* Best Performance Section */}
+      {/* General Section */}
+      <div className="bg-ocean-100 h-[110vh] flex flex-col justify-between">
+        <div className="mx-12 py-8">
+          <h3 className="text-justify mb-4">
+            Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
+            consectetuer adipiscing elit, sed diam nonummy nibh euismod
+            tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+            consectetuer adipiscing elit, sed diam nonummy nibh euismod
+            tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+            consectetuer adipiscing elit, sed diam nonummy nibh euismod
+            tincidunt ut laoreet dolore magna.
+          </h3>
+          <h2 className="font-bold text-2xl">
+            Final Grade: {student?.final_grade}
+          </h2>
+          {/* Bar Chart */}
+          <div className="grid grid-cols-9 h-fit gap-4">
+            <div className="col-span-5 bg-neutral-50 p-4 rounded-xl">
+              <BarChart
+                labels={["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"]}
+                datasets={quarter_dataset}
+              />
+              <p className="text-sm text-neutral-500">Fluctuation:</p>
+            </div>
+            {/* Overall Performance Assessment */}
+            <div className="col-span-4 h-[65vh] overflow-x-auto px-3">
+              <h2 className="text-xl font-bold">Overall Performance:</h2>
+              <div className="grid grid-cols-7 mb-4">
+                <CardInfo
+                  className="col-span-4 w-full h-fit px-4 py-2 bg-tallano_gold-100 rounded-l-xl"
+                  title={"Written Works"}
+                  value={ave_ww_pct}
+                >
+                  <div className="font-light text-[0.8rem]">
+                    <h5 className="flex justify-between">
+                      Quarter with highest grade:
+                      <span className="font-semibold">{ww_best_quarter}</span>
+                    </h5>
+                    <h5 className="flex justify-between">
+                      Quarter with lowest grade:
+                      <span className="font-semibold">
+                        {ww_underperformed_quarter}
+                      </span>
+                    </h5>
+                    <h5 className="flex justify-between">
+                      Surpassed students in:
+                      <span className="font-semibold">91%</span>
+                    </h5>
+                    <h5 className="flex justify-between">
+                      Average Rank:
+                      <span className="font-semibold">2</span>
+                    </h5>
+                  </div>
+                </CardInfo>
+                <CardInfo
+                  className="col-span-3 w-full h-fit px-4 py-2 bg-neutral-50 rounded-r-xl"
+                  title={"Performance Tasks"}
+                  value={ave_pt_pct}
+                >
+                  <div className="text-[0.8rem]">
+                    <h5 className="font-semibold">{pt_best_quarter}</h5>
+                    <h5 className="font-semibold">
+                      {pt_underperformed_quarter}
+                    </h5>
+                    <h5 className="font-semibold">91%</h5>
+                    <h5 className="font-semibold">2</h5>
+                  </div>
+                </CardInfo>
+              </div>
+              <div className="flex justify-center gap-4 h-40 mb-4">
+                {student?.quarter?.map((quarter, idx) => (
+                  <div
+                    className={classNames(
+                      "w-28 h-full rounded-2xl border-4",
+                      quarter.grade_before >= 75
+                        ? "bg-green-100 border-green-300"
+                        : "bg-red-100 border-red-300"
+                    )}
+                  >
+                    <p className="font-bold text-[0.7rem] pt-1 px-2 italic">
+                      Quarter {idx + 1}
+                    </p>
+                    <div className="w-full grid place-items-center">
+                      <h2 className="font-bold text-2xl">
+                        {quarter.grade_before}
+                      </h2>
+                      <h2 className="border-t-2 border-black font-semibold text-base">
+                        Class Rank:
+                      </h2>
+                      <h2 className="font-bold text-xl">{quarter.ranking}</h2>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-sm flex justify-between border-t border-neutral-300">
+                <h6>
+                  Performs {better_at} with a margin of (+{margin})
+                </h6>
+
+                <h6>
+                  Average Rank: <span className="font-bold">{ave_rank}</span>
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Toggle Quarter */}
+        <div className="flex justify-end">
+          {myquar.map((quarter, idx) => (
+            <div
+              key={idx}
+              className={classNames(
+                "px-12 pt-4 pb-1 text-xl rounded-t-xl",
+                quar === idx ? "bg-white" : ""
+              )}
+            >
+              <button
+                onClick={() => {
+                  setQuar(idx);
+                  setMyStudent(student?.quarter![idx]!);
+                }}
+              >
+                {myquar[idx]}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Quarter Section */}
+      <div className="mx-12 my-10 h-[90vh]">
+        <div className="h-full">
+          <div className="grid grid-cols-2">
+            <div>
+              <h1 className="font-bold text-2xl">Performance Analysis</h1>
+              <h3>{myquar[quar]} Evaluation</h3>
+            </div>
+            {/* Grade Component */}
+            <div className="col-span-1 flex justify-end gap-4">
+              <div className="flex flex-col place-content-center">
+                <h1 className="text-lg font-semibold">Quarter Grade:</h1>
+                <h3 className="text-base">
+                  Suggested Grade:{" "}
+                  <span className="font-bold">{myStudent.grade_before}</span>
+                </h3>
+                <div className="flex gap-3">
+                  <h3>
+                    Class Ranking:{" "}
+                    <span className="font-bold">{myStudent.ranking}</span>
+                  </h3>
+                  {myStudent.ranking! <= 4 && (
+                    <StarIcon className="h-5 text-tallano_gold-300" />
+                  )}
+                </div>
+              </div>
+              <div className="grid place-content-center">
+                <div className="grid place-content-center w-28 h-28 rounded-full bg-tallano_gold-200">
+                  <h1 className="font-bold text-3xl">
+                    {myStudent.grade_before}
+                  </h1>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4 mx-4 py-6 h-fit">
+            {/* Line Chart */}
+            <div>
+              <Line
+                data={{
+                  labels:
+                    ww_labels.length >= pt_labels.length
+                      ? ww_labels
+                      : pt_labels,
+                  datasets: dataToRender,
+                }}
+                options={{
+                  scales: {
+                    y: { max: 100, min: 0, ticks: { stepSize: 20 } },
+                  },
+                  plugins: {
+                    legend: {
+                      display: true,
+                    },
+                  },
+                }}
+              />
+              <p className="text-sm text-neutral-500">Fluctuation:</p>
+            </div>
+            {/* Line Chart Assessment */}
+            <div className="h-[45vh] overflow-x-auto px-3">
+              <h5 className="text-justify">
+                Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna.Assessment: Paragraph (Large)
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore
+                magna.Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                tincidunt ut laoreet dolore magna.Assessment: Paragraph (Large)
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+              </h5>
+            </div>
+          </div>
+          <div className="grid grid-cols-9 gap-4 mx-4 py-6 h-fit">
+            <div className="col-span-4">
+              {/* Top Performance Section */}
               <div className="">
-                <h3 className="text-lg font-semibold">Best Performance</h3>
+                <h3 className="text-lg font-semibold">Top Performance</h3>
                 <div className="grid grid-cols-2 gap-2 mt-4">
                   <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between">
-                    <h6 className="px-4 ">Written Work 2:</h6>
+                    <h6 className="px-4 ">Written Work {ww_best_task! + 1}:</h6>
                     <div className="flex justify-end">
-                      <h1 className="font-bold text-xl px-6">10/10</h1>
+                      <h1 className="font-bold text-xl px-6">
+                        {tdata.ww.raw_scores.score[ww_best_task!]} /{" "}
+                        {tdata.ww.raw_scores.hp[ww_best_task!]}
+                      </h1>
                     </div>
                   </div>
                   <div className=" h-24 bg-ocean-100 py-2 rounded-3xl flex flex-col justify-between">
-                    <h6 className="px-4">Performance Task 1:</h6>
+                    <h6 className="px-4">
+                      Performance Task {pt_best_task! + 1} :
+                    </h6>
                     <div className="flex justify-end px-6">
-                      <h1 className="font-bold text-xl">18/20</h1>
+                      <h1 className="font-bold text-xl">
+                        {tdata.pt.raw_scores.score[pt_best_task!]} /{" "}
+                        {tdata.pt.raw_scores.hp[pt_best_task!]}
+                      </h1>
                     </div>
                   </div>
                 </div>
               </div>
               {/* Tasks Streak */}
-              <div className="">
-                <h3 className="text-lg font-semibold">Tasks Record</h3>
-                <div>
-                  <h6>Written Works</h6>
+              <div className="mt-4">
+                <div className="border-b-2 pb-3">
+                  <div className="flex justify-between">
+                    <h6>Written Works: </h6>
+                    <h6>
+                      <span className="font-bold">{tdata.ww.passed}</span> of{" "}
+                      <span className="font-bold">{tdata.ww.total}</span> task/s
+                      passed.
+                    </h6>
+                  </div>
                   <div className="flex gap-2">
                     {wworks.map((task) =>
-                      task === 100 ? (
+                      task === "Perfect" ? (
                         <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
                           <StarIcon className="text-tallano_gold-300" />
                         </div>
-                      ) : task === -1 ? (
-                        <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
-                      ) : task >= 75 ? (
+                      ) : task === "??" ? (
+                        <div className="flex justify-center items-center w-14 h-14 bg-neutral-50 border-4 rounded-full">
+                          <h1 className="text-sm">No data</h1>
+                        </div>
+                      ) : task === "Passed" ? (
                         <div className="w-14 h-14 border-4 rounded-full border-green-300">
                           <CheckIcon className="text-green-300" />
                         </div>
-                      ) : (
+                      ) : task === "Failed" ? (
                         <div className="w-14 h-14 border-4 border-red-300 rounded-full">
                           <XIcon className="text-red-300" />
                         </div>
+                      ) : task === "Considerable" ? (
+                        <div className="flex justify-center items-center w-14 h-14 border-4 border-orange-300 rounded-full">
+                          <h1 className="text-2xl font-bold text-orange-300">
+                            C
+                          </h1>
+                        </div>
+                      ) : (
+                        <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
                       )
                     )}
                   </div>
                 </div>
-                <div>
-                  <h6>Performance Tasks</h6>
+                <div className="mt-3">
+                  <div className="flex justify-between">
+                    <h6>Performance Tasks: </h6>
+                    <h6>
+                      <span className="font-bold">{tdata.pt.passed}</span> of{" "}
+                      <span className="font-bold">{tdata.pt.total}</span> task/s
+                      passed.
+                    </h6>
+                  </div>
                   <div className="flex gap-2">
                     {ptasks.map((task) =>
-                      task === 100 ? (
+                      task === "Perfect" ? (
                         <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
                           <StarIcon className="text-tallano_gold-300" />
                         </div>
-                      ) : task === -1 ? (
+                      ) : task === "no data" ? (
                         <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
-                      ) : task >= 75 ? (
+                      ) : task === "Passed" ? (
                         <div className="w-14 h-14 border-4 rounded-full border-green-300">
                           <CheckIcon className="text-green-300" />
                         </div>
@@ -300,10 +749,106 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 </div>
               </div>
             </div>
-            <div className="border"></div>
+            <div
+              className={classNames("col-span-5 grid grid-cols-10 gap-3 p-4")}
+            >
+              <div
+                className={classNames(
+                  myStudent.written_weighted_score?.highest_posible_score! >
+                    myStudent.performance_weighted_score?.highest_posible_score!
+                    ? "col-span-6"
+                    : myStudent.performance_weighted_score
+                        ?.highest_posible_score! >
+                      myStudent.written_weighted_score?.highest_posible_score!
+                    ? "col-span-4"
+                    : "col-span-5"
+                )}
+              >
+                {/* Written Works Circular Progress */}
+                <div className="relative">
+                  <div className="z-40 absolute inset-0 flex justify-center items-center">
+                    <div className="flex flex-col justify-center items-center">
+                      <h2 className="font-bold text-3xl">
+                        {tdata.ww.percentage}%
+                      </h2>
+                      <h3 className="text-lg font-semibold">Written Works</h3>
+                      <p className="text-base">
+                        Scored {tdata.ww.score_sum} out of {tdata.ww.total_item}
+                      </p>
+                    </div>
+                  </div>
+                  <CircularProgress
+                    value={tdata.ww.percentage}
+                    pathColor="#FFF598"
+                    strokeWidth={8}
+                  />
+                </div>
+                <div className={"w-40"}>
+                  <div className="relative">
+                    <div className="z-40 absolute inset-0 flex justify-center items-center">
+                      <div className="flex flex-col justify-center items-center">
+                        <h2 className="font-bold text-xl">
+                          {tdata.ww.percentage}%
+                        </h2>
+                        <h3 className="text-[0.8rem] font-semibold">
+                          Surpassed
+                        </h3>
+                        <p className="text-[0.6rem]">
+                          {tdata.ww.score_sum} out of {tdata.ww.total_item}{" "}
+                          students
+                        </p>
+                      </div>
+                    </div>
+                    <CircularProgress
+                      value={tdata.ww.percentage}
+                      pathColor="#FFF598"
+                      strokeWidth={10}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                className={classNames(
+                  myStudent.written_weighted_score?.highest_posible_score! >
+                    myStudent.performance_weighted_score?.highest_posible_score!
+                    ? "col-span-4"
+                    : myStudent.performance_weighted_score
+                        ?.highest_posible_score! >
+                      myStudent.written_weighted_score?.highest_posible_score!
+                    ? "col-span-6"
+                    : "col-span-5"
+                )}
+              >
+                <h1>
+                  {myStudent.written_weighted_score?.highest_posible_score!}
+                </h1>
+                {/* Performance Tasks Circular Progress */}
+                <div className="relative">
+                  <div className="z-40 absolute inset-0 flex justify-center items-center">
+                    <div className="flex flex-col justify-center items-center">
+                      <h2 className="font-bold text-3xl">
+                        {tdata.pt.percentage}%
+                      </h2>
+                      <h3 className="text-lg font-semibold">
+                        Performance Tasks
+                      </h3>
+                      <p className="text-base">
+                        Scored {tdata.pt.score_sum} out of {tdata.pt.total_item}
+                      </p>
+                    </div>
+                  </div>
+                  <CircularProgress
+                    value={tdata.pt.percentage}
+                    pathColor="#63C7FF"
+                    strokeWidth={8}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      <div className="h-[100vh]"></div>
     </>
   );
 };

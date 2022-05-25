@@ -36,6 +36,14 @@ export interface Student {
   ranking: number | null;
 }
 
+export interface DataSet {
+  label: string;
+  data: any[];
+  fill: true;
+  backgroundColor: string;
+  borderColor: string;
+}
+
 export interface Quarter {
   id: number;
   grade_before: number;
