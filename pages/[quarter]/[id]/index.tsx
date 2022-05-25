@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { useSelectedStudent } from "../../../../hooks/useSelectedStudent";
+import ReactTooltip from "react-tooltip";
+import { useSelectedStudent } from "../../../hooks/useSelectedStudent";
 import {
   Chart,
   ArcElement,
@@ -31,11 +32,11 @@ import { GetServerSideProps } from "next";
 import { Bar, Line, Radar } from "react-chartjs-2";
 import { StarIcon } from "@heroicons/react/solid";
 import { CheckIcon, XIcon } from "@heroicons/react/outline";
-import BarChart from "../../../../components/BarChart";
-import { DataSet, Student } from "../../../../types/Students";
-import CardInfo from "../../../../components/CardInfo";
-import CircularProgress from "../../../../components/CircularProgress";
-import { useClassroom } from "../../../../hooks/useSetClassroom";
+import BarChart from "../../../components/BarChart";
+import { DataSet, Student } from "../../../types/Students";
+import CardInfo from "../../../components/CardInfo";
+import CircularProgress from "../../../components/CircularProgress";
+import { useClassroom } from "../../../hooks/useSetClassroom";
 import {
   CircularProgressbar,
   CircularProgressbarWithChildren,
@@ -70,9 +71,9 @@ Chart.register(
   Tooltip
 );
 
-function classNames(...classes: string[]) {
+const classNames = (...classes: string[]) => {
   return classes.filter(Boolean).join(" ");
-}
+};
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { quarter, id } = query;
@@ -128,33 +129,43 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   const { students } = useClassroom();
   const { student, setStudent } = useSelectedStudent();
   const router = useRouter();
+  let myquar: string[] = [];
+
   //set quarter page to render
   const [quar, setQuar] = useState<number>(quarter - 1);
-  const myquar = ["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"];
+  let ww_available_scores = [];
+  let pt_available_scores = [];
+  if (!students || !student) {
+    //TO FIX: ROUTE BACK USER
+  } else {
+    let qSum: any = 0;
+    students![0].quarter?.map((quarter) => {
+      qSum += quarter.written_works?.length! > 0 ? 1 : 0;
+    });
 
+    var buttons: string[] = [];
+    for (var i = 1; i <= qSum; i++) {
+      buttons.push("Quarter " + i);
+      ww_available_scores.push(
+        student?.quarter![i - 1].written_percentage?.score
+      );
+      pt_available_scores.push(
+        student?.quarter![i - 1].performance_percentage?.score
+      );
+    }
+    myquar = buttons;
+  }
   //set data of student for the quarter
   const [myStudent, setMyStudent] = useState(student?.quarter![quarter - 1]!);
-
-  // TO FIX : REFRESH PAGE
 
   //set quarter data
   const quarter_grades = {
     written_works:
       // grade pct
-      [
-        student?.quarter![0].written_percentage!.score,
-        student?.quarter![1].written_percentage!.score,
-        student?.quarter![2].written_percentage!.score,
-        student?.quarter![3].written_percentage!.score,
-      ],
+      ww_available_scores,
     performance_tasks:
       //grade pct
-      [
-        student?.quarter![0].performance_percentage!.score,
-        student?.quarter![1].performance_percentage!.score,
-        student?.quarter![2].performance_percentage!.score,
-        student?.quarter![3].performance_percentage!.score,
-      ],
+      pt_available_scores,
   };
 
   // get best quarter - written works
@@ -166,6 +177,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     getIndexOfMaxNumber(quarter_grades.performance_tasks) + 1
   );
   // get underperformed quarter - written works
+
   const ww_underperformed_quarter = addOrdinal(
     getIndexOfMinNumber(quarter_grades.written_works) + 1
   );
@@ -184,7 +196,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     pt_sum: number[] = [],
     hps_pt: number[] = [];
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < myquar.length; i++) {
     quarter_data.push(student?.quarter![i].grade_before!);
     sum += student?.quarter![i].ranking!;
     let scr = student?.quarter![i].written_percentage?.score!;
@@ -327,7 +339,6 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     tdata.ww.raw_scores.hp.push(task.highest_possible_score);
     tdata.ww.passed += task.status.match(/Passed|Perfect/g) ? 1 : 0;
   });
-
   myStudent.performance_tasks?.forEach((task) => {
     const task_label = "Task " + task.tasked_number.toString();
     pt_labels.push(task_label);
@@ -373,9 +384,9 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   // get weighted omsim of a written works and performance task
   const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
   const wgh_pt = myStudent.performance_weighted_score?.highest_possible_score;
+
   // get best written task accomplished
   let ww_best_task: number | null = getTask("best", tdata.ww.raw_scores.pct);
-
   //get best performance task accomplished
   let pt_best_task: number | null = getTask("best", tdata.pt.raw_scores.pct);
 
@@ -386,6 +397,8 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   tdata.pt.percentage = Number(
     ((tdata.pt.score_sum / tdata.pt.total_item) * 100).toFixed(1)
   );
+
+  // generate feedback
   const tdiff = tdata.pt.percentage - tdata.ww.percentage;
   const feedback: string | null = generateFeedback(
     "better at",
@@ -406,6 +419,12 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     better_at = "better in Written Works";
     margin = ave_ww_pct - ave_pt_pct;
   }
+  //sample classroom average dataset
+  const test_ave_ds = [80, 85, 82, 80];
+  const test_ave_render = [];
+  for (let i = 0; i < myquar.length; i++) {
+    test_ave_render.push(test_ave_ds[i]);
+  }
 
   margin = Number(margin.toFixed(1));
 
@@ -419,7 +438,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     },
     {
       label: "Average Grade",
-      data: [80, 85, 82, 80],
+      data: test_ave_render,
       fill: true,
       backgroundColor: "#63C7FF",
       borderColor: "#63C7FF",
@@ -521,7 +540,8 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
           <div className="grid grid-cols-9 h-fit gap-4">
             <div className="col-span-5 bg-neutral-50 p-4 rounded-xl">
               <BarChart
-                labels={["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"]}
+                indexAxis="x"
+                labels={myquar}
                 datasets={quarter_dataset}
               />
               <p className="text-sm text-neutral-500">Fluctuation:</p>
@@ -572,29 +592,34 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 </CardInfo>
               </div>
               <div className="flex justify-center gap-4 h-40 mb-4">
-                {student?.quarter?.map((quarter, idx) => (
-                  <div
-                    className={classNames(
-                      "w-28 h-full rounded-2xl border-4",
-                      quarter.grade_before >= 75
-                        ? "bg-green-100 border-green-300"
-                        : "bg-red-100 border-red-300"
-                    )}
-                  >
-                    <p className="font-bold text-[0.7rem] pt-1 px-2 italic">
-                      Quarter {idx + 1}
-                    </p>
-                    <div className="w-full grid place-items-center">
-                      <h2 className="font-bold text-2xl">
-                        {quarter.grade_before}
-                      </h2>
-                      <h2 className="border-t-2 border-black font-semibold text-base">
-                        Class Rank:
-                      </h2>
-                      <h2 className="font-bold text-xl">{quarter.ranking}</h2>
-                    </div>
-                  </div>
-                ))}
+                {student?.quarter?.map(
+                  (quarter, idx) =>
+                    idx < myquar.length && (
+                      <div
+                        className={classNames(
+                          "w-28 h-full rounded-2xl border-4",
+                          quarter.grade_before >= 75
+                            ? "bg-green-100 border-green-300"
+                            : "bg-red-100 border-red-300"
+                        )}
+                      >
+                        <p className="font-bold text-[0.7rem] pt-1 px-2 italic">
+                          Quarter {idx + 1}
+                        </p>
+                        <div className="w-full grid place-items-center">
+                          <h2 className="font-bold text-2xl">
+                            {quarter.grade_before}
+                          </h2>
+                          <h2 className="border-t-2 border-black font-semibold text-base">
+                            Class Rank:
+                          </h2>
+                          <h2 className="font-bold text-xl">
+                            {quarter.ranking}
+                          </h2>
+                        </div>
+                      </div>
+                    )
+                )}
               </div>
 
               <div className="text-sm flex justify-between border-t border-neutral-300">
@@ -766,7 +791,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                       </h6>
                     </div>
                     <div className="flex gap-2">
-                      {wworks.map((task) =>
+                      {wworks.map((task, idx) =>
                         task === "Perfect" ? (
                           <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
                             <StarIcon className="text-tallano_gold-300" />
@@ -798,7 +823,11 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                             </h1>
                           </div>
                         ) : (
-                          <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
+                          <div
+                            data-tip
+                            data-for={idx.toString()}
+                            className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"
+                          ></div>
                         )
                       )}
                     </div>
@@ -885,6 +914,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
               <div
                 className={classNames("col-span-5 grid grid-cols-10 gap-3 p-4")}
               >
+                {/* WW Data */}
                 <div
                   className={classNames(
                     wgh_ww! > wgh_pt!
@@ -946,6 +976,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                     </div>
                   </div>
                 </div>
+                {/* PT Data */}
                 <div
                   className={classNames(
                     wgh_ww! > wgh_pt!
@@ -1013,7 +1044,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
         </div>
       </div>
       {/* External Elements Section */}
-      <div className="min-h-[120vh] bg-ocean-100">
+      <div className="min-h-fit bg-ocean-100">
         <div className="mx-12 my-10">
           <div className="pt-10">
             <h2 className="text-2xl font-bold">
@@ -1021,7 +1052,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
             </h2>
             <h3 className="italic">External Elements/Factors</h3>
           </div>
-          <div>
+          <div className="pb-10">
             <div className="flex gap-3 mt-6">
               <h2 className="font-bold text-lg">Environmental Factors: </h2>
               <h2 className="font-bold text-lg">
@@ -1075,31 +1106,31 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                         },
                       }}
                     />
-                    <div className="w-1/2 p-4 border rounded-lg bg-white font-bold">
-                      <h4>Legend in Fuzzy Range</h4>
-                      <div className="font-normal border-t mt-2 pt-2">
-                        <div className="flex justify-between">
-                          <p>Unaffecting at all</p> <p>0.0 - 0.19</p>
-                        </div>
-                        <div className="flex justify-between">
-                          <p>Quite Affecting </p> <p>0.2 - 0.39</p>
-                        </div>
-                        <div className="flex justify-between">
-                          <p>Affecting </p> <p>0.4 - 0.59</p>
-                        </div>
-                        <div className="flex justify-between">
-                          <p>Greatly Affecting </p> <p>0.6 - 0.79</p>
-                        </div>
-                        <div className="flex justify-between">
-                          <p>Extremely Affecting </p> <p>0.8 - 1.00</p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
-              <div className="col-span-6 ml-6">
-                <div>
+              <div className="col-span-6 ml-6 flex flex-col justify-between">
+                <div className="w-1/2 p-4 rounded-lg bg-yellow-50 font-bold">
+                  <h4>Legend in Fuzzy Range</h4>
+                  <div className="font-normal border-t border-neutral-400 mt-2 pt-2">
+                    <div className="flex justify-between">
+                      <p>Unaffecting at all</p> <p>0.0</p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p>Quite Affecting </p> <p>0.25</p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p>Affecting </p> <p>0.50</p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p>Greatly Affecting </p> <p>0.75</p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p>Extremely Affecting </p> <p>1.00</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="h-96 overflow-x-auto text-justify pr-4">
                   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
                   diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
                   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
@@ -1107,13 +1138,146 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
                   diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
                   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                  diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                  diam nonummy nibh euismod tincidunt ut laoreet dolore
+                  magna.Lorem ipsum dolor sit amet, consectetuer adipiscing
+                  elit, sed diam nonummy nibh euismod tincidunt ut laoreet
+                  dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna.Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna.Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna.Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna.Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                  laoreet dolore magna.
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 py-6">
+              <h2 className="font-bold text-lg">Technological Factors: </h2>
+              <h2 className="font-bold text-lg">
+                {capitalize(
+                  student?.inference_result?.technological.linguistic!
+                )}
+              </h2>
+            </div>
+            <div className="grid grid-cols-11 gap-4 pb-10">
+              <div className="col-span-6 h-96 overflow-x-auto text-justify pr-4">
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore
+                magna.Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore
+                magna.Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore
+                magna.Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore
+                magna.Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore
+                magna.Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
+              </div>
+              <div className="col-span-5">
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between font-light">
+                    <h6 className="px-4 ">Wi-Fi Connection</h6>
+                    <div className="flex justify-end">
+                      <h1 className="font-bold text-xl px-6">
+                        {student?.survey_result?.wifi.linguistic}
+                      </h1>
+                    </div>
+                  </div>
+                  <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between font-light">
+                    <h6 className="px-4 ">Data Connection</h6>
+                    <div className="flex justify-end">
+                      <h1 className="font-bold text-xl px-6">
+                        {student?.survey_result?.data.linguistic}
+                      </h1>
+                    </div>
+                  </div>
+                </div>
+                <div className=" h-28 border border-black py-2 rounded-3xl flex flex-col justify-between">
+                  <h6 className="px-4 ">Device Availability</h6>
+                  <div className="flex justify-end">
+                    <h1 className="font-bold text-xl px-6">
+                      {student?.survey_result?.device.linguistic}
+                    </h1>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <div className="bg-white h-[10vh]"></div>
     </>
   );
 };

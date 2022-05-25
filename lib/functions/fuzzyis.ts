@@ -416,15 +416,15 @@ export function environmentalFactors(envVariables: number[]) {
   let linguistic = "";
 
   if (average >= 1) {
-    linguistic = "very poor";
+    linguistic = "Very Poor";
   } else if (average > 1 && average <= 2) {
-    linguistic = "poor";
+    linguistic = "Poor";
   } else if (average > 2 && average <= 3) {
-    linguistic = "average";
+    linguistic = "Average";
   } else if (average > 3 && average <= 4) {
-    linguistic = "good";
+    linguistic = "Good";
   } else if (average > 4) {
-    linguistic = "very good";
+    linguistic = "Very Good";
   }
   const env: InferenceDetails = {
     value: average,

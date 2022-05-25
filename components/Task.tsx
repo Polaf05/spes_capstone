@@ -78,7 +78,7 @@ export const Task = ({
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   var count = [0, 0, 0, 0, 0];
   students?.map((student) => {
-    const i = labels.indexOf(student.remarks);
+    const i = labels.indexOf(student.quarter![quarter].remarks);
     count[i] += 1;
   });
 
@@ -100,7 +100,7 @@ export const Task = ({
   };
 
   return (
-    <div className="bg-ocean-100 p-12 grid grid-cols-12 gap-4">
+    <div className="grid grid-cols-12 gap-4 px-12">
       <div className="col-span-7">
         <div className="text-2xl font-bold">
           <h1>
@@ -125,7 +125,7 @@ export const Task = ({
         <div className="text-lg font-semibold">
           Sorted by: {sortingMethod ? sortingMethod : "Name"}
         </div>
-        <div className="w-full overflow-y-auto h-96">
+        <div className="w-full overflow-y-auto h-[60vh]">
           <table className="table-fixed min-w-full rounded-md text-lg text-left border-collapse">
             {/* Table Head - Buttons */}
             <thead className="border-b-2 bg-white sticky top-0">
@@ -160,7 +160,7 @@ export const Task = ({
                     className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                     onClick={() => setSorting("Grade After")}
                   >
-                    After
+                    Suggested Grade
                   </button>
                 </th>
                 <th className="text-right">
@@ -198,16 +198,18 @@ export const Task = ({
                       ({student.quarter![quarter].diff})
                     </td>
                     <td>{student.quarter![quarter].grade_after}</td>
-                    <td className="pr-4 text-right">{student.remarks}</td>
+                    <td className="pr-4 text-right">
+                      {student.quarter![quarter].remarks}
+                    </td>
                   </tr>
                 ))}
             </tbody>
           </table>
         </div>
       </div>
-      <div className="col-span-5 max-h-screen">
-        <div className="flex flex-row gap-4">
-          <div className="w-48 xl:w-80">
+      <div className="col-span-5 h-fit">
+        <div className="grid grid-cols-5 gap-4">
+          <div className="col-span-3">
             <Doughnut
               data={data}
               options={{
@@ -220,7 +222,7 @@ export const Task = ({
               }}
             />
           </div>
-          <div className="col-span-4 w-60">
+          <div className="col-span-2 h-fit">
             <h6 className="text-lg font-semibold pt-3 border-b-2 border-black">
               Legend
             </h6>
@@ -248,7 +250,7 @@ export const Task = ({
             </section>
           </div>
         </div>
-        <div className="row-span-2 mx-3 overflow-auto max-h-52 md:overflow-auto mt-10">
+        <div className="row-span-2 overflow-auto h-44 md:overflow-auto mt-5">
           <p className="inline-block text-justify">
             Chart Description: Paragraph (Large) Lorem ipsum dolor sit amet,
             consectetuer adipiscing elit, sed diam nonummy nibh euismod

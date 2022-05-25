@@ -99,14 +99,14 @@ const StudentDialog = ({
   if (category === "Written Works") {
     student?.quarter![quarter].written_works?.forEach((task) => {
       const task_label = "Task " + task.tasked_number.toString();
-      const score = (task.score / task.highest_posible_score) * 100;
+      const score = (task.score / task.highest_possible_score) * 100;
       labels.push(task_label);
       scores.push(score);
     });
   } else if (category === "Performance Tasks") {
     student?.quarter![quarter].performance_tasks?.forEach((task) => {
       const task_label = "Task " + task.tasked_number.toString();
-      const score = (task.score / task.highest_posible_score) * 100;
+      const score = (task.score / task.highest_possible_score) * 100;
       labels.push(task_label);
       scores.push(score);
     });
@@ -247,7 +247,7 @@ const StudentDialog = ({
                   </div>
                 </div>
                 <div className="flex justify-end">
-                  <Link href={`/dev/${quarter + 1}/${student?.id}`} passHref>
+                  <Link href={`/${quarter + 1}/${student?.id}`} passHref>
                     <button
                       type="button"
                       className="inline-flex justify-center rounded-md border border-transparent bg-ocean-100 px-4 py-2 text-base font-medium text-ocean-400 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
