@@ -11,7 +11,7 @@ export function remoteExperience(effectivity: number, similarities: number) {
   //OUTPUT DECLARATION
   const OVERALL_EXPERIENCE = new LinguisticVariable(
     "overallExperience",
-    [0, 10]
+    [0, 1]
   );
 
   system.addOutput(OVERALL_EXPERIENCE);
@@ -28,36 +28,40 @@ export function remoteExperience(effectivity: number, similarities: number) {
 
   //EFFECTIVITY_IMPLEMENTATION TERMS
   EFFECTIVITY_IMPLEMENTATION.addTerm(
-    new Term("not effective", "gauss", [1.416, 0])
+    new Term("not effective", "gauss", [0.1416, 0])
   );
   EFFECTIVITY_IMPLEMENTATION.addTerm(
-    new Term("quite effective", "gauss", [1.416, 3.334])
+    new Term("quite effective", "gauss", [0.1416, 0.3334])
   );
   EFFECTIVITY_IMPLEMENTATION.addTerm(
-    new Term("effective", "gauss", [1.416, 6.667])
+    new Term("effective", "gauss", [0.1416, 0.6667])
   );
   EFFECTIVITY_IMPLEMENTATION.addTerm(
-    new Term("very effective", "gauss", [1.416, 10])
+    new Term("very effective", "gauss", [0.1416, 1])
   );
   //SIMILARITY_PERFORMANCE TERMS
-  SIMILARITY_PERFORMANCE.addTerm(new Term("not similar", "gauss", [1.416, 0]));
+  SIMILARITY_PERFORMANCE.addTerm(new Term("not similar", "gauss", [0.1416, 0]));
   SIMILARITY_PERFORMANCE.addTerm(
-    new Term("quite similar", "gauss", [1.416, 3.334])
+    new Term("quite similar", "gauss", [0.1416, 0.3334])
   );
-  SIMILARITY_PERFORMANCE.addTerm(new Term("similar", "gauss", [1.416, 6.667]));
   SIMILARITY_PERFORMANCE.addTerm(
-    new Term("more than similar", "gauss", [1.416, 10])
+    new Term("similar", "gauss", [0.1416, 0.6667])
+  );
+  SIMILARITY_PERFORMANCE.addTerm(
+    new Term("more than similar", "gauss", [0.1416, 1])
   );
 
   //OVERALL EXPERIENCE TER<S
   OVERALL_EXPERIENCE.addTerm(
-    new Term("very poor", "triangle", [-2.25, 0, 2.25])
+    new Term("very poor", "triangle", [-0.225, 0, 0.225])
   );
-  OVERALL_EXPERIENCE.addTerm(new Term("poor", "triangle", [0, 2.5, 5]));
-  OVERALL_EXPERIENCE.addTerm(new Term("average", "triangle", [2.5, 5, 7.5]));
-  OVERALL_EXPERIENCE.addTerm(new Term("good", "triangle", [5, 7.5, 10]));
+  OVERALL_EXPERIENCE.addTerm(new Term("poor", "triangle", [0, 0.25, 0.5]));
   OVERALL_EXPERIENCE.addTerm(
-    new Term("very good", "triangle", [7.5, 10, 12.5])
+    new Term("average", "triangle", [0.25, 0.5, 0.75])
+  );
+  OVERALL_EXPERIENCE.addTerm(new Term("good", "triangle", [0.5, 0.75, 1]));
+  OVERALL_EXPERIENCE.addTerm(
+    new Term("very good", "triangle", [0.75, 1, 1.25])
   );
 
   system.rules = [
@@ -93,37 +97,39 @@ export function internetInference(dataValue: number, wifiValue: number) {
   //OUTPUT DECLARATION
   const INTERNET_CONNECTIVITY = new LinguisticVariable(
     "internetConnectivity",
-    [0, 10]
+    [0, 1]
   );
 
   system.addOutput(INTERNET_CONNECTIVITY);
 
   //INPUT DECLARATION
-  const DATA = new LinguisticVariable("data", [0, 10]);
-  const WIFI = new LinguisticVariable("wifi", [0, 10]);
+  const DATA = new LinguisticVariable("data", [0, 1]);
+  const WIFI = new LinguisticVariable("wifi", [0, 1]);
 
   system.addInput(DATA);
   system.addInput(WIFI);
 
   //WIFI TERMS
-  WIFI.addTerm(new Term("not available", "gauss", [2.123, 0]));
-  WIFI.addTerm(new Term("bad", "gauss", [2.123, 5]));
-  WIFI.addTerm(new Term("good", "gauss", [2.123, 10]));
+  WIFI.addTerm(new Term("not available", "gauss", [0.2123, 0]));
+  WIFI.addTerm(new Term("bad", "gauss", [0.2123, 0.5]));
+  WIFI.addTerm(new Term("good", "gauss", [0.2123, 1]));
 
   //DATA TERMS
-  DATA.addTerm(new Term("not available", "gauss", [2.123, 0]));
-  DATA.addTerm(new Term("bad", "gauss", [2.123, 5]));
-  DATA.addTerm(new Term("good", "gauss", [2.123, 10]));
+  DATA.addTerm(new Term("not available", "gauss", [0.2123, 0]));
+  DATA.addTerm(new Term("bad", "gauss", [0.2123, 0.5]));
+  DATA.addTerm(new Term("good", "gauss", [0.2123, 1]));
 
   //OUTPUT TERMS
   INTERNET_CONNECTIVITY.addTerm(
-    new Term("very poor", "triangle", [-2.5, 0, 2.5])
+    new Term("very poor", "triangle", [-0.25, 0, 0.25])
   );
-  INTERNET_CONNECTIVITY.addTerm(new Term("poor", "triangle", [0, 2.5, 5]));
-  INTERNET_CONNECTIVITY.addTerm(new Term("average", "triangle", [2.5, 5, 7.5]));
-  INTERNET_CONNECTIVITY.addTerm(new Term("good", "triangle", [5, 7.5, 10]));
+  INTERNET_CONNECTIVITY.addTerm(new Term("poor", "triangle", [0, 0.25, 0.5]));
   INTERNET_CONNECTIVITY.addTerm(
-    new Term("very good", "triangle", [7.5, 10, 12.5])
+    new Term("average", "triangle", [0.25, 0.5, 0.75])
+  );
+  INTERNET_CONNECTIVITY.addTerm(new Term("good", "triangle", [0.5, 0.75, 1]));
+  INTERNET_CONNECTIVITY.addTerm(
+    new Term("very good", "triangle", [0.75, 1, 1.25])
   );
 
   //RULE SET
@@ -150,43 +156,45 @@ export function resourceInference(internetValue: number, deviceValue: number) {
   const system = new FIS("resource");
 
   //OUTPUT DECLARATION
-  const RESOURCE = new LinguisticVariable("resource", [0, 10]);
+  const RESOURCE = new LinguisticVariable("resource", [0, 1]);
 
   system.addOutput(RESOURCE);
 
   //INPUT DECLERATION
-  const INTERNET_CONNECTIVITY = new LinguisticVariable("internet", [0, 10]);
-  const DEVICE = new LinguisticVariable("device", [0, 14]);
+  const INTERNET_CONNECTIVITY = new LinguisticVariable("internet", [0, 1]);
+  const DEVICE = new LinguisticVariable("device", [0, 1]);
 
   system.addInput(DEVICE);
   system.addInput(INTERNET_CONNECTIVITY);
 
   //INTERNET TERMS
   INTERNET_CONNECTIVITY.addTerm(
-    new Term("very poor", "triangle", [-2.5, 0, 2.5])
+    new Term("very poor", "triangle", [-0.25, 0, 0.25])
   );
-  INTERNET_CONNECTIVITY.addTerm(new Term("poor", "triangle", [0, 2.5, 5]));
-  INTERNET_CONNECTIVITY.addTerm(new Term("average", "triangle", [2.5, 5, 7.5]));
-  INTERNET_CONNECTIVITY.addTerm(new Term("good", "triangle", [5, 7.5, 10]));
+  INTERNET_CONNECTIVITY.addTerm(new Term("poor", "triangle", [0, 0.25, 0.5]));
   INTERNET_CONNECTIVITY.addTerm(
-    new Term("very good", "triangle", [7.5, 10, 12.5])
+    new Term("average", "triangle", [0.25, 0.5, 0.75])
+  );
+  INTERNET_CONNECTIVITY.addTerm(new Term("good", "triangle", [0.5, 0.75, 1]));
+  INTERNET_CONNECTIVITY.addTerm(
+    new Term("very good", "triangle", [0.75, 1, 1.25])
   );
 
   //DEVICE TERMS
-  DEVICE.addTerm(new Term("no device", "triangle", [-2.334, 0, 2.334]));
-  DEVICE.addTerm(new Term("rent", "triangle", [0, 2.334, 4.666]));
-  DEVICE.addTerm(new Term("borrow", "triangle", [2.334, 4.666, 7]));
-  DEVICE.addTerm(new Term("share", "triangle", [4.666, 7, 9.334]));
-  DEVICE.addTerm(new Term("mobile", "triangle", [7, 9.334, 11.67]));
-  DEVICE.addTerm(new Term("laptop", "triangle", [9.334, 11.67, 14]));
-  DEVICE.addTerm(new Term("both", "triangle", [11.67, 14, 16.34]));
+  DEVICE.addTerm(new Term("no device", "triangle", [-0.1667, 0, 0.1667]));
+  DEVICE.addTerm(new Term("rent", "triangle", [0, 0.1667, 0.3333]));
+  DEVICE.addTerm(new Term("borrow", "triangle", [0.1667, 0.3333, 0.5]));
+  DEVICE.addTerm(new Term("share", "triangle", [0.3333, 0.5, 0.6667]));
+  DEVICE.addTerm(new Term("mobile", "triangle", [0.5, 0.6667, 0.8333]));
+  DEVICE.addTerm(new Term("laptop", "triangle", [0.6667, 0.8333, 1]));
+  DEVICE.addTerm(new Term("both", "triangle", [0.8333, 1, 1.167]));
 
   //RESOURCE TERMS
-  RESOURCE.addTerm(new Term("very poor", "triangle", [-2.5, 0, 2.5]));
-  RESOURCE.addTerm(new Term("poor", "triangle", [0, 2.5, 5]));
-  RESOURCE.addTerm(new Term("average", "triangle", [2.5, 5, 7.5]));
-  RESOURCE.addTerm(new Term("good", "triangle", [5, 7.5, 10]));
-  RESOURCE.addTerm(new Term("very good", "triangle", [7.5, 10, 12.5]));
+  RESOURCE.addTerm(new Term("very poor", "triangle", [-0.25, 0, 0.25]));
+  RESOURCE.addTerm(new Term("poor", "triangle", [0, 0.25, 0.5]));
+  RESOURCE.addTerm(new Term("average", "triangle", [0.25, 0.5, 0.75]));
+  RESOURCE.addTerm(new Term("good", "triangle", [0.5, 0.75, 1]));
+  RESOURCE.addTerm(new Term("very good", "triangle", [0.75, 1, 1.25]));
 
   //RULE SET
   system.rules = [
@@ -251,14 +259,14 @@ export function accessibilityInference(
 
   //OUTPUT DECLARATION
 
-  const ACCESSIBILITY = new LinguisticVariable("accessibility", [0, 10]);
+  const ACCESSIBILITY = new LinguisticVariable("accessibility", [0, 1]);
 
   system.addOutput(ACCESSIBILITY);
 
   //INPUT DECLARATION
 
-  const TECHNOLOGY = new LinguisticVariable("technology", [0, 10]);
-  const PLATFORM = new LinguisticVariable("platform", [0, 10]);
+  const TECHNOLOGY = new LinguisticVariable("technology", [0, 1]);
+  const PLATFORM = new LinguisticVariable("platform", [0, 1]);
 
   system.addInput(TECHNOLOGY);
   system.addInput(PLATFORM);
@@ -268,24 +276,24 @@ export function accessibilityInference(
   TECHNOLOGY.addTerm(new Term("very difficult", "triangle", [-2.5, 0, 2.5]));
   TECHNOLOGY.addTerm(new Term("difficult", "triangle", [0, 2.5, 5]));
   TECHNOLOGY.addTerm(new Term("easy", "triangle", [2.5, 5, 7.5]));
-  TECHNOLOGY.addTerm(new Term("quite easy", "triangle", [5, 7.5, 10]));
-  TECHNOLOGY.addTerm(new Term("very easy", "triangle", [7.5, 10, 12.5]));
+  TECHNOLOGY.addTerm(new Term("quite easy", "triangle", [5, 7.5, 1]));
+  TECHNOLOGY.addTerm(new Term("very easy", "triangle", [7.5, 1, 12.5]));
 
   //PLATFORM TERMS
 
   PLATFORM.addTerm(new Term("very difficult", "triangle", [-2.5, 0, 2.5]));
   PLATFORM.addTerm(new Term("difficult", "triangle", [0, 2.5, 5]));
   PLATFORM.addTerm(new Term("accessible", "triangle", [2.5, 5, 7.5]));
-  PLATFORM.addTerm(new Term("quite easy", "triangle", [5, 7.5, 10]));
-  PLATFORM.addTerm(new Term("very easy", "triangle", [7.5, 10, 12.5]));
+  PLATFORM.addTerm(new Term("quite easy", "triangle", [5, 7.5, 1]));
+  PLATFORM.addTerm(new Term("very easy", "triangle", [7.5, 1, 12.5]));
 
   //ACCESSSIBILTY TERMS
 
   ACCESSIBILITY.addTerm(new Term("very poor", "triangle", [-2.5, 0, 2.5]));
   ACCESSIBILITY.addTerm(new Term("poor", "triangle", [0, 2.5, 5]));
   ACCESSIBILITY.addTerm(new Term("average", "triangle", [2.5, 5, 7.5]));
-  ACCESSIBILITY.addTerm(new Term("good", "triangle", [5, 7.5, 10]));
-  ACCESSIBILITY.addTerm(new Term("very good", "triangle", [7.5, 10, 12.5]));
+  ACCESSIBILITY.addTerm(new Term("good", "triangle", [5, 7.5, 1]));
+  ACCESSIBILITY.addTerm(new Term("very good", "triangle", [7.5, 1, 12.5]));
 
   system.rules = [
     new Rule(["very easy", "very easy"], ["very good"], "and"),
@@ -334,14 +342,14 @@ export function technologicalInference(
   const system = new FIS("technological factors");
 
   //OUTPUT DECLARATION
-  const TECHNOLOGICAL = new LinguisticVariable("Tfactor", [0, 10]);
+  const TECHNOLOGICAL = new LinguisticVariable("Tfactor", [0, 1]);
 
   system.addOutput(TECHNOLOGICAL);
 
   //INPUT DECLATION
 
-  const RESOURCE = new LinguisticVariable("resource", [0, 10]);
-  const ACCESSIBILITY = new LinguisticVariable("accessilibity", [0, 10]);
+  const RESOURCE = new LinguisticVariable("resource", [0, 1]);
+  const ACCESSIBILITY = new LinguisticVariable("accessilibity", [0, 1]);
 
   system.addInput(RESOURCE);
   system.addInput(ACCESSIBILITY);
@@ -351,24 +359,24 @@ export function technologicalInference(
   RESOURCE.addTerm(new Term("very poor", "triangle", [-2.5, 0, 2.5]));
   RESOURCE.addTerm(new Term("poor", "triangle", [0, 2.5, 5]));
   RESOURCE.addTerm(new Term("average", "triangle", [2.5, 5, 7.5]));
-  RESOURCE.addTerm(new Term("good", "triangle", [5, 7.5, 10]));
-  RESOURCE.addTerm(new Term("very good", "triangle", [7.5, 10, 12.5]));
+  RESOURCE.addTerm(new Term("good", "triangle", [5, 7.5, 1]));
+  RESOURCE.addTerm(new Term("very good", "triangle", [7.5, 1, 12.5]));
 
   //ACCESSSIBILTY TERMS
 
   ACCESSIBILITY.addTerm(new Term("very poor", "triangle", [-2.5, 0, 2.5]));
   ACCESSIBILITY.addTerm(new Term("poor", "triangle", [0, 2.5, 5]));
   ACCESSIBILITY.addTerm(new Term("average", "triangle", [2.5, 5, 7.5]));
-  ACCESSIBILITY.addTerm(new Term("good", "triangle", [5, 7.5, 10]));
-  ACCESSIBILITY.addTerm(new Term("very good", "triangle", [7.5, 10, 12.5]));
+  ACCESSIBILITY.addTerm(new Term("good", "triangle", [5, 7.5, 1]));
+  ACCESSIBILITY.addTerm(new Term("very good", "triangle", [7.5, 1, 12.5]));
 
   //TECHNOLOGICAL TERMS
 
   TECHNOLOGICAL.addTerm(new Term("very poor", "gauss", [-2.5, 0, 2.5]));
   TECHNOLOGICAL.addTerm(new Term("poor", "gauss", [0, 2.5, 5]));
   TECHNOLOGICAL.addTerm(new Term("average", "gauss", [2.5, 5, 7.5]));
-  TECHNOLOGICAL.addTerm(new Term("good", "gauss", [5, 7.5, 10]));
-  TECHNOLOGICAL.addTerm(new Term("very good", "gauss", [7.5, 10, 12.5]));
+  TECHNOLOGICAL.addTerm(new Term("good", "gauss", [5, 7.5, 1]));
+  TECHNOLOGICAL.addTerm(new Term("very good", "gauss", [7.5, 1, 12.5]));
 
   system.rules = [
     new Rule(["very good", "very good"], ["very good"], "and"),
@@ -413,25 +421,7 @@ export function environmentalFactors(envVariables: number[]) {
 
   let average = sum / envVariables.length;
 
-  let linguistic = "";
-
-  if (average >= 1) {
-    linguistic = "very poor";
-  } else if (average > 1 && average <= 2) {
-    linguistic = "poor";
-  } else if (average > 2 && average <= 3) {
-    linguistic = "average";
-  } else if (average > 3 && average <= 4) {
-    linguistic = "good";
-  } else if (average > 4) {
-    linguistic = "very good";
-  }
-  const env: InferenceDetails = {
-    value: average,
-    linguistic: linguistic,
-  };
-
-  return env;
+  return average;
 }
 
 export function externalElements(
@@ -442,13 +432,13 @@ export function externalElements(
 
   //OUTPUT DECLARATION
 
-  const EXTERNAL = new LinguisticVariable("external", [0, 10]);
+  const EXTERNAL = new LinguisticVariable("external", [0, 1]);
 
   system.addOutput(EXTERNAL);
 
   //INPUT DECLARATION
 
-  const TECHNOLOGICAL = new LinguisticVariable("technological", [0, 10]);
+  const TECHNOLOGICAL = new LinguisticVariable("technological", [0, 1]);
   const ENVIRONMENTAL = new LinguisticVariable("environment", [0, 5]);
 
   system.addInput(TECHNOLOGICAL);
@@ -458,8 +448,8 @@ export function externalElements(
   TECHNOLOGICAL.addTerm(new Term("very poor", "triangle", [-2.5, 0, 2.5]));
   TECHNOLOGICAL.addTerm(new Term("poor", "triangle", [0, 2.5, 5]));
   TECHNOLOGICAL.addTerm(new Term("average", "triangle", [2.5, 5, 7.5]));
-  TECHNOLOGICAL.addTerm(new Term("good", "triangle", [5, 7.5, 10]));
-  TECHNOLOGICAL.addTerm(new Term("very good", "triangle", [7.5, 10, 12.5]));
+  TECHNOLOGICAL.addTerm(new Term("good", "triangle", [5, 7.5, 1]));
+  TECHNOLOGICAL.addTerm(new Term("very good", "triangle", [7.5, 1, 12.5]));
 
   //ENVIRONMENTAL TERMS
   ENVIRONMENTAL.addTerm(new Term("very poor", "triangle", [-1.25, 0, 1.25]));
@@ -472,8 +462,8 @@ export function externalElements(
   EXTERNAL.addTerm(new Term("very poor", "triangle", [-2.5, 0, 2.5]));
   EXTERNAL.addTerm(new Term("poor", "triangle", [0, 2.5, 5]));
   EXTERNAL.addTerm(new Term("average", "triangle", [2.5, 5, 7.5]));
-  EXTERNAL.addTerm(new Term("good", "triangle", [5, 7.5, 10]));
-  EXTERNAL.addTerm(new Term("very good", "triangle", [7.5, 10, 12.5]));
+  EXTERNAL.addTerm(new Term("good", "triangle", [5, 7.5, 1]));
+  EXTERNAL.addTerm(new Term("very good", "triangle", [7.5, 1, 12.5]));
 
   //Rule Base
 
@@ -525,14 +515,14 @@ export function afterGradeInference(
 
   //OUTPUT DECLARATION
 
-  const AFTER_GRADE = new LinguisticVariable("gradeAfter", [60, 100]);
+  const AFTER_GRADE = new LinguisticVariable("gradeAfter", [0, 0.8]);
 
   system.addOutput(AFTER_GRADE);
 
   // INPUT DECLARTION
 
   const BEFORE_GRADE = new LinguisticVariable("gradeBefore", [60, 100]);
-  const EXTERNAL_FACTORS = new LinguisticVariable("externalFactors", [0, 10]);
+  const EXTERNAL_FACTORS = new LinguisticVariable("externalFactors", [0, 1]);
   system.addInput(BEFORE_GRADE);
   system.addInput(EXTERNAL_FACTORS);
 
@@ -544,18 +534,18 @@ export function afterGradeInference(
   BEFORE_GRADE.addTerm(new Term("very good", "triangle", [92.5, 100, 107.5]));
 
   //EXTERNAL FACTORS TERMS
-  EXTERNAL_FACTORS.addTerm(new Term("very poor", "triangle", [-2.5, 0, 2.5]));
-  EXTERNAL_FACTORS.addTerm(new Term("poor", "triangle", [0, 2.5, 5]));
-  EXTERNAL_FACTORS.addTerm(new Term("average", "triangle", [2.5, 5, 7.5]));
-  EXTERNAL_FACTORS.addTerm(new Term("good", "triangle", [5, 7.5, 10]));
-  EXTERNAL_FACTORS.addTerm(new Term("very good", "triangle", [7.5, 10, 12.5]));
+  EXTERNAL_FACTORS.addTerm(new Term("very poor", "triangle", [-0.25, 0, 0.25]));
+  EXTERNAL_FACTORS.addTerm(new Term("poor", "triangle", [0, 0.25, 0.5]));
+  EXTERNAL_FACTORS.addTerm(new Term("average", "triangle", [0.25, 0.5, 0.75]));
+  EXTERNAL_FACTORS.addTerm(new Term("good", "triangle", [0.5, 0.75, 1]));
+  EXTERNAL_FACTORS.addTerm(new Term("very good", "triangle", [0.75, 1, 1.25]));
 
   //AFTER GRADE TERMS
-  AFTER_GRADE.addTerm(new Term("very poor", "triangle", [60, 70, 77.5]));
-  AFTER_GRADE.addTerm(new Term("poor", "triangle", [70, 77.5, 85]));
-  AFTER_GRADE.addTerm(new Term("average", "triangle", [77.5, 85, 92.5]));
-  AFTER_GRADE.addTerm(new Term("good", "triangle", [85, 92.5, 100]));
-  AFTER_GRADE.addTerm(new Term("very good", "triangle", [92.5, 100, 107.5]));
+  AFTER_GRADE.addTerm(new Term("very poor", "triangle", [-0.2, 0, 0.2]));
+  AFTER_GRADE.addTerm(new Term("poor", "triangle", [0, 0.2, 0.4]));
+  AFTER_GRADE.addTerm(new Term("average", "triangle", [0.2, 0.4, 0.6]));
+  AFTER_GRADE.addTerm(new Term("good", "triangle", [0.4, 0.6, 0.8]));
+  AFTER_GRADE.addTerm(new Term("very good", "triangle", [0.6, 0.8, 1]));
 
   system.rules = [
     new Rule(["very good", "very good"], ["average"], "and"),
@@ -613,15 +603,15 @@ export function inferenceData(survey: SurveyResult) {
 
   let environment = environmentalFactors(survey.environment_factors.value);
 
-  let externalFactors = externalElements(technological, environment.value);
+  let externalFactors = externalElements(technological, environment);
 
   const data_inference = {
-    experience: getInferenceValue(experience) as any,
+    experience: getInferenceValue(experience),
     internet: getInferenceValue(internet),
     resource: getInferenceValue(resource),
     accessibility: getInferenceValue(accessibility),
     technological: getInferenceValue(technological),
-    environment: environment,
+    environment: getInferenceValue(environment),
     external_elements: getInferenceValue(externalFactors),
   };
 
@@ -631,20 +621,20 @@ export function inferenceData(survey: SurveyResult) {
 export function getInferenceValue(inference: number) {
   let values = "";
 
-  if (inference <= 2) {
+  if (inference <= 0.2) {
     values = "Very Poor";
-  } else if (inference > 2 && inference < 4) {
+  } else if (inference > 0.2 && inference <= 0.4) {
     values = "Poor";
-  } else if (inference > 4 && inference < 6) {
+  } else if (inference > 0.4 && inference <= 0.6) {
     values = "Average";
-  } else if (inference > 6 && inference < 8) {
+  } else if (inference > 0.6 && inference <= 0.8) {
     values = "Good";
-  } else if (inference > 8) {
+  } else if (inference > 0.8) {
     values = "Very Good";
   }
 
   const data: InferenceDetails = {
-    value: inference,
+    value: parseFloat(inference.toFixed(1)),
     linguistic: values,
   };
 

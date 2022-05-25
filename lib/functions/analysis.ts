@@ -1,5 +1,6 @@
 import { count } from "console";
 import { Student, TaskAnalysis, TaskData } from "../../types/Students";
+import { afterGradeInference } from "./fuzzyis";
 
 export function fluctuation(task: TaskData[], possible: TaskData[]) {
   let trend = [];
@@ -179,5 +180,3 @@ export function getRanking(classroom: Student[], task_length: any) {
 
   return class_list;
 }
-
-export function rank() {}
