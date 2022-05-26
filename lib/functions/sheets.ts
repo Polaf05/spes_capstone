@@ -8,8 +8,12 @@ export async function getSurveyList(link: string) {
 
   const sheetId = sheets[5];
   try {
+    // const data = await axios
+    //   .post("http://localhost:3000/api/test", { sheetId: sheetId })
+    //   .then((res) => res.data);
+
     const data = await axios
-      .post("http://localhost:3000/api/test", { sheetId: sheetId })
+      .post("/api/test", { sheetId: sheetId })
       .then((res) => res.data);
 
     const rows = data.data.values;
