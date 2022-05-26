@@ -31,6 +31,12 @@ import LoadingSpinner from "../../components/Loader";
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
 
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
+let errors: boolean[] = [];
+
 const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
   const [fileName, setFileName] = useState(null);
@@ -38,6 +44,7 @@ const gettingStarted = () => {
   const [text_value, setText_value] = useState("");
   const [message, setMessage] = useState<string | null>(INITIAL_MESSAGE);
   const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
 
   let handleForms = async (text: string) => {
     setLoading(true);
@@ -45,16 +52,23 @@ const gettingStarted = () => {
     let gsheet = await getSurveyList(text);
 
     if (gsheet != null) {
-      setForms(gsheet);
-      setMessage("FORMS CONNECTED");
-
-      console.log(isLoading);
+      errors[0] = true;
+      console.log(errors[0]);
+      if (gsheet) {
+        errors[1] = true;
+        setForms(gsheet);
+        setMessage("FORMS CONNECTED");
+      } else {
+        errors[1] = false;
+      }
     } else {
       setMessage("ERROR, INCORRECT TEMPLATE OR THE FORMS IS RESTRICTED");
+      errors[0] = false;
       setForms(null);
       setStudents(null);
       setFileName(null);
     }
+    setError(errors);
     setLoading(false);
   };
 
@@ -65,6 +79,7 @@ const gettingStarted = () => {
       const file_name = file.name;
       if (file_name.match(".xlsx")) {
         setFileName(file_name);
+        errors[2] = true;
         setMessage("File uploaded successfully");
         const reader = new FileReader();
 
@@ -84,6 +99,7 @@ const gettingStarted = () => {
           let task_length = [] as any;
 
           if (wsname[6] === "DO NOT DELETE") {
+            errors[3] = true;
             wsname.map((value, index) => {
               if (index != wsname.length - 1) {
                 const ws = wb.Sheets[value];
@@ -289,6 +305,8 @@ const gettingStarted = () => {
             let class_list = getRanking(classroom, task_length);
             console.log(class_list);
             setStudents(class_list);
+            setError(errors);
+            console.log(error);
           } else {
             console.log(
               "excel file did not match the template, please upload another file"
@@ -301,6 +319,8 @@ const gettingStarted = () => {
               setStudents(null);
               localStorage.removeItem("students");
             }
+
+            errors[3] = false;
           }
         };
         reader.readAsBinaryString(file);
@@ -316,6 +336,8 @@ const gettingStarted = () => {
         setMessage(
           "File is incompatible, system only accepts excel files with proper format"
         );
+        errors[2] = false;
+        errors[3] = false;
         console.log("file denied");
       }
     }
@@ -357,42 +379,49 @@ const gettingStarted = () => {
                     <SearchIcon className="text-white w-7 h-9" />
                   )}
                 </button>
-                {forms && (
-                  <div>
-                    <div>
-                      {students ? (
-                        <h6 className="text-lg font-bold">
-                          Uploaded File: {fileName}
-                        </h6>
-                      ) : (
-                        <h6 className="text-lg font-bold">
-                          Please upload your file here:
-                        </h6>
-                      )}
-                    </div>
 
-                    <form action="">
-                      <div>
-                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 w-full border-gray-300 border-dashed rounded-md">
-                          <div className="space-y-1 text-center">
-                            <div className="flex text-lg text-gray-600">
-                              <label className="relative cursor-pointer  font-bold text-ocean-400 hover:text-ocean-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ocean-400">
-                                <span>Upload a file</span>
-                                <input
-                                  id="file-upload"
-                                  name="file-upload"
-                                  type="file"
-                                  className="sr-only"
-                                  onChange={handleFile}
-                                />
-                              </label>
-                            </div>
+                <div>
+                  <div>
+                    {students ? (
+                      <h6 className="text-lg font-bold">
+                        Uploaded File: {fileName}
+                      </h6>
+                    ) : (
+                      <h6 className="text-lg font-bold">
+                        Please upload your file here:
+                      </h6>
+                    )}
+                  </div>
+
+                  <form action="">
+                    <div>
+                      <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 w-full border-gray-300 border-dashed rounded-md">
+                        <div className="space-y-1 text-center">
+                          <div className="flex text-lg text-gray-600">
+                            <label
+                              className={classNames(
+                                "font-bold focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ocean-400",
+                                forms != null
+                                  ? "relative cursor-pointer text-ocean-400 hover:text-ocean-400"
+                                  : "text-misc-disable"
+                              )}
+                            >
+                              <span>Upload a file</span>
+                              <input
+                                id="file-upload"
+                                name="file-upload"
+                                type="file"
+                                className="sr-only"
+                                onChange={handleFile}
+                                disabled={forms == null}
+                              />
+                            </label>
                           </div>
                         </div>
                       </div>
-                    </form>
-                  </div>
-                )}
+                    </div>
+                  </form>
+                </div>
               </section>
             </section>
             <section className="relative space-y-24 w-1/3">
@@ -405,11 +434,8 @@ const gettingStarted = () => {
                 />
               </div>
               <div className="w-full m-8 space-y-12">
-                <h6 className="text-base font-bold whitespace-normal">
-                  {message}
-                </h6>
                 {fileName && (
-                  <Link href={"/dev/dashboard"} passHref>
+                  <Link href={"/dashboard"} passHref>
                     <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
                       Continue
                     </button>
