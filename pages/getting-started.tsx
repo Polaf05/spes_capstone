@@ -405,7 +405,7 @@ const gettingStarted = () => {
                   {message}
                 </h6>
                 {fileName && (
-                  <Link href={"/dev/dashboard"} passHref>
+                  <Link href={"/dashboard"} passHref>
                     <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
                       Continue
                     </button>
