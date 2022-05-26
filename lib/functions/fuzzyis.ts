@@ -422,6 +422,7 @@ export function environmentalFactors(envVariables: number[]) {
   let average = sum / envVariables.length;
 
   return average;
+
 }
 
 export function externalElements(

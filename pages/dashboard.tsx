@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useClassroom } from "../../hooks/useSetClassroom";
+import { useClassroom } from "../hooks/useSetClassroom";
 
 const Dashboard = () => {
   const { students } = useClassroom();
@@ -15,13 +15,18 @@ const Dashboard = () => {
     } else {
       let qSum: any = 0;
       students[0].quarter?.map((quarter) => {
-        qSum += quarter.written_works?.length! > 0 ? 1 : 0;
+        qSum +=
+          quarter.written_works?.length! > 0 ||
+          quarter.performance_tasks?.length! > 0
+            ? 1
+            : 0;
       });
 
       var buttons: number[] = [];
       for (var i = 1; i <= qSum; i++) {
         buttons.push(i);
       }
+      console.log(buttons);
       setQuarters(buttons);
     }
   }, []);
@@ -45,7 +50,7 @@ const Dashboard = () => {
             <div className="flex gap-4">
               {quarters.map((button, idx) => (
                 <div key={idx}>
-                  <Link href={`/dev/${button}`} passHref>
+                  <Link href={`/${button}`} passHref>
                     <button className="rounded-3xl w-60 h-40 bg-ocean-100 grid place-items-center">
                       <h3 className="font-semibold text-lg">
                         Quarter {button}

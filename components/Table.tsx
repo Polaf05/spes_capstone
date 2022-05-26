@@ -18,8 +18,8 @@ const Table = ({ setIsOpen }: { setIsOpen: any }) => {
     setFilteredStudents([
       ...filteredStudents!.sort((a, b) => {
         switch (sortingMethod) {
-          case "grade_before":
-            return b.grade_before - a.grade_before;
+          case "final_grade_before":
+            return b.final_grade_before - a.final_grade_before;
           case "name":
             let fa = a.name.toLowerCase(),
               fb = b.name.toLowerCase();
@@ -31,11 +31,15 @@ const Table = ({ setIsOpen }: { setIsOpen: any }) => {
               return 1;
             }
             return 0;
-          case "grade_after":
+          case "final_grade_after":
           case "remarks":
-            return b.grade_after - a.grade_after;
+            return b.final_grade_after - a.final_grade_after;
           case "+/-":
-            return b.diff - a.diff;
+            return (
+              b.final_grade_after -
+              b.final_grade_before -
+              (a.final_grade_after - a.final_grade_before)
+            );
           default:
             return 0;
         }
@@ -59,7 +63,7 @@ const Table = ({ setIsOpen }: { setIsOpen: any }) => {
           <div className="">
             <button
               type="button"
-              onClick={() => setSorting("grade_before")}
+              onClick={() => setSorting("final_grade_before")}
               className="flex gap-2 items-center focus:text-ocean-400 bg-transparent hover:bg-ocean-400/[0.2] text-gray-900 font-semibold py-1 px-3 hover:-transparent rounded-full"
             >
               Before
@@ -77,7 +81,7 @@ const Table = ({ setIsOpen }: { setIsOpen: any }) => {
           <div className="">
             <button
               type="button"
-              onClick={() => setSorting("grade_after")}
+              onClick={() => setSorting("final_grade_after")}
               className="flex gap-2 bg-transparent focus:text-ocean-400 hover:bg-ocean-400/[0.2] text-gray-900 font-semibold py-1 px-3 hover:-transparent rounded-full"
             >
               After
@@ -117,23 +121,27 @@ const Table = ({ setIsOpen }: { setIsOpen: any }) => {
                   >
                     {student.name}
                   </td>
-                  <td className="px-5 py-4">{student.grade_before}</td>
+                  <td className="px-5 py-4">{student.final_grade_before}</td>
                   <td>
                     <span className="text-base">
-                      {"(" + student.diff.toFixed(1) + ")"}
+                      {"(" +
+                        (
+                          student.final_grade_after - student.final_grade_before
+                        ).toFixed(1) +
+                        ")"}
                     </span>
                   </td>
 
                   <td
                     className={
-                      student.grade_before == student.grade_after
+                      student.final_grade_before == student.final_grade_after
                         ? "px-5 py-4 text-gray-900 font-semibold"
-                        : student.grade_before < student.grade_after
+                        : student.final_grade_before < student.final_grade_after
                         ? "px-5 py-4 text-green-800 font-semibold"
                         : "px-5 py-4 text-red-800 font-semibold"
                     }
                   >
-                    {student.grade_after}
+                    {student.final_grade_after}
                   </td>
 
                   <td className="px-5 py-4 ">{student.remarks}</td>

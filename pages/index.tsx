@@ -18,7 +18,7 @@ const Home: NextPage = () => {
             elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore
             magna.
           </p>
-          <Link href={"/dev/getting-started"} passHref>
+          <Link href={"/getting-started"} passHref>
             <button className="rounded-full w-64 h-14 bg-ocean-300 text-white text-lg font-bold">
               Continue
             </button>
