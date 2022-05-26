@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { DownloadIcon } from "@heroicons/react/outline";
+import React, { useEffect, useState } from "react";
+import { DownloadIcon, SearchIcon } from "@heroicons/react/outline";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -13,7 +13,6 @@ import {
   SurveyResult,
   DataInference,
 } from "../../types/Students";
-import { getEmojiList } from "../api/sheets";
 import {
   getRemarks,
   getSurveyResults,
@@ -25,18 +24,41 @@ import {
   afterGradeInference,
   inferenceData,
 } from "../../lib/functions/fuzzyis";
-import { getServerSideProps } from "../dev/[quarter]";
+import { getSurveyList } from "../../lib/functions/sheets";
+import Loader from "../../components/Loader";
+import LoadingSpinner from "../../components/Loader";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
 
-const gettingStarted = (emojis: any) => {
+const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
   const [fileName, setFileName] = useState(null);
+  const [forms, setForms] = useState<SurveyResult[] | null>(null);
+  const [text_value, setText_value] = useState("");
   const [message, setMessage] = useState<string | null>(INITIAL_MESSAGE);
-  const { emojis: surveyResults } = emojis;
+  const [isLoading, setLoading] = useState(false);
 
-  const handleFile = (e: any) => {
+  let handleForms = async (text: string) => {
+    setLoading(true);
+    console.log("pindot");
+    let gsheet = await getSurveyList(text);
+
+    if (gsheet != null) {
+      setForms(gsheet);
+      setMessage("FORMS CONNECTED");
+
+      console.log(isLoading);
+    } else {
+      setMessage("ERROR, INCORRECT TEMPLATE OR THE FORMS IS RESTRICTED");
+      setForms(null);
+      setStudents(null);
+      setFileName(null);
+    }
+    setLoading(false);
+  };
+
+  const handleFile = async (e: any) => {
     const [file] = e.target.files;
 
     if (file != null) {
@@ -163,27 +185,26 @@ const gettingStarted = (emojis: any) => {
 
                         let remarks = getRemarks(item[35]);
 
-                        let survey = getSurveyResults(
-                          surveyResults,
-                          students[i].name
-                        );
-
+                        let survey = getSurveyResults(forms!, students[i].name);
                         let infer: DataInference =
                           survey == undefined
                             ? ([] as any)
                             : inferenceData(survey);
 
+                        let grade_after =
+                          survey == undefined
+                            ? 0
+                            : item[35] +
+                              afterGradeInference(
+                                item[35],
+                                infer.external_elements.value
+                              );
+
                         const quarter_grade: Quarter = {
                           id: i,
                           grade_before: item[35],
-                          diff: 90 - item[35],
-                          grade_after:
-                            survey == undefined
-                              ? 0
-                              : afterGradeInference(
-                                  item[35],
-                                  infer.external_elements.value
-                                ),
+                          diff: grade_after - item[35],
+                          grade_after: grade_after,
                           remarks: remarks as string,
                           written_works: written_works,
                           performance_tasks: performace_works,
@@ -236,7 +257,7 @@ const gettingStarted = (emojis: any) => {
                 quarter_grade.push(quart[index]);
               });
 
-              let survey = getSurveyResults(surveyResults, item.name);
+              let survey = getSurveyResults(forms!, item.name);
 
               let infer: DataInference =
                 survey == undefined ? ([] as any) : inferenceData(survey);
@@ -250,7 +271,8 @@ const gettingStarted = (emojis: any) => {
                 final_grade_after:
                   survey == undefined
                     ? 0
-                    : afterGradeInference(
+                    : finals[index].final_grade +
+                      afterGradeInference(
                         finals[index].final_grade,
                         infer.external_elements.value
                       ),
@@ -316,43 +338,61 @@ const gettingStarted = (emojis: any) => {
                 </p>
               </section>
               <section className="m-4 space-y-4">
-                {students ? (
-                  <h6 className="text-lg font-bold">
-                    Uploaded File: {fileName}
-                  </h6>
-                ) : (
-                  <h6 className="text-lg font-bold">
-                    Please upload your file here:
-                  </h6>
-                )}
-
-                <form action="">
+                <div className="mb-3 pt-0">
+                  <input
+                    type="text"
+                    placeholder="Placeholder"
+                    className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
+                    onChange={(e) => setText_value(e.target.value)}
+                  />
+                </div>
+                <button
+                  className="flex justify-center rounded-xl w-52 h-10 bg-ocean-400"
+                  onClick={() => handleForms(text_value)}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <SearchIcon className="text-white w-7 h-9" />
+                  )}
+                </button>
+                {forms && (
                   <div>
-                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 w-full border-gray-300 border-dashed rounded-md">
-                      <div className="space-y-1 text-center">
-                        <div className="flex text-lg text-gray-600">
-                          <label className="relative cursor-pointer  font-bold text-ocean-400 hover:text-ocean-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ocean-400">
-                            <span>Upload a file</span>
-                            <input
-                              id="file-upload"
-                              name="file-upload"
-                              type="file"
-                              className="sr-only"
-                              onChange={handleFile}
-                            />
-                          </label>
+                    <div>
+                      {students ? (
+                        <h6 className="text-lg font-bold">
+                          Uploaded File: {fileName}
+                        </h6>
+                      ) : (
+                        <h6 className="text-lg font-bold">
+                          Please upload your file here:
+                        </h6>
+                      )}
+                    </div>
+
+                    <form action="">
+                      <div>
+                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 w-full border-gray-300 border-dashed rounded-md">
+                          <div className="space-y-1 text-center">
+                            <div className="flex text-lg text-gray-600">
+                              <label className="relative cursor-pointer  font-bold text-ocean-400 hover:text-ocean-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ocean-400">
+                                <span>Upload a file</span>
+                                <input
+                                  id="file-upload"
+                                  name="file-upload"
+                                  type="file"
+                                  className="sr-only"
+                                  onChange={handleFile}
+                                />
+                              </label>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </form>
                   </div>
-                </form>
-
-                <h6 className="text-md font-bold">
-                  If you don't have a template file yet, please download here:
-                </h6>
-                <button className="flex justify-center rounded-xl w-52 h-10 bg-ocean-400">
-                  <DownloadIcon className="text-white w-7 h-9"></DownloadIcon>
-                </button>
+                )}
               </section>
             </section>
             <section className="relative space-y-24 w-1/3">
@@ -383,15 +423,6 @@ const gettingStarted = (emojis: any) => {
     </React.Fragment>
   );
 };
-
-export async function getStaticProps(context: any) {
-  const emojis = await getEmojiList();
-  return {
-    props: {
-      emojis: emojis, // remove sheet header
-    },
-  };
-}
 
 export default gettingStarted;
 

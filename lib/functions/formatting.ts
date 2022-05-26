@@ -52,9 +52,9 @@ export function getStatus(
     return "Perfect";
   } else if (score >= passing_score) {
     return "Passed";
-  } else if (score >= passing_score - 2 && score < passing_score) {
+  } else if (score >= passing_score - 1 && score < passing_score) {
     return "Considerable";
-  } else if (score < passing_score - 2 && score > 0) {
+  } else if (score < passing_score - 1 && score > 0) {
     return "Failed";
   } else if (score == 0) {
     return "Zero";
@@ -87,15 +87,15 @@ export function giveValue(item: any) {
   } else if (item.effectivity_implementation == "Quite effective") {
     //3
     effect.linguistic = "Quite effective";
-    effect.value = 3.334;
+    effect.value = 0.3334;
   } else if (item.effectivity_implementation == "Effective") {
     //5
     effect.linguistic = "Effective";
-    effect.value = 6.667;
+    effect.value = 0.6667;
   } else {
     //7
     effect.linguistic = "Very effective";
-    effect.value = 10;
+    effect.value = 1;
   }
 
   if (item.learning_performance_similarities == "Not Similar") {
@@ -105,25 +105,25 @@ export function giveValue(item: any) {
   } else if (item.learning_performance_similarities == "Quite Similar") {
     //3
     similarities.linguistic = "Quite Similar";
-    similarities.value = 3.334;
+    similarities.value = 0.3334;
   } else if (item.learning_performance_similarities == "Similar") {
     //5
     similarities.linguistic = "Similar";
-    similarities.value = 6.667;
+    similarities.value = 0.6667;
   } else {
     //7
     similarities.linguistic = "More than Similar";
-    similarities.value = 10;
+    similarities.value = 1;
   }
 
   if (item.wifi.includes("have an excellent")) {
     //1
     wifi.linguistic = "Good";
-    wifi.value = 10;
+    wifi.value = 1;
   } else if (item.wifi.includes("slow and sometimes intermittent")) {
     //3
     wifi.linguistic = "Bad";
-    wifi.value = 5;
+    wifi.value = 0.5;
   } else {
     //5
     wifi.linguistic = "No Wifi Connection";
@@ -133,11 +133,11 @@ export function giveValue(item: any) {
   if (item.data.includes("have an excellent")) {
     //1
     data.linguistic = "Good";
-    data.value = 10;
+    data.value = 1;
   } else if (item.data.includes("slow and sometimes intermittent")) {
     //3
     data.linguistic = "Bad";
-    data.value = 5;
+    data.value = 0.5;
   } else {
     //5
     data.linguistic = "No Data Connection";
@@ -149,22 +149,22 @@ export function giveValue(item: any) {
     device.value = 0;
   } else if (item.device.includes("rent")) {
     device.linguistic = "Renting Device";
-    device.value = 2.334;
+    device.value = 0.1667;
   } else if (item.device.includes("share")) {
-    device.linguistic = "Shared Device";
-    device.value = 4.666;
+    device.linguistic = "Sharing Device";
+    device.value = 0.3333;
   } else if (item.device.includes("borrow")) {
-    device.linguistic = "Borrowed Device";
-    device.value = 7;
+    device.linguistic = "Borrowing a Device";
+    device.value = 0.5;
   } else if (item.device.includes("have a personal tablet")) {
-    device.linguistic = "Have Mobile";
-    device.value = 9.334;
+    device.linguistic = "Mobile/Tablet only";
+    device.value = 0.6667;
   } else if (item.device.includes("have a personal laptop")) {
-    device.linguistic = "Have Laptop";
-    device.value = 11.67;
+    device.linguistic = "Laptop/Computer only";
+    device.value = 0.8333;
   } else {
-    device.linguistic = "Have Both laptop and mobile";
-    device.value = 14;
+    device.linguistic = "Both Laptop and Mobile";
+    device.value = 1;
   }
 
   if (item.name.includes(",")) {
@@ -231,13 +231,13 @@ export function getEnvironmentalData(row: any, counter: number) {
 
   for (let i = counter; i <= counter + 8; i++) {
     if (row[i] == "Greatly Affecting") {
-      environment.push(4);
+      environment.push(0.75);
     } else if (row[i] == "Affecting") {
-      environment.push(3);
+      environment.push(0.5);
     } else if (row[i] == "Quite Affecting") {
-      environment.push(2);
+      environment.push(0.25);
     } else if (row[i] == "Unaffecting at all") {
-      environment.push(1);
+      environment.push(0);
     }
   }
 
@@ -252,7 +252,7 @@ export function getSurveyResults(survey_list: SurveyResult[], name: string) {
 
 export function getRemarks(grade_before: number) {
   if (grade_before < 75) {
-    return "Very poor";
+    return "Very Poor";
   } else if (grade_before >= 75 && grade_before <= 82) {
     return "Poor";
   } else if (grade_before >= 82 && grade_before <= 89) {

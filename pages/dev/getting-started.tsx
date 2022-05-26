@@ -13,7 +13,7 @@ import {
   SurveyResult,
   DataInference,
 } from "../../types/Students";
-import { getEmojiList } from "../api/sheets";
+import { getSurveyList } from "../../lib/functions/sheets";
 import {
   getRemarks,
   getSurveyResults,
@@ -385,7 +385,9 @@ const gettingStarted = (emojis: any) => {
 };
 
 export async function getStaticProps(context: any) {
-  const emojis = await getEmojiList();
+  const emojis = await getSurveyList(
+    "1t8HF0FYxnSWSc9fauKT7iKi1xIh1LzJ1Y7It-YXvtDA"
+  );
   return {
     props: {
       emojis: emojis, // remove sheet header
