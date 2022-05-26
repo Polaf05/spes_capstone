@@ -252,7 +252,7 @@ export function getSurveyResults(survey_list: SurveyResult[], name: string) {
 
 export function getRemarks(grade_before: number) {
   if (grade_before < 75) {
-    return "Very poor";
+    return "Very Poor";
   } else if (grade_before >= 75 && grade_before <= 82) {
     return "Poor";
   } else if (grade_before >= 82 && grade_before <= 89) {
