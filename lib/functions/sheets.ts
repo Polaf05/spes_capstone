@@ -13,7 +13,7 @@ export async function getSurveyList(link: string) {
     //   .then((res) => res.data);
 
     const data = await axios
-      .post("https://spes-capstone.vercel.app/api/test", { sheetId: sheetId })
+      .post("/api/test", { sheetId: sheetId })
       .then((res) => res.data);
 
     const rows = data.data.values;
