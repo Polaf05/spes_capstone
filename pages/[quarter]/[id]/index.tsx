@@ -768,38 +768,66 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                   }}
                 />
                 <div className="border-t mt-3 text-sm text-neutral-500">
-                  <div className="flex gap-4">
+                  <div className="flex justify-between">
                     <p>Written Works</p>
-                    <p>
-                      Fluctuation:{" "}
-                      {myStudent.written_tasks_analysis?.fluctuation.toFixed(1)}
-                    </p>
-                    <p>
-                      Consistency:{" "}
-                      {myStudent.written_tasks_analysis?.fluctuation.toFixed(1)}
-                    </p>
-                    <p>
-                      Plunged: {myStudent.written_tasks_analysis?.plunge_task}
-                    </p>
+                    <div className="flex gap-2">
+                      <p>
+                        Fluctuation:{" "}
+                        {myStudent.written_tasks_analysis?.fluctuation.toFixed(
+                          1
+                        )}
+                      </p>
+                      <p>
+                        Consistency:{" "}
+                        {myStudent.written_tasks_analysis?.fluctuation.toFixed(
+                          1
+                        )}
+                      </p>
+                      {myStudent.written_tasks_analysis?.plunge_task.length! >
+                        0 && (
+                        <p>
+                          Plunged:{" "}
+                          {myStudent.written_tasks_analysis?.plunge_task}
+                        </p>
+                      )}
+                      {myStudent.written_tasks_analysis?.surge_task.length! >
+                        0 && (
+                        <p>
+                          Surged: {myStudent.written_tasks_analysis?.surge_task}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex gap-4">
+                  <div className="flex justify-between">
                     <p>Performance Tasks</p>
-                    <p>
-                      Fluctuation:{" "}
-                      {myStudent.performace_tasks_analysis?.fluctuation.toFixed(
-                        1
+                    <div className="flex gap-2">
+                      <p>
+                        Fluctuation:{" "}
+                        {myStudent.performace_tasks_analysis?.fluctuation.toFixed(
+                          1
+                        )}
+                      </p>
+                      <p>
+                        Consistency:{" "}
+                        {myStudent.performace_tasks_analysis?.fluctuation.toFixed(
+                          1
+                        )}
+                      </p>
+                      {myStudent.performace_tasks_analysis?.plunge_task
+                        .length! > 0 && (
+                        <p>
+                          Plunged:{" "}
+                          {myStudent.performace_tasks_analysis?.plunge_task}
+                        </p>
                       )}
-                    </p>
-                    <p>
-                      Consistency:{" "}
-                      {myStudent.performace_tasks_analysis?.fluctuation.toFixed(
-                        1
+                      {myStudent.performace_tasks_analysis?.surge_task.length! >
+                        0 && (
+                        <p>
+                          Surged:{" "}
+                          {myStudent.performace_tasks_analysis?.surge_task}
+                        </p>
                       )}
-                    </p>
-                    <p>
-                      Plunged:{" "}
-                      {myStudent.performace_tasks_analysis?.plunge_task}
-                    </p>
+                    </div>
                   </div>
                 </div>
               </div>
