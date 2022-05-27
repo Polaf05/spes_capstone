@@ -14,6 +14,7 @@ import {
   DataInference,
 } from "../../types/Students";
 import {
+  getGradeAfter,
   getRemarks,
   getSurveyResults,
   getTask,
@@ -214,10 +215,12 @@ const gettingStarted = () => {
                                 infer.external_elements.value
                               );
 
+                        grade_after = getGradeAfter(grade_after);
+
                         const quarter_grade: Quarter = {
                           id: i,
                           grade_before: item[35],
-                          diff: grade_after - item[35],
+                          diff: parseFloat((grade_after - item[35]).toFixed(1)),
                           grade_after: grade_after,
                           remarks: remarks as string,
                           written_works: written_works,
