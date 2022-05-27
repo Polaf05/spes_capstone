@@ -25,7 +25,6 @@ import {
   inferenceData,
 } from "../../lib/functions/fuzzyis";
 import { getSurveyList } from "../../lib/functions/sheets";
-import Loader from "../../components/Loader";
 import LoadingSpinner from "../../components/Loader";
 
 const INITIAL_MESSAGE =
@@ -48,7 +47,6 @@ const gettingStarted = () => {
 
   let handleForms = async (text: string) => {
     setLoading(true);
-    console.log("pindot");
     let gsheet = await getSurveyList(text);
 
     if (gsheet != null) {
@@ -434,6 +432,9 @@ const gettingStarted = () => {
                 />
               </div>
               <div className="w-full m-8 space-y-12">
+                <h6 className="text-base font-bold whitespace-normal">
+                  {message}
+                </h6>
                 {fileName && (
                   <Link href={"/dashboard"} passHref>
                     <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
