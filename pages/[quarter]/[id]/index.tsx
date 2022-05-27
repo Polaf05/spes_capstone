@@ -767,7 +767,41 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                     },
                   }}
                 />
-                <p className="text-sm text-neutral-500">Fluctuation:</p>
+                <div className="border-t mt-3 text-sm text-neutral-500">
+                  <div className="flex gap-4">
+                    <p>Written Works</p>
+                    <p>
+                      Fluctuation:{" "}
+                      {myStudent.written_tasks_analysis?.fluctuation.toFixed(1)}
+                    </p>
+                    <p>
+                      Consistency:{" "}
+                      {myStudent.written_tasks_analysis?.fluctuation.toFixed(1)}
+                    </p>
+                    <p>
+                      Plunged: {myStudent.written_tasks_analysis?.plunge_task}
+                    </p>
+                  </div>
+                  <div className="flex gap-4">
+                    <p>Performance Tasks</p>
+                    <p>
+                      Fluctuation:{" "}
+                      {myStudent.performace_tasks_analysis?.fluctuation.toFixed(
+                        1
+                      )}
+                    </p>
+                    <p>
+                      Consistency:{" "}
+                      {myStudent.performace_tasks_analysis?.fluctuation.toFixed(
+                        1
+                      )}
+                    </p>
+                    <p>
+                      Plunged:{" "}
+                      {myStudent.performace_tasks_analysis?.plunge_task}
+                    </p>
+                  </div>
+                </div>
               </div>
               {/* Line Chart Assessment */}
               <div className="h-[45vh] overflow-x-auto px-3">
