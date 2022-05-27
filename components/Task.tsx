@@ -130,7 +130,7 @@ export const Task = ({
             {/* Table Head - Buttons */}
             <thead className="border-b-2 bg-white sticky top-0">
               <tr className="text-center">
-                <th className="flex flex-row pl-2">
+                <th className="flex items-center pl-2">
                   <button
                     className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                     value={"Name"}
@@ -152,15 +152,15 @@ export const Task = ({
                     className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                     onClick={() => setSorting("Adjustment Difference")}
                   >
-                    +/-
+                    Adjustment
                   </button>
                 </th>
                 <th>
                   <button
-                    className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
+                    className="font-semibold text- flex flex-col hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                     onClick={() => setSorting("Grade After")}
                   >
-                    Suggested Grade
+                    Suggested
                   </button>
                 </th>
                 <th className="text-right">

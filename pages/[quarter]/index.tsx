@@ -6,13 +6,14 @@ import { Tab } from "@headlessui/react";
 import { Task } from "../../components/Task";
 import { GetServerSideProps } from "next";
 import BarChart from "../../components/BarChart";
-import { DataSet } from "../../types/Students";
+import { DataSet, Student } from "../../types/Students";
 import CircularProgress from "../../components/CircularProgress";
 import PeopleChart from "../../components/PeopleChart";
 import { useRouter } from "next/router";
 import ProgressComponent from "../../components/ProgressComponent";
 import CardInfo from "../../components/CardInfo";
 import StruggledSections from "../../components/sections/StruggledSections";
+import { render } from "@headlessui/react/dist/utils/render";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -41,25 +42,6 @@ export default function Tasks({ quarter }: { quarter: number }) {
   // get weighted omsim of a written works and performance task
   const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
   const wgh_pt = myStudent.performance_weighted_score?.highest_possible_score;
-
-  /* students?.forEach((student) => {
-    const grade_before = student.grade_before;
-    const grade_after = student.grade_after;
-    const diff = grade_after - grade_before;
-    const remark =
-      diff >= 1.2 && grade_after > 90
-        ? "Very Good"
-        : diff > 0.0 && grade_after > 85
-        ? "Good"
-        : diff >= -0.5 && grade_after > 80
-        ? "Average"
-        : diff > -0.8 || grade_after > 75
-        ? "Poor"
-        : "Very Poor";
-
-    const index = labels.indexOf(remark);
-    count[index] += 1;
-  });*/
 
   const data = {
     labels: labels,
@@ -92,10 +74,76 @@ export default function Tasks({ quarter }: { quarter: number }) {
     },
   ]);
 
+  type TaskInfo = {
+    task_no: number;
+    total: number;
+    ave_score: number;
+    ave_score_pct: number;
+    students: {
+      population: number; // total classroom population
+      participated: number; // students participated
+      no_data: number; // students absent/no data found
+      passed: number; //passed students
+    };
+  };
+
+  //get average of written work
+
+  //const ave: number = getAverage(students!, quarter, 1);
+
+  const tasks_dataset = [
+    {
+      task_no: 1,
+      total: 10,
+      ave_score: 9.2,
+      ave_score_pct: 92,
+      students: {
+        population: 50, // total classroom population
+        participated: 47, // students participated
+        no_data: 3, // students absent/no data found
+        passed: 42, //passed students
+        failed: ["Reniel Avellano"], //failed students
+      },
+    },
+    {
+      task_no: 2,
+      total: 20,
+      ave_score: 18,
+      ave_score_pct: 90,
+      students: {
+        population: 50, // total classroom population
+        participated: 49, // students participated
+        no_data: 1, // students absent/no data found
+        passed: 48, //passed students
+        failed: 0, //failed students
+      },
+    },
+    {
+      task_no: 3,
+      total: 10,
+      ave_score: 8,
+      ave_score_pct: 80,
+      students: {
+        population: 50, // total classroom population
+        participated: 48, // students participated
+        no_data: 3, // students absent/no data found
+        passed: 42, //passed students
+        failed: ["Laura Manlapaz", "JC Tolentino"], //failed students
+      },
+    },
+  ];
+
+  const render_data: number[] = [];
+  const render_labels: string[] = [];
+  tasks_dataset.map((task, idx) => {
+    render_data.push(task.ave_score_pct);
+    render_labels.push(`Task ${task.task_no}`);
+  });
+
   const quarter_dataset: DataSet[] = [
     {
       label: "Students Passed",
-      data: [99, 80, 88, 87],
+      data: render_data,
       fill: true,
       backgroundColor: "#FFF598",
       borderColor: "#FFF598",
@@ -170,61 +218,41 @@ export default function Tasks({ quarter }: { quarter: number }) {
               {/* Omsim Chart */}
               {/* Student Cards */}
               <div className="m-8 pb-24">
-                <StruggledSections />
-                <h2 className="text-xl font-bold">
-                  Students had a hard time with:
-                </h2>
-                <div className="grid grid-cols-2 grid-flow-row gap-2">
-                  <div className="col-span-1 my-2 h-fit px-4 py-2 border-2 border-red-300 rounded-xl">
-                    <div className="flex justify-between">
-                      <h4>Performance Tasks</h4>
-                      <h4>Task No.</h4>
-                    </div>
-                    <div className="mt-4">
-                      <div className="flex justify-between">
-                        <h4 className="text-lg font-bold">Omskim Ignacio</h4>
-                        <h4 className="text-lg font-bold">4,5,6</h4>
-                      </div>
-                      <div className="flex justify-between">
-                        <h4 className="text-lg font-bold">Omskim Ignacio</h4>
-                        <h4 className="text-lg font-bold">4,5,6</h4>
-                      </div>
-                      <div className="flex justify-between">
-                        <h4 className="text-lg font-bold">Omskim Ignacio</h4>
-                        <h4 className="text-lg font-bold">4,5,6</h4>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-span-1 my-2 h-fit px-4 py-2 border-2 border-red-300 rounded-xl">
-                    <div className="flex justify-between">
-                      <h4>Performance Tasks</h4>
-                      <h4>Task No.</h4>
-                    </div>
-                    <div className="mt-4">
-                      <div className="flex justify-between">
-                        <h4 className="text-lg font-bold">Omskim Ignacio</h4>
-                        <h4 className="text-lg font-bold">4,5,6</h4>
-                      </div>
-                      <div className="flex justify-between">
-                        <h4 className="text-lg font-bold">Omskim Ignacio</h4>
-                        <h4 className="text-lg font-bold">4,5,6</h4>
-                      </div>
-                      <div className="flex justify-between">
-                        <h4 className="text-lg font-bold">Omskim Ignacio</h4>
-                        <h4 className="text-lg font-bold">4,5,6</h4>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <StruggledSections students={students} quarter={quarter} />
               </div>
               {/* Bar Chart */}
               <div className="h-fit m-8 px-24 pb-24 border-b-2 border-ocean-400">
-                <h1 className="text-3xl font-bold">Quarter Grade</h1>
-                <BarChart
-                  indexAxis="y"
-                  labels={["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"]}
-                  datasets={quarter_dataset}
-                />
+                <div className="grid grid-cols-10 mt-4">
+                  <div className="col-span-4 py-4">
+                    <h2 className="text-xl font-semibold">Task Information</h2>
+                    <div>
+                      <h6 className="font-light">Average Score</h6>
+                      <h6 className="font-light">Average Score PCT</h6>
+
+                      <h6 className="font-light">
+                        No. of Students Participated
+                      </h6>
+                      <div className="w-full">
+                        <PeopleChart
+                          passed_tasks={8}
+                          length={10}
+                          color="yellow"
+                        />
+                        <p className="font-light text-center">
+                          8 out of 10 students omsim
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-span-6">
+                    <h2 className="text-3xl font-bold">Task Chart</h2>
+                    <BarChart
+                      indexAxis="y"
+                      labels={render_labels}
+                      datasets={quarter_dataset}
+                    />
+                  </div>
+                </div>
                 <p className="italic text-justify mt-8">
                   Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
                   adipiscing elit, sedlor sit amet, consectetuer adipiscing
