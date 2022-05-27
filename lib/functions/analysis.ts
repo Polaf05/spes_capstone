@@ -138,11 +138,58 @@ export function getRanking(classroom: Student[], task_length: any) {
     }
 
     class_list = classroom.sort(
-      (a, b) => b.quarter![i].grade_before - a.quarter![i].grade_before
+      (a, b) =>
+        b.quarter![i].written_percentage!.score! -
+        a.quarter![i].written_percentage!.score!
     );
 
     let group: any = [];
     let j = 0;
+    class_list.map((student, index, class_list) => {
+      let points = 0;
+      if (!group[student.quarter![i].written_percentage!.score!]) {
+        group[student.quarter![i].written_percentage!.score!] = [];
+        j = index + 1;
+        points = j;
+      } else {
+        points = j + 0.5;
+
+        class_list[index - 1].quarter![i].written_percentage!.ranking = points;
+      }
+      group[student.quarter![i].written_percentage!.score!].push(student);
+      student.quarter![i].written_percentage!.ranking = points;
+    });
+
+    class_list = classroom.sort(
+      (a, b) =>
+        b.quarter![i].performance_percentage!.score! -
+        a.quarter![i].performance_percentage!.score!
+    );
+
+    group = [];
+    j = 0;
+    class_list.map((student, index, class_list) => {
+      let points = 0;
+      if (!group[student.quarter![i].performance_percentage!.score!]) {
+        group[student.quarter![i].performance_percentage!.score!] = [];
+        j = index + 1;
+        points = j;
+      } else {
+        points = j + 0.5;
+
+        class_list[index - 1].quarter![i].performance_percentage!.ranking =
+          points;
+      }
+      group[student.quarter![i].performance_percentage!.score!].push(student);
+      student.quarter![i].performance_percentage!.ranking = points;
+    });
+
+    class_list = classroom.sort(
+      (a, b) => b.quarter![i].grade_before - a.quarter![i].grade_before
+    );
+
+    group = [];
+    j = 0;
     class_list.map((student, index, class_list) => {
       let points = 0;
       if (!group[student.quarter![i].grade_before]) {
