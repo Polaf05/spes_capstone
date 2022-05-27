@@ -36,6 +36,7 @@ module.exports = {
           okay: "#F9E852",
           good: "#65EF73",
           verygood: "#52BDF9",
+          disable: "#D3D3D3",
         },
         table: {
           delawan: "#F2EFD1",

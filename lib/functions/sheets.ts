@@ -22,7 +22,7 @@ export async function getSurveyList(link: string) {
         rows[0][9] !==
         "How effective do you believe the implementation of remote learning was in alleviating the education crisis in your school in the midst of a pandemic?"
       ) {
-        return null;
+        return false;
       } else {
         let flag = true;
         let surveyType: SurveyResult[] = [];
