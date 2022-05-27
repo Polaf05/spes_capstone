@@ -30,19 +30,6 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   };
 };
 
-const getAverage = (students: Student[], quarter: number, task: number) => {
-  let ww_sum = 0;
-  let total = 0;
-  students.map((student) => {
-    if (student?.quarter![quarter].written_works![task].status != "??") {
-      ww_sum += student?.quarter![quarter].written_works![task].score;
-      total += 1;
-    }
-  });
-
-  return 0;
-};
-
 export default function Tasks({ quarter }: { quarter: number }) {
   const { students } = useClassroom();
   const [open, setIsOpen] = useState<boolean>(false);
@@ -102,7 +89,7 @@ export default function Tasks({ quarter }: { quarter: number }) {
 
   //get average of written work
 
-  const ave: number = getAverage(students, quarter, 1);
+  //const ave: number = getAverage(students!, quarter, 1);
 
   const tasks_dataset = [
     {

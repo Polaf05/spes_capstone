@@ -8,14 +8,14 @@ const CardInfo = ({
 }: {
   className: string;
   title: string;
-  value: number;
+  value: any;
   children: React.ReactNode;
 }) => {
   return (
     <div className={className}>
       <h1 className="mb-4">{title}</h1>
       {children}
-      <h1 className="font-bold text-3xl mt-4 flex justify-end">{value}</h1>
+      <h1 className="font-bold text-3xl mt-4 flex justify-end">{value}%</h1>
     </div>
   );
 };
