@@ -13,6 +13,7 @@ export type TaskData = {
 export type scoreData = {
   score: number;
   highest_possible_score: number;
+  ranking: number;
 };
 
 export type StruggledStudent = {

@@ -14,6 +14,7 @@ import {
   DataInference,
 } from "../types/Students";
 import {
+  getGradeAfter,
   getRemarks,
   getSurveyResults,
   getTask,
@@ -211,10 +212,14 @@ const gettingStarted = () => {
                                 infer.external_elements.value
                               );
 
+                        grade_after = parseFloat(
+                          getGradeAfter(grade_after).toFixed(1)
+                        );
+
                         const quarter_grade: Quarter = {
                           id: i,
                           grade_before: item[35],
-                          diff: grade_after - item[35],
+                          diff: parseFloat((grade_after - item[35]).toFixed(1)),
                           grade_after: grade_after,
                           remarks: remarks as string,
                           written_works: written_works,
@@ -273,20 +278,24 @@ const gettingStarted = () => {
               let infer: DataInference =
                 survey == undefined ? ([] as any) : inferenceData(survey);
 
+              let grade_after =
+                survey == undefined
+                  ? 0
+                  : finals[index].final_grade +
+                    afterGradeInference(
+                      finals[index].final_grade,
+                      infer.external_elements.value
+                    );
+
+              grade_after = parseFloat(getGradeAfter(grade_after).toFixed(1));
+
               const student_info: Student = {
                 id: item.id,
                 name: item.name,
                 gender: item.gender,
                 quarter: quarter_grade,
                 final_grade_before: finals[index].final_grade,
-                final_grade_after:
-                  survey == undefined
-                    ? 0
-                    : finals[index].final_grade +
-                      afterGradeInference(
-                        finals[index].final_grade,
-                        infer.external_elements.value
-                      ),
+                final_grade_after: grade_after,
                 remarks: finals[index].remarks,
                 survey_result: survey == undefined ? ([] as any) : survey,
                 //inference_result: inference_data,

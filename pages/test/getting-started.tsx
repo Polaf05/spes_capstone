@@ -215,7 +215,9 @@ const gettingStarted = () => {
                                 infer.external_elements.value
                               );
 
-                        grade_after = getGradeAfter(grade_after);
+                        grade_after = parseFloat(
+                          getGradeAfter(grade_after).toFixed(1)
+                        );
 
                         const quarter_grade: Quarter = {
                           id: i,
@@ -279,20 +281,24 @@ const gettingStarted = () => {
               let infer: DataInference =
                 survey == undefined ? ([] as any) : inferenceData(survey);
 
+              let grade_after =
+                survey == undefined
+                  ? 0
+                  : finals[index].final_grade +
+                    afterGradeInference(
+                      finals[index].final_grade,
+                      infer.external_elements.value
+                    );
+
+              grade_after = parseFloat(getGradeAfter(grade_after).toFixed(1));
+
               const student_info: Student = {
                 id: item.id,
                 name: item.name,
                 gender: item.gender,
                 quarter: quarter_grade,
                 final_grade_before: finals[index].final_grade,
-                final_grade_after:
-                  survey == undefined
-                    ? 0
-                    : finals[index].final_grade +
-                      afterGradeInference(
-                        finals[index].final_grade,
-                        infer.external_elements.value
-                      ),
+                final_grade_after: grade_after,
                 remarks: finals[index].remarks,
                 survey_result: survey == undefined ? ([] as any) : survey,
                 //inference_result: inference_data,
