@@ -8,8 +8,12 @@ export async function getSurveyList(link: string) {
 
   const sheetId = sheets[5];
   try {
+    // const data = await axios
+    //   .post("http://localhost:3000/api/test", { sheetId: sheetId })
+    //   .then((res) => res.data);
+
     const data = await axios
-      .post("http://localhost:3000/api/test", { sheetId: sheetId })
+      .post("/api/test", { sheetId: sheetId })
       .then((res) => res.data);
 
     const rows = data.data.values;
@@ -18,7 +22,7 @@ export async function getSurveyList(link: string) {
         rows[0][9] !==
         "How effective do you believe the implementation of remote learning was in alleviating the education crisis in your school in the midst of a pandemic?"
       ) {
-        return null;
+        return false;
       } else {
         let flag = true;
         let surveyType: SurveyResult[] = [];

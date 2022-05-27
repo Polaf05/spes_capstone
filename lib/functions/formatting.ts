@@ -263,3 +263,11 @@ export function getRemarks(grade_before: number) {
     return "Very Good";
   }
 }
+
+export function getGradeAfter(grade_after: number) {
+  if (grade_after >= 100) {
+    grade_after = 100;
+  }
+
+  return grade_after;
+}
