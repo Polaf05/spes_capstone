@@ -387,6 +387,26 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
       tdata.underperformed_tasks.push([_score, _total, _task, _status]);
   });
 
+  //surpassed students
+  const ranks: number[] = [];
+  //initialize ranks
+  students?.map((s) => {
+    ranks.push(0);
+  });
+  students?.map((s) => {
+    const index = Math.trunc(s.quarter![quarter - 1].ranking!);
+    ranks[index - 1] += 1;
+  });
+
+  //student rank
+  const my_ranking = Math.trunc(myStudent.ranking!);
+  //sum of surpassed
+  let surp_sum = 0;
+  for (let i = my_ranking; i < students?.length!; i++) {
+    surp_sum += ranks[i];
+  }
+  const pct = Number(((surp_sum / students?.length!) * 100).toFixed(1));
+
   // get weighted omsim of a written works and performance task
   const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
   const wgh_pt = myStudent.performance_weighted_score?.highest_possible_score;
@@ -769,7 +789,12 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
               <div className="col-span-4">
                 {/* Top Performance Section */}
                 <div className="">
-                  <h3 className="text-xl font-bold">{tdata.ww.raw_scores.score[ww_best_task!] != -1 && tdata.pt.raw_scores.score[pt_best_task!] != -1 ? "Top Performance" : "No data available for student  "}</h3>
+                  <h3 className="text-xl font-bold">
+                    {tdata.ww.raw_scores.score[ww_best_task!] != -1 &&
+                    tdata.pt.raw_scores.score[pt_best_task!] != -1
+                      ? "Top Performance"
+                      : "No data available for student  "}
+                  </h3>
                   <div className="grid grid-cols-2 gap-2 mt-4">
                     {tdata.ww.raw_scores.score[ww_best_task!] != -1 && (
                       <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between">
@@ -1011,9 +1036,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                     <div className="relative">
                       <div className="z-40 absolute inset-0 flex justify-center items-center">
                         <div className="flex flex-col justify-center items-center">
-                          <h2 className="font-bold text-xl">
-                            {tdata.pt.percentage}%
-                          </h2>
+                          <h2 className="font-bold text-xl">{pct}%</h2>
                           <h3 className="text-[0.8rem] font-semibold">
                             Surpassed
                           </h3>
@@ -1024,13 +1047,12 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                                 : "text-[0.5rem]"
                             }
                           >
-                            {tdata.pt.score_sum} out of {tdata.pt.total_item}{" "}
-                            students
+                            {surp_sum} out of {students?.length} students
                           </p>
                         </div>
                       </div>
                       <CircularProgress
-                        value={tdata.pt.percentage}
+                        value={pct}
                         pathColor="#63C7FF"
                         strokeWidth={10}
                       />
