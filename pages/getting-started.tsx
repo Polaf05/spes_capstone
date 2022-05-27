@@ -20,7 +20,11 @@ import {
   getTask,
   getWeighted,
 } from "../lib/functions/formatting";
-import { fluctuation, getRanking } from "../lib/functions/analysis";
+import {
+  fluctuation,
+  getRanking,
+  quarterAnalysis,
+} from "../lib/functions/analysis";
 import { afterGradeInference, inferenceData } from "../lib/functions/fuzzyis";
 import { getSurveyList } from "../lib/functions/sheets";
 import LoadingSpinner from "../components/Loader";
@@ -273,6 +277,8 @@ const gettingStarted = () => {
                 quarter_grade.push(quart[index]);
               });
 
+              let quarter_analysis = quarterAnalysis(quarter_grade);
+
               let survey = getSurveyResults(forms!, item.name);
 
               let infer: DataInference =
@@ -294,9 +300,11 @@ const gettingStarted = () => {
                 name: item.name,
                 gender: item.gender,
                 quarter: quarter_grade,
+                quarter_analysis: quarter_analysis,
                 final_grade_before: finals[index].final_grade,
                 final_grade_after: grade_after,
-                remarks: finals[index].remarks,
+                final_remarks: finals[index].remarks,
+                remarks: getRemarks(finals[index].final_grade) as string,
                 survey_result: survey == undefined ? ([] as any) : survey,
                 //inference_result: inference_data,
                 inference_result:
