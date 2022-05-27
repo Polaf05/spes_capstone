@@ -83,13 +83,28 @@ export default function Tasks({ quarter }: { quarter: number }) {
       population: number; // total classroom population
       participated: number; // students participated
       no_data: number; // students absent/no data found
-      passed: number; //passed students
+      passed: Student[]; //passed students
+      perfect: Student[];
+      failed: Student[];
     };
   };
 
-  //get average of written work
-
-  //const ave: number = getAverage(students!, quarter, 1);
+  //get data of all tasks
+  students?.map((student) => {
+    let ww_tasks: number[] = [];
+    let status: any[] = [];
+    let participated: number[] = [];
+    student.quarter![quarter - 1].written_works?.map((task, idx) => {
+      //sum of all task score
+      ww_tasks[idx] += task.score;
+      //designate student to Perfect, Passed, Failed, Considerable, No data Category
+      // if (task.status === "Perfect") status[0].push(student);
+      // else if (task.status === "Passed") status[1].push(student);
+      // else if (task.status === "Failed") status[2].push(student);
+      // else if (task.status === "Considerable") status[3].push(student);
+      // else status[4].push(student);
+    });
+  });
 
   const tasks_dataset = [
     {
