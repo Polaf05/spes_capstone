@@ -195,6 +195,17 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     pt_sum: number[] = [],
     hps_pt: number[] = [];
 
+  //get average grade per quarter
+  const ave_quarter_grade = [0, 0, 0, 0];
+  for (let i = 0; i < myquar.length; i++) {
+    let sum: number = 0;
+    students?.map((student, idx) => {
+      sum += student!.quarter![i].grade_before;
+    });
+    const ave = Number((sum / students?.length!).toFixed(1));
+    ave_quarter_grade[i] = ave;
+  }
+
   for (let i = 0; i < myquar.length; i++) {
     //console.log(student?.quarter![i].grade_before!);
     quarter_data.push(student?.quarter![i].grade_before!);
@@ -388,25 +399,37 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   });
 
   //surpassed students
-  const ranks: number[] = [];
+  const ww_ranks: number[] = [];
+  const pt_ranks: number[] = [];
   //initialize ranks
   students?.map((s) => {
-    ranks.push(0);
+    ww_ranks.push(0);
+    pt_ranks.push(0);
   });
   students?.map((s) => {
-    const index = Math.trunc(s.quarter![quarter - 1].ranking!);
-    ranks[index - 1] += 1;
+    const ww_index = Math.trunc(
+      s.quarter![quarter - 1].written_percentage?.ranking!
+    );
+    const pt_index = Math.trunc(
+      s.quarter![quarter - 1].performance_percentage?.ranking!
+    );
+
+    ww_ranks[ww_index - 1] += 1;
+    pt_ranks[pt_index - 1] += 1;
   });
 
   //student rank
-  const my_ranking = Math.trunc(myStudent.ranking!);
+  const my_ranking = Math.trunc(myStudent.written_percentage?.ranking!);
   //sum of surpassed
-  let surp_sum = 0;
-  for (let i = my_ranking; i < students?.length!; i++) {
-    surp_sum += ranks[i];
-  }
-  const pct = Number(((surp_sum / students?.length!) * 100).toFixed(1));
+  let ww_surp_sum = 0;
+  let pt_surp_sum = 0;
 
+  for (let i = my_ranking; i < students?.length!; i++) {
+    ww_surp_sum += ww_ranks[i];
+    pt_surp_sum += pt_ranks[i];
+  }
+  const ww_pct = Number(((ww_surp_sum / students?.length!) * 100).toFixed(1));
+  const pt_pct = Number(((pt_surp_sum / students?.length!) * 100).toFixed(1));
   // get weighted omsim of a written works and performance task
   const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
   const wgh_pt = myStudent.performance_weighted_score?.highest_possible_score;
@@ -447,26 +470,20 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     flag = "ww";
     margin = ave_ww_pct - ave_pt_pct;
   }
-  //sample classroom average dataset
-  const test_ave_ds = [80, 85, 82, 80];
-  const test_ave_render = [];
-  for (let i = 0; i < myquar.length; i++) {
-    test_ave_render.push(test_ave_ds[i]);
-  }
 
   margin = Number(margin.toFixed(1));
 
   const quarter_dataset: DataSet[] = [
     {
-      label: "Quarter Grade",
+      label: "Grade",
       data: quarter_data,
       fill: true,
       backgroundColor: "#FFF598",
       borderColor: "#FFF598",
     },
     {
-      label: "Average Grade",
-      data: test_ave_render,
+      label: "Average Student Grade",
+      data: ave_quarter_grade,
       fill: true,
       backgroundColor: "#63C7FF",
       borderColor: "#63C7FF",
@@ -707,7 +724,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                   <h1 className="text-lg font-semibold">Quarter Grade:</h1>
                   <h3 className="text-base">
                     Suggested Grade:{" "}
-                    <span className="font-bold">{myStudent.grade_before}</span>
+                    <span className="font-bold">{myStudent.grade_after}</span>
                   </h3>
                   <div className="flex gap-3">
                     <h3>
@@ -927,7 +944,10 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 </div>
                 <div className="mt-4">
                   <h2 className="text-xl font-bold">
-                    {tdata.underperformed_tasks.length > 0
+                    {tdata.ww.raw_scores.score[ww_best_task!] == -1 &&
+                    tdata.pt.raw_scores.score[pt_best_task!] == -1
+                      ? ""
+                      : tdata.underperformed_tasks.length > 0
                       ? `${capitalize("student")} had a hard time with:`
                       : `Wow! ${capitalize(
                           "student"
@@ -994,9 +1014,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                       <div className="relative">
                         <div className="z-40 absolute inset-0 flex justify-center items-center">
                           <div className="flex flex-col justify-center items-center">
-                            <h2 className="font-bold text-xl">
-                              {tdata.ww.percentage}%
-                            </h2>
+                            <h2 className="font-bold text-xl">{ww_pct}%</h2>
                             <h3 className="text-[0.8rem] font-semibold">
                               Surpassed
                             </h3>
@@ -1007,13 +1025,12 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                                   : "text-[0.4rem]"
                               }
                             >
-                              {tdata.ww.score_sum} out of {tdata.ww.total_item}{" "}
-                              students
+                              {ww_surp_sum} out of {students?.length!} students
                             </p>
                           </div>
                         </div>
                         <CircularProgress
-                          value={tdata.ww.percentage}
+                          value={ww_pct}
                           pathColor="#FFF598"
                           strokeWidth={10}
                         />
@@ -1036,7 +1053,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                     <div className="relative">
                       <div className="z-40 absolute inset-0 flex justify-center items-center">
                         <div className="flex flex-col justify-center items-center">
-                          <h2 className="font-bold text-xl">{pct}%</h2>
+                          <h2 className="font-bold text-xl">{pt_pct}%</h2>
                           <h3 className="text-[0.8rem] font-semibold">
                             Surpassed
                           </h3>
@@ -1047,12 +1064,12 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                                 : "text-[0.5rem]"
                             }
                           >
-                            {surp_sum} out of {students?.length} students
+                            {pt_surp_sum} out of {students?.length} students
                           </p>
                         </div>
                       </div>
                       <CircularProgress
-                        value={pct}
+                        value={pt_pct}
                         pathColor="#63C7FF"
                         strokeWidth={10}
                       />
