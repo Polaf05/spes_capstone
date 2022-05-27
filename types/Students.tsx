@@ -16,6 +16,28 @@ export type scoreData = {
   ranking: number;
 };
 
+export type StruggledStudent = {
+  student: Student;
+  failedTasks: {
+    pt: number[];
+    ww: number[];
+  };
+  passedTasks: {
+    pt: {
+      passed: number[];
+      perfect: number[];
+    };
+    ww: {
+      passed: number[];
+      perfect: number[];
+    };
+  };
+
+  pt_length: number;
+  ww_length: number;
+  //noDataTasks: number[];
+};
+
 export type TaskAnalysis = {
   fluctuation: number;
   trend: number[];

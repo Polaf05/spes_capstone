@@ -44,6 +44,7 @@ import {
 } from "react-circular-progressbar";
 import { tasks } from "googleapis/build/src/apis/tasks";
 import { Router, useRouter } from "next/router";
+import { type } from "os";
 
 Chart.register(
   ArcElement,
@@ -77,7 +78,6 @@ const classNames = (...classes: string[]) => {
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { quarter, id } = query;
-  console.log(query);
   return {
     props: {
       quarter: Number(quarter),
@@ -146,12 +146,11 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     var buttons: string[] = [];
     for (var i = 1; i <= qSum; i++) {
       buttons.push("Quarter " + i);
-      ww_available_scores.push(
-        student?.quarter![i - 1].written_percentage?.score
-      );
-      pt_available_scores.push(
-        student?.quarter![i - 1].performance_percentage?.score
-      );
+      const ww_grade = student?.quarter![i - 1].written_percentage?.score;
+      const pt_grade = student?.quarter![i - 1].performance_percentage?.score;
+
+      ww_available_scores.push(typeof ww_grade === "string" ? 0 : ww_grade);
+      pt_available_scores.push(typeof pt_grade === "string" ? 0 : pt_grade);
     }
     myquar = buttons;
   }
@@ -197,27 +196,34 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     hps_pt: number[] = [];
 
   for (let i = 0; i < myquar.length; i++) {
+    //console.log(student?.quarter![i].grade_before!);
     quarter_data.push(student?.quarter![i].grade_before!);
     sum += student?.quarter![i].ranking!;
-    let scr = student?.quarter![i].written_percentage?.score!;
-    ww_qsum += scr != undefined ? scr : 0;
-    scr = student?.quarter![i].performance_percentage?.score!;
-    pt_qsum += scr != undefined ? scr : 0;
+    let scr = 0;
+    //console.log(student?.quarter![i].written_percentage?.score!);
+
+    //get sum of Weighted Score
+    if (typeof student?.quarter![i].written_percentage?.score! !== "string") {
+      let scr = student?.quarter![i].written_percentage?.score!;
+      ww_qsum += scr;
+    }
+    if (
+      typeof student?.quarter![i].performance_percentage?.score! !== "string"
+    ) {
+      let scr = student?.quarter![i].performance_percentage?.score!;
+      pt_qsum += scr;
+    }
 
     let w = 0,
       hw = 0,
       hp = 0,
       p = 0;
     student?.quarter![i].written_works?.map((task) => {
-      if (task.score != undefined) {
-        w += task.score;
-      }
+      if (task.score != undefined) w += task.score;
       hw += task.highest_possible_score;
     });
     student?.quarter![i].performance_tasks?.map((task) => {
-      if (task.score != undefined) {
-        p += task.score;
-      }
+      if (task.score != undefined) p += task.score;
       hp += task.highest_possible_score;
     });
 
@@ -404,19 +410,21 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     "better at",
     Number(tdiff.toFixed(1))
   );
-
   const ave_rank: string = (sum / 4).toFixed(2);
   const ave_ww_pct: number = Number((ww_qsum / 4).toFixed(1));
   const ave_pt_pct: number = Number((pt_qsum / 4).toFixed(1));
   let better_at: string = "";
+  let flag = "both";
   let margin: number = 0;
   if (ave_pt_pct === ave_ww_pct) {
     better_at = "good with both Written Works and Performance Tasks";
   } else if (ave_pt_pct > ave_ww_pct) {
     better_at = "better in Performance Tasks";
+    flag = "pt";
     margin = ave_pt_pct - ave_ww_pct;
   } else {
     better_at = "better in Written Works";
+    flag = "ww";
     margin = ave_ww_pct - ave_pt_pct;
   }
   //sample classroom average dataset
@@ -469,20 +477,16 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
 
   const length: number =
     student?.survey_result?.environment_factors.value.length!;
-  const arr: number[] = getFuzzyValue(
-    length,
-    student?.survey_result?.environment_factors.value!
-  );
+
   let fsum = 0;
   student?.survey_result?.environment_factors.value.map((val) => {
-    fsum += Number((val / length).toFixed(1));
+    fsum += val;
   });
   const ave_env_fuzzy = Number((fsum / length).toFixed(1));
-
   const radarData = [
     {
       label: "Degree of Truth",
-      data: arr,
+      data: student?.survey_result?.environment_factors.value,
       fill: true,
       backgroundColor: "rgba(54, 162, 235, 0.2)",
       borderColor: "rgb(54, 162, 235)",
@@ -492,13 +496,21 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   const wworks: string[] = ww_status;
   const ptasks: string[] = pt_status;
 
+  let count_nd = [0, 0];
   for (let i = wworks.length; i < 10; i++) {
     wworks.push("no data");
+    count_nd[0] += 1;
   }
   for (let i = ptasks.length; i < 10; i++) {
     ptasks.push("no data");
+    count_nd[1] += 1;
   }
 
+  let no_data_found = [false, false];
+  if (count_nd[0] === myStudent.written_works?.length!) no_data_found[0] = true;
+
+  if (count_nd[1] === myStudent.performance_tasks?.length!)
+    no_data_found[1] = true;
   const percentage: number = 0;
 
   return (
@@ -549,9 +561,16 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
             {/* Overall Performance Assessment */}
             <div className="col-span-4 h-[65vh] overflow-x-auto px-3">
               <h2 className="text-xl font-bold">Overall Performance:</h2>
-              <div className="grid grid-cols-7 mb-4">
+              <div className="grid grid-cols-10 mb-4">
                 <CardInfo
-                  className="col-span-4 w-full h-fit px-4 py-2 bg-tallano_gold-100 rounded-l-xl"
+                  className={classNames(
+                    "w-full h-fit px-4 py-2 bg-tallano_gold-100 rounded-l-xl",
+                    flag === "both"
+                      ? "col-span-5"
+                      : flag === "ww"
+                      ? "col-span-6"
+                      : "col-span-4"
+                  )}
                   title={"Written Works"}
                   value={ave_ww_pct}
                 >
@@ -566,18 +585,17 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                         {ww_underperformed_quarter}
                       </span>
                     </h5>
-                    <h5 className="flex justify-between">
-                      Surpassed students in:
-                      <span className="font-semibold">91%</span>
-                    </h5>
-                    <h5 className="flex justify-between">
-                      Average Rank:
-                      <span className="font-semibold">2</span>
-                    </h5>
                   </div>
                 </CardInfo>
                 <CardInfo
-                  className="col-span-3 w-full h-fit px-4 py-2 bg-neutral-50 rounded-r-xl"
+                  className={classNames(
+                    "w-full h-fit px-4 py-2 bg-white rounded-r-xl",
+                    flag === "both"
+                      ? "col-span-5"
+                      : flag === "pt"
+                      ? "col-span-6"
+                      : "col-span-4"
+                  )}
                   title={"Performance Tasks"}
                   value={ave_pt_pct}
                 >
@@ -586,8 +604,6 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                     <h5 className="font-semibold">
                       {pt_underperformed_quarter}
                     </h5>
-                    <h5 className="font-semibold">91%</h5>
-                    <h5 className="font-semibold">2</h5>
                   </div>
                 </CardInfo>
               </div>
@@ -753,30 +769,34 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
               <div className="col-span-4">
                 {/* Top Performance Section */}
                 <div className="">
-                  <h3 className="text-xl font-bold">Top Performance</h3>
+                  <h3 className="text-xl font-bold">{tdata.ww.raw_scores.score[ww_best_task!] != -1 && tdata.pt.raw_scores.score[pt_best_task!] != -1 ? "Top Performance" : "No data available for student  "}</h3>
                   <div className="grid grid-cols-2 gap-2 mt-4">
-                    <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between">
-                      <h6 className="px-4 ">
-                        Written Work {ww_best_task! + 1}:
-                      </h6>
-                      <div className="flex justify-end">
-                        <h1 className="font-bold text-xl px-6">
-                          {tdata.ww.raw_scores.score[ww_best_task!]} /{" "}
-                          {tdata.ww.raw_scores.hp[ww_best_task!]}
-                        </h1>
+                    {tdata.ww.raw_scores.score[ww_best_task!] != -1 && (
+                      <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between">
+                        <h6 className="px-4 ">
+                          Written Work {ww_best_task! + 1}:
+                        </h6>
+                        <div className="flex justify-end">
+                          <h1 className="font-bold text-xl px-6">
+                            {tdata.ww.raw_scores.score[ww_best_task!]} /{" "}
+                            {tdata.ww.raw_scores.hp[ww_best_task!]}
+                          </h1>
+                        </div>
                       </div>
-                    </div>
-                    <div className=" h-24 bg-ocean-100 py-2 rounded-3xl flex flex-col justify-between">
-                      <h6 className="px-4">
-                        Performance Task {pt_best_task! + 1} :
-                      </h6>
-                      <div className="flex justify-end px-6">
-                        <h1 className="font-bold text-xl">
-                          {tdata.pt.raw_scores.score[pt_best_task!]} /{" "}
-                          {tdata.pt.raw_scores.hp[pt_best_task!]}
-                        </h1>
+                    )}
+                    {tdata.pt.raw_scores.score[pt_best_task!] != -1 && (
+                      <div className=" h-24 bg-ocean-100 py-2 rounded-3xl flex flex-col justify-between">
+                        <h6 className="px-4">
+                          Performance Task {pt_best_task! + 1} :
+                        </h6>
+                        <div className="flex justify-end px-6">
+                          <h1 className="font-bold text-xl">
+                            {tdata.pt.raw_scores.score[pt_best_task!]} /{" "}
+                            {tdata.pt.raw_scores.hp[pt_best_task!]}
+                          </h1>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
                 {/* Tasks Streak */}
