@@ -30,8 +30,9 @@ import {
   Tooltip,
 } from "chart.js";
 import Link from "next/link";
-import { classNames } from "../lib/functions/concat";
+import { classNames, studentInCategory } from "../lib/functions/concat";
 import { getGrade } from "../lib/functions/grade_computation";
+import { getRemarks } from "../lib/functions/formatting";
 
 Chart.register(
   ArcElement,
@@ -209,9 +210,9 @@ const StudentDialog = ({
                       <span
                         className={classNames(
                           "border h-16 w-16 rounded-full grid place-items-center",
-                          student?.remarks === "Very Good"
-                            ? "bg-yellow-200"
-                            : "bg-slate-300"
+                          student?.quarter![quarter].remarks === "Very Poor"
+                            ? "bg-red-200"
+                            : "bg-yellow-200"
                         )}
                       >
                         <h1 className="font-bold text-xl">
@@ -251,9 +252,6 @@ const StudentDialog = ({
                   </div>
                   <div className="grid grid-cols-2 mt-2 h-72">
                     <div className="overflow-auto">
-                      {/* {topStudents.includes(id)
-                        ? `Top ${topStudents.indexOf(id) + 1}`
-                        : ""} */}
                       <h4 className="pl-6 font-semibold">{category}</h4>
                       <Line
                         data={{
@@ -276,6 +274,61 @@ const StudentDialog = ({
                       </pre>
                     </div>
                     <div className="col-start-2 overflow-y-auto">
+                      <div className="h-10 flex gap-2">
+                        <span
+                          className={classNames(
+                            "w-fit  p-2 flex justify-center items-center rounded-full font-semibold",
+                            getRemarks(
+                              getGrade(
+                                category === "Over All"
+                                  ? student!.quarter![quarter].grade_before
+                                  : category === "Written Works"
+                                  ? student!.quarter![quarter]
+                                      .written_percentage?.score!
+                                  : student!.quarter![quarter]
+                                      .performance_percentage?.score!
+                              )
+                            ) === "Very Poor"
+                              ? "bg-red-200"
+                              : "bg-ocean-100"
+                          )}
+                        >
+                          {getRemarks(
+                            getGrade(
+                              category === "Over All"
+                                ? student!.quarter![quarter].grade_before
+                                : category === "Written Works"
+                                ? student!.quarter![quarter].written_percentage
+                                    ?.score!
+                                : student!.quarter![quarter]
+                                    .performance_percentage?.score!
+                            )
+                          )}
+                        </span>
+                        {(category === "Over All"
+                          ? student!.quarter![quarter].ranking!
+                          : category === "Written Works"
+                          ? student?.quarter![quarter].written_percentage
+                              ?.ranking!
+                          : student?.quarter![quarter].performance_percentage
+                              ?.ranking!) < 6 && (
+                          <span
+                            className={classNames(
+                              "w-fit bg-yellow-100 p-2 flex justify-center items-center rounded-full font-semibold"
+                            )}
+                          >
+                            Rank{" "}
+                            {studentInCategory(
+                              category,
+                              student!.quarter![quarter].ranking!,
+                              student?.quarter![quarter].written_percentage
+                                ?.ranking!,
+                              student?.quarter![quarter].performance_percentage
+                                ?.ranking!
+                            )}
+                          </span>
+                        )}
+                      </div>
                       <p className="inline-block text-justify">
                         Assessment: Paragraph (Large) Lorem ipsum dolor sit
                         amet, consectetuer adipiscing elit, sed diam nonummy
