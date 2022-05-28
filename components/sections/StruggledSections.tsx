@@ -1,3 +1,4 @@
+import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import React from "react";
 import { StruggledStudent, Student } from "../../types/Students";
 import StruggledStudentCard from "./StruggledStudentCard";
@@ -62,7 +63,7 @@ const StruggledSections = ({
   struggledStudents.map((student) => {
     // if walang bagsak and may at least 1 perfect score
     if (
-      student.failedTasks.pt.length === 0 &&
+      student.failedTasks.ww.length === 0 &&
       student.failedTasks.pt.length === 0 &&
       (student.passedTasks.ww.perfect.length > 1 ||
         student.passedTasks.pt.perfect.length > 1)
@@ -85,6 +86,12 @@ const StruggledSections = ({
     <div className="grid grid-cols-10 gap-4">
       <div className="col-span-7">
         <h2 className="text-xl font-bold">Students Struggled</h2>
+        <div className="flex gap-1 items-center">
+          <QuestionMarkCircleIcon className="w-4 h-4 text-neutral-500" />
+          <p className="text-neutral-600 text-sm">
+            Students who failed half of the given tasks
+          </p>
+        </div>
         <div className="mt-4 gap-4">
           <div className="">
             <StruggledStudentCard
@@ -102,6 +109,13 @@ const StruggledSections = ({
       </div>
       <div className="col-span-3">
         <h2 className="text-xl font-bold">Students Excelled</h2>
+        <div className="flex gap-1 items-center">
+          <QuestionMarkCircleIcon className="w-4 h-4 text-neutral-500" />
+          <p className="text-neutral-600 text-sm">
+            Students with no failing task and with at least 1 perfect score
+          </p>
+        </div>
+
         <div className="mt-4 h-fit px-4 py-2 border-2 border-green-300 rounded-xl">
           <div className="mt-4">
             {studentsExcelled.map((student) => (

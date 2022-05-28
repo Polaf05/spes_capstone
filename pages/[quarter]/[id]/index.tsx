@@ -594,10 +594,15 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                     {student?.quarter_analysis.fluctuation.toFixed(1)}
                   </p>
                   {student?.quarter_analysis.plunge_task.length! > 0 && (
-                    <p>Plunged: {student?.quarter_analysis.plunge_task}</p>
+                    <p>
+                      Plunged:{" "}
+                      {student?.quarter_analysis.plunge_task.join(", ")}
+                    </p>
                   )}
                   {student?.quarter_analysis.surge_task.length! > 0 && (
-                    <p>Surged: {student?.quarter_analysis.surge_task}</p>
+                    <p>
+                      Surged: {student?.quarter_analysis.surge_task.join(", ")}
+                    </p>
                   )}
                 </div>
               </div>
@@ -790,13 +795,18 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                         0 && (
                         <p>
                           Plunged:{" "}
-                          {myStudent.written_tasks_analysis?.plunge_task}
+                          {myStudent.written_tasks_analysis?.plunge_task.join(
+                            ", "
+                          )}
                         </p>
                       )}
                       {myStudent.written_tasks_analysis?.surge_task.length! >
                         0 && (
                         <p>
-                          Surged: {myStudent.written_tasks_analysis?.surge_task}
+                          Surged:{" "}
+                          {myStudent.written_tasks_analysis?.surge_task.join(
+                            ", "
+                          )}
                         </p>
                       )}
                     </div>

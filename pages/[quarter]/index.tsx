@@ -30,6 +30,18 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   };
 };
 
+const getRemarks = (grade: number) => {
+  return grade < 75
+    ? "Very Poor"
+    : grade < 83
+    ? "Poor"
+    : grade < 90
+    ? "Average"
+    : grade < 97
+    ? "Good"
+    : "Very Good";
+};
+
 export default function Tasks({ quarter }: { quarter: number }) {
   const { students } = useClassroom();
   const [open, setIsOpen] = useState<boolean>(false);
@@ -61,20 +73,6 @@ export default function Tasks({ quarter }: { quarter: number }) {
       },
     ],
   };
-  const [categories] = useState([
-    {
-      title: "Over All",
-      value: "Good",
-    },
-    {
-      title: "Written Works",
-      value: "Average",
-    },
-    {
-      title: "Performance Tasks",
-      value: "Very Good",
-    },
-  ]);
 
   type TaskInfo = {
     task_no: number;
@@ -93,7 +91,9 @@ export default function Tasks({ quarter }: { quarter: number }) {
   let pt_task_array: TaskInfo[] = [];
 
   const index = quarter - 1;
-  console.log(students ? "meron" : "wala");
+  //category average
+  let ww_cat_sum = 0,
+    pt_cat_sum = 0;
 
   //Written Works
   students![0].quarter![index].written_works?.forEach((task, idx) => {
@@ -137,6 +137,14 @@ export default function Tasks({ quarter }: { quarter: number }) {
       ((task_info.ave_score / task_info.total) * 100).toFixed(1)
     );
 
+    //get sum of passing percentage
+    ww_cat_sum += Number(
+      (
+        ((task_info.passed.length + task_info.perfect.length) /
+          task_info.participated) *
+        100
+      ).toFixed(1)
+    );
     ww_task_array.push(task_info);
   });
 
@@ -183,8 +191,36 @@ export default function Tasks({ quarter }: { quarter: number }) {
       ((task_info.ave_score / task_info.total) * 100).toFixed(1)
     );
 
+    //get sum of passing percentage
+    pt_cat_sum += Number(
+      (
+        ((task_info.passed.length + task_info.perfect.length) /
+          task_info.participated) *
+        100
+      ).toFixed(1)
+    );
     pt_task_array.push(task_info);
   });
+
+  const ww_cat_ave =
+    ww_cat_sum / students![0].quarter![index].written_works?.length!;
+  const pt_cat_ave =
+    pt_cat_sum / students![0].quarter![index].performance_tasks?.length!;
+
+  const [categories] = useState([
+    {
+      title: "Over All",
+      value: getRemarks((ww_cat_ave + pt_cat_ave) / 2),
+    },
+    {
+      title: "Written Works",
+      value: getRemarks(ww_cat_ave),
+    },
+    {
+      title: "Performance Tasks",
+      value: getRemarks(pt_cat_ave),
+    },
+  ]);
 
   const ww_render_data: number[] = [];
   const ww_render_labels: string[] = [];
@@ -202,7 +238,7 @@ export default function Tasks({ quarter }: { quarter: number }) {
 
   const ww_quarter_dataset: DataSet[] = [
     {
-      label: "Written Works Ave Score PCT",
+      label: "Ave Score PCT",
       data: ww_render_data,
       fill: true,
       backgroundColor: "#FFF598",
@@ -212,7 +248,7 @@ export default function Tasks({ quarter }: { quarter: number }) {
 
   const pt_quarter_dataset: DataSet[] = [
     {
-      label: "Performance Tasks Ave Score PCT",
+      label: "Ave Score PCT",
       data: pt_render_data,
       fill: true,
       backgroundColor: "#63C7FF",
