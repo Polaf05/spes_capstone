@@ -16,6 +16,9 @@ export function fluctuation(task: TaskData[], possible: TaskData[]) {
   let percent: number[] = [];
 
   for (let i = 0; i < task.length; i++) {
+    if (task[i].score == undefined) {
+      task[i].score = 0;
+    }
     let percentage = (task[i].score / possible[i].score) * 10;
 
     percent.push(percentage);
