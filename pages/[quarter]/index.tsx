@@ -14,6 +14,7 @@ import ProgressComponent from "../../components/ProgressComponent";
 import CardInfo from "../../components/CardInfo";
 import StruggledSections from "../../components/sections/StruggledSections";
 import { render } from "@headlessui/react/dist/utils/render";
+import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -315,10 +316,11 @@ export default function Tasks({ quarter }: { quarter: number }) {
               </div>
               {/* Bar Chart */}
               <div className="h-fit m-8 px-24 pb-24 border-b-2 border-ocean-400">
+                <h1 className="text-3xl font-bold">Tasks Assessment</h1>
                 <div className="grid grid-cols-12 gap-4 mt-4">
                   <div className="col-span-4 py-4">
                     <h2 className="text-xl font-semibold">
-                      Task Information: {task + 1}
+                      Written Work: {task + 1}
                     </h2>
                     <div>
                       <h6 className="font-light">
@@ -369,7 +371,6 @@ export default function Tasks({ quarter }: { quarter: number }) {
                     </div>
                   </div>
                   <div className="col-span-8 pl-4 border-l">
-                    <h2 className="text-3xl font-bold">Written Works</h2>
                     <div className="relative">
                       <div className="z-40 absolute py-8 w-[3vw] h-full bg-white flex flex-col justify-around">
                         {tasks_buttons[0].map((button, idx) => (
@@ -396,8 +397,9 @@ export default function Tasks({ quarter }: { quarter: number }) {
                   <div className="grid grid-cols-12 gap-4 mt-4">
                     <div className="col-span-4 py-4">
                       <h2 className="text-xl font-semibold">
-                        Task Information: {pt_task + 1}
+                        Performance Task: {pt_task + 1}
                       </h2>
+
                       <div>
                         <h6 className="font-light">
                           Average Score: {pt_task_array[pt_task].ave_score}/
@@ -448,7 +450,6 @@ export default function Tasks({ quarter }: { quarter: number }) {
                       </div>
                     </div>
                     <div className="col-span-8 pl-4 border-l">
-                      <h2 className="text-3xl font-bold">Performance Tasks</h2>
                       <div className="relative">
                         <div className="z-40 absolute py-8 w-[3vw] h-full bg-white flex flex-col justify-around">
                           {tasks_buttons[1].map((button, idx) => (
