@@ -20,7 +20,11 @@ import {
   getTask,
   getWeighted,
 } from "../../lib/functions/formatting";
-import { fluctuation, getRanking } from "../../lib/functions/analysis";
+import {
+  fluctuation,
+  getRanking,
+  quarterAnalysis,
+} from "../../lib/functions/analysis";
 import {
   afterGradeInference,
   inferenceData,
@@ -215,7 +219,9 @@ const gettingStarted = () => {
                                 infer.external_elements.value
                               );
 
-                        grade_after = getGradeAfter(grade_after);
+                        grade_after = parseFloat(
+                          getGradeAfter(grade_after).toFixed(1)
+                        );
 
                         const quarter_grade: Quarter = {
                           id: i,
@@ -274,26 +280,34 @@ const gettingStarted = () => {
                 quarter_grade.push(quart[index]);
               });
 
+              let quarter_analysis = quarterAnalysis(quarter_grade);
+
               let survey = getSurveyResults(forms!, item.name);
 
               let infer: DataInference =
                 survey == undefined ? ([] as any) : inferenceData(survey);
+
+              let grade_after =
+                survey == undefined
+                  ? 0
+                  : finals[index].final_grade +
+                    afterGradeInference(
+                      finals[index].final_grade,
+                      infer.external_elements.value
+                    );
+
+              grade_after = parseFloat(getGradeAfter(grade_after).toFixed(1));
 
               const student_info: Student = {
                 id: item.id,
                 name: item.name,
                 gender: item.gender,
                 quarter: quarter_grade,
+                quarter_analysis: quarter_analysis,
                 final_grade_before: finals[index].final_grade,
-                final_grade_after:
-                  survey == undefined
-                    ? 0
-                    : finals[index].final_grade +
-                      afterGradeInference(
-                        finals[index].final_grade,
-                        infer.external_elements.value
-                      ),
-                remarks: finals[index].remarks,
+                final_grade_after: grade_after,
+                final_remarks: finals[index].remarks,
+                remarks: getRemarks(finals[index].final_grade) as string,
                 survey_result: survey == undefined ? ([] as any) : survey,
                 //inference_result: inference_data,
                 inference_result:

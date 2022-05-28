@@ -13,6 +13,7 @@ export type TaskData = {
 export type scoreData = {
   score: number;
   highest_possible_score: number;
+  ranking: number;
 };
 
 export type StruggledStudent = {
@@ -50,8 +51,10 @@ export interface Student {
   name: string;
   gender: string;
   quarter: Quarter[] | null;
+  quarter_analysis: TaskAnalysis;
   final_grade_before: number;
   final_grade_after: number;
+  final_remarks: string;
   remarks: string;
   survey_result: SurveyResult | null;
   inference_result: DataInference | null;

@@ -67,6 +67,7 @@ export function getWeighted(score: number, possible: number) {
   const scores: scoreData = {
     score: score,
     highest_possible_score: possible,
+    ranking: 0,
   };
 
   return scores;
