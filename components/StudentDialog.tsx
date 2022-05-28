@@ -30,6 +30,8 @@ import {
   Tooltip,
 } from "chart.js";
 import Link from "next/link";
+import { classNames } from "../lib/functions/concat";
+import { getGrade } from "../lib/functions/grade_computation";
 
 Chart.register(
   ArcElement,
@@ -57,22 +59,16 @@ Chart.register(
   Tooltip
 );
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
 const StudentDialog = ({
   quarter,
   category,
   open,
   setIsOpen,
-  topStudents,
 }: {
   quarter: number;
   category: string;
   open: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  topStudents: number[];
 }) => {
   const { student } = useSelectedStudent();
   let diffArrow, id: number;
@@ -94,33 +90,77 @@ const StudentDialog = ({
     backgroundColor: string;
     borderColor: string;
   };
-  const labels: string[] = [];
-  const scores: number[] = [];
-  if (category === "Written Works") {
-    student?.quarter![quarter].written_works?.forEach((task) => {
-      const task_label = "Task " + task.tasked_number.toString();
-      const score = (task.score / task.highest_possible_score) * 100;
-      labels.push(task_label);
-      scores.push(score);
-    });
-  } else if (category === "Performance Tasks") {
-    student?.quarter![quarter].performance_tasks?.forEach((task) => {
-      const task_label = "Task " + task.tasked_number.toString();
-      const score = (task.score / task.highest_possible_score) * 100;
-      labels.push(task_label);
-      scores.push(score);
-    });
-  }
-  const dataToRender: DataSet = {
-    label: category,
-    data: scores,
+  const ww_labels: string[] = [];
+  const pt_labels: string[] = [];
+
+  const ww_scores: number[] = [];
+  const pt_scores: number[] = [];
+
+  student?.quarter![quarter].written_works?.forEach((task) => {
+    const task_label = "Task " + task.tasked_number.toString();
+    const grade = getGrade(task.score);
+    const score =
+      (grade === -1 ? 0 : grade / task.highest_possible_score) * 100;
+    ww_labels.push(task_label);
+    ww_scores.push(score);
+  });
+  student?.quarter![quarter].performance_tasks?.forEach((task) => {
+    const task_label = "Task " + task.tasked_number.toString();
+    const grade = getGrade(task.score);
+    const score =
+      (grade === -1 ? 0 : grade / task.highest_possible_score) * 100;
+    pt_labels.push(task_label);
+    pt_scores.push(score);
+  });
+
+  const ww_dataToRender: DataSet = {
+    label: "Written Works",
+    data: ww_scores,
     fill: true,
-    backgroundColor: "rgba(75,192,192,0.2)",
-    borderColor: "rgba(75,192,192,1)",
+    backgroundColor: "rgba(75,192,192,0)",
+    borderColor: "#FFF598",
   };
-  const dataChart = {
-    labels: labels,
-    datasets: [dataToRender],
+  const pt_dataToRender: DataSet = {
+    label: "Performance Tasks",
+    data: pt_scores,
+    fill: true,
+    backgroundColor: "rgba(128,0,128, 0)",
+    borderColor: "#63C7FF",
+  };
+
+  const dataToRender: DataSet[] = [ww_dataToRender, pt_dataToRender];
+
+  const data_to_render =
+    category === "Over All"
+      ? dataToRender
+      : "Written Works"
+      ? [ww_dataToRender]
+      : [pt_dataToRender];
+
+  console.log(data_to_render);
+  type Chart = {
+    labels: string[];
+    datasets: DataSet | DataSet[];
+  };
+
+  const this_labels =
+    category === "Over All"
+      ? ww_labels.length > pt_labels.length
+        ? ww_labels
+        : pt_labels
+      : "Written Works"
+      ? ww_labels
+      : pt_labels;
+  const dataChart: Chart = {
+    labels:
+      category === "Over All"
+        ? ww_labels.length > pt_labels.length
+          ? ww_labels
+          : pt_labels
+        : "Written Works"
+        ? ww_labels
+        : pt_labels,
+    datasets: data_to_render,
   };
 
   const data =
@@ -216,7 +256,10 @@ const StudentDialog = ({
                         : ""} */}
                       <h4 className="pl-6 font-semibold">{category}</h4>
                       <Line
-                        data={dataChart}
+                        data={{
+                          labels: this_labels,
+                          datasets: data_to_render,
+                        }}
                         options={{
                           scales: {
                             y: { max: 100, min: 0, ticks: { stepSize: 20 } },
