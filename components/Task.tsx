@@ -9,6 +9,20 @@ import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
+const getRemarks = (grade: number) => {
+  return grade < 75
+    ? "Very Poor"
+    : grade < 83
+    ? "Poor"
+    : grade < 90
+    ? "Average"
+    : grade < 97
+    ? "Good"
+    : "Very Good";
+};
+
+const getGrade = (grade: any) =>
+  typeof grade === "string" ? "no data" : grade;
 
 export const Task = ({
   category,
@@ -78,7 +92,15 @@ export const Task = ({
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   var count = [0, 0, 0, 0, 0];
   students?.map((student) => {
-    const i = labels.indexOf(student.quarter![quarter].remarks);
+    const i = labels.indexOf(
+      category === "Over All"
+        ? student.quarter![quarter].remarks
+        : getRemarks(
+            category === "Written Works"
+              ? student.quarter![quarter].written_percentage?.score!
+              : student.quarter![quarter].performance_percentage?.score!
+          )
+    );
     count[i] += 1;
   });
 
@@ -105,21 +127,7 @@ export const Task = ({
         <div className="text-2xl font-bold">
           <h1>
             Clasroom Assessment:{" "}
-            <span
-              className={
-                assessment === "Very Good"
-                  ? "text-legend-vgood"
-                  : assessment === "Good"
-                  ? "text-legend-good"
-                  : assessment === "Average"
-                  ? "text-legend-ave"
-                  : assessment === "Poor"
-                  ? "text-legend-poor"
-                  : "text-legend-vpoor"
-              }
-            >
-              {assessment}
-            </span>
+            <span className="underline decoration-2">{assessment}</span>
           </h1>
         </div>
         <div className="text-lg font-semibold">
@@ -185,21 +193,48 @@ export const Task = ({
                     }}
                     key={idx}
                   >
-                    <td className="pl-4 text-left">{student.name}</td>
+                    <td className="pl-4 font-semibold text-left">
+                      {student.name}
+                    </td>
                     <td>
                       {category === "Over All"
                         ? student.quarter![quarter].grade_before
-                        : category === "Written Works"
-                        ? student.quarter![quarter].written_percentage?.score
-                        : student.quarter![quarter].performance_percentage
-                            ?.score}
+                        : getGrade(
+                            category === "Written Works"
+                              ? student.quarter![quarter].written_percentage
+                                  ?.score
+                              : student.quarter![quarter].performance_percentage
+                                  ?.score
+                          )}
                     </td>
                     <td className="text-base">
-                      ({student.quarter![quarter].diff})
+                      (
+                      {category === "Over All"
+                        ? student.quarter![quarter].diff
+                        : 0}
+                      )
                     </td>
-                    <td>{student.quarter![quarter].grade_after}</td>
+                    <td>
+                      {category === "Over All"
+                        ? student.quarter![quarter].grade_after
+                        : getGrade(
+                            category === "Written Works"
+                              ? student.quarter![quarter].written_percentage
+                                  ?.score
+                              : student.quarter![quarter].performance_percentage
+                                  ?.score
+                          )}
+                    </td>
                     <td className="pr-4 text-right">
-                      {student.quarter![quarter].remarks}
+                      {category === "Over All"
+                        ? student.quarter![quarter].remarks
+                        : getRemarks(
+                            category === "Written Works"
+                              ? student.quarter![quarter].written_percentage
+                                  ?.score!
+                              : student.quarter![quarter].performance_percentage
+                                  ?.score!
+                          )}
                     </td>
                   </tr>
                 ))}

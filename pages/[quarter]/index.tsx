@@ -30,9 +30,23 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   };
 };
 
+const getRemarks = (grade: number) => {
+  return grade < 75
+    ? "Very Poor"
+    : grade < 83
+    ? "Poor"
+    : grade < 90
+    ? "Average"
+    : grade < 97
+    ? "Good"
+    : "Very Good";
+};
+
 export default function Tasks({ quarter }: { quarter: number }) {
   const { students } = useClassroom();
   const [open, setIsOpen] = useState<boolean>(false);
+  const [task, setTask] = useState<number>(0);
+  const [pt_task, setPtTask] = useState<number>(0);
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   const router = useRouter();
   var count = [0, 0, 0, 0, 0];
@@ -59,126 +73,190 @@ export default function Tasks({ quarter }: { quarter: number }) {
       },
     ],
   };
-  const [categories] = useState([
-    {
-      title: "Over All",
-      value: "Good",
-    },
-    {
-      title: "Written Works",
-      value: "Average",
-    },
-    {
-      title: "Performance Tasks",
-      value: "Very Good",
-    },
-  ]);
 
   type TaskInfo = {
     task_no: number;
     total: number;
     ave_score: number;
     ave_score_pct: number;
-    students: {
-      population: number; // total classroom population
-      participated: number; // students participated
-      no_data: number; // students absent/no data found
-      passed: Student[]; //passed students
-      perfect: Student[];
-      failed: Student[];
-    };
+    population: number; // total classroom population
+    participated: number; // students participated
+    no_data: Student[]; // students absent/no data found
+    passed: Student[]; //passed students
+    perfect: Student[];
+    failed: Student[];
+    considerable: Student[];
   };
+  let ww_task_array: TaskInfo[] = [];
+  let pt_task_array: TaskInfo[] = [];
 
-  //get data of all tasks
-  students?.map((student) => {
-    let ww_tasks: number[] = [];
-    let status: any[] = [];
-    let participated: number[] = [];
-    student.quarter![quarter - 1].written_works?.map((task, idx) => {
-      //sum of all task score
-      ww_tasks[idx] += task.score;
-      //designate student to Perfect, Passed, Failed, Considerable, No data Category
-      // if (task.status === "Perfect") status[0].push(student);
-      // else if (task.status === "Passed") status[1].push(student);
-      // else if (task.status === "Failed") status[2].push(student);
-      // else if (task.status === "Considerable") status[3].push(student);
-      // else status[4].push(student);
+  const index = quarter - 1;
+  //category average
+  let ww_cat_sum = 0,
+    pt_cat_sum = 0;
+
+  //Written Works
+  students![0].quarter![index].written_works?.forEach((task, idx) => {
+    //initialized values
+    const task_info: TaskInfo = {
+      task_no: idx + 1,
+      total: 0,
+      ave_score: 0,
+      ave_score_pct: 0,
+      population: 0, // total classroom population
+      participated: 0, // students participated
+      no_data: [], // students absent/no data found
+      passed: [], //passed students
+      perfect: [],
+      failed: [],
+      considerable: [],
+    };
+    let score_sum = 0;
+    students?.map((student, no) => {
+      const status = student?.quarter![index].written_works![idx].status;
+      if (status === "??") {
+        task_info.no_data.push(student);
+      } else {
+        if (status === "Perfect") task_info.perfect.push(student);
+        else if (status === "Passed") task_info.passed.push(student);
+        else if (status === "Considerable")
+          task_info.considerable.push(student);
+        else task_info.failed.push(student);
+        //particpants
+        task_info.participated += 1;
+        //score sum
+        score_sum += student?.quarter![index].written_works![idx].score;
+      }
+      //total population
+      task_info.population += 1;
     });
+    //total score
+    task_info.total = task.highest_possible_score;
+    task_info.ave_score = Number((score_sum / students?.length!).toFixed(1));
+    task_info.ave_score_pct = Number(
+      ((task_info.ave_score / task_info.total) * 100).toFixed(1)
+    );
+
+    //get sum of passing percentage
+    ww_cat_sum += Number(
+      (
+        ((task_info.passed.length + task_info.perfect.length) /
+          task_info.participated) *
+        100
+      ).toFixed(1)
+    );
+    ww_task_array.push(task_info);
   });
 
-  const tasks_dataset = [
-    {
-      task_no: 1,
-      total: 10,
-      ave_score: 9.2,
-      ave_score_pct: 92,
-      students: {
-        population: 50, // total classroom population
-        participated: 47, // students participated
-        no_data: 3, // students absent/no data found
-        passed: 42, //passed students
-        failed: ["Reniel Avellano"], //failed students
-      },
-    },
-    {
-      task_no: 2,
-      total: 20,
-      ave_score: 18,
-      ave_score_pct: 90,
-      students: {
-        population: 50, // total classroom population
-        participated: 49, // students participated
-        no_data: 1, // students absent/no data found
-        passed: 48, //passed students
-        failed: 0, //failed students
-      },
-    },
-    {
-      task_no: 3,
-      total: 10,
-      ave_score: 8,
-      ave_score_pct: 80,
-      students: {
-        population: 50, // total classroom population
-        participated: 48, // students participated
-        no_data: 3, // students absent/no data found
-        passed: 42, //passed students
-        failed: ["Laura Manlapaz", "JC Tolentino"], //failed students
-      },
-    },
-  ];
+  //Performance Tasks
+  students![0].quarter![index].performance_tasks?.forEach((task, idx) => {
+    //initialized values
+    const task_info: TaskInfo = {
+      task_no: idx + 1,
+      total: 0,
+      ave_score: 0,
+      ave_score_pct: 0,
+      population: 0, // total classroom population
+      participated: 0, // students participated
+      no_data: [], // students absent/no data found
+      passed: [], //passed students
+      perfect: [],
+      failed: [],
+      considerable: [],
+    };
+    let score_sum = 0;
+    students?.map((student, no) => {
+      const status = student?.quarter![index].performance_tasks![idx].status;
+      if (status === "??") {
+        task_info.no_data.push(student);
+      } else {
+        if (status === "Perfect") task_info.perfect.push(student);
+        else if (status === "Passed") task_info.passed.push(student);
+        else if (status === "Considerable")
+          task_info.considerable.push(student);
+        else task_info.failed.push(student);
+        //particpants
+        task_info.participated += 1;
+        //score sum
+        score_sum += student?.quarter![index].performance_tasks![idx].score;
+      }
+      console.log(task_info.population);
+      //total population
+      task_info.population += 1;
+    });
+    //total score
+    task_info.total = task.highest_possible_score;
+    task_info.ave_score = Number((score_sum / students?.length!).toFixed(1));
+    task_info.ave_score_pct = Number(
+      ((task_info.ave_score / task_info.total) * 100).toFixed(1)
+    );
 
-  const render_data: number[] = [];
-  const render_labels: string[] = [];
-  tasks_dataset.map((task, idx) => {
-    render_data.push(task.ave_score_pct);
-    render_labels.push(`Task ${task.task_no}`);
+    //get sum of passing percentage
+    pt_cat_sum += Number(
+      (
+        ((task_info.passed.length + task_info.perfect.length) /
+          task_info.participated) *
+        100
+      ).toFixed(1)
+    );
+    pt_task_array.push(task_info);
   });
 
-  const quarter_dataset: DataSet[] = [
+  const ww_cat_ave =
+    ww_cat_sum / students![0].quarter![index].written_works?.length!;
+  const pt_cat_ave =
+    pt_cat_sum / students![0].quarter![index].performance_tasks?.length!;
+
+  const [categories] = useState([
     {
-      label: "Students Passed",
-      data: render_data,
+      title: "Over All",
+      value: getRemarks((ww_cat_ave + pt_cat_ave) / 2),
+    },
+    {
+      title: "Written Works",
+      value: getRemarks(ww_cat_ave),
+    },
+    {
+      title: "Performance Tasks",
+      value: getRemarks(pt_cat_ave),
+    },
+  ]);
+
+  const ww_render_data: number[] = [];
+  const ww_render_labels: string[] = [];
+  ww_task_array.map((task, idx) => {
+    ww_render_data.push(task.ave_score_pct);
+    ww_render_labels.push(`Task ${task.task_no}`);
+  });
+
+  const pt_render_data: number[] = [];
+  const pt_render_labels: string[] = [];
+  pt_task_array.map((task, idx) => {
+    pt_render_data.push(task.ave_score_pct);
+    pt_render_labels.push(`Task ${task.task_no}`);
+  });
+
+  const ww_quarter_dataset: DataSet[] = [
+    {
+      label: "Ave Score PCT",
+      data: ww_render_data,
       fill: true,
       backgroundColor: "#FFF598",
       borderColor: "#FFF598",
     },
   ];
 
-  const passed_tasks = [
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    false,
-    false,
+  const pt_quarter_dataset: DataSet[] = [
+    {
+      label: "Ave Score PCT",
+      data: pt_render_data,
+      fill: true,
+      backgroundColor: "#63C7FF",
+      borderColor: "#63C7FF",
+    },
   ];
 
-  const dummy = [50, 12, 3, 66, 99, 10];
+  const tasks_buttons = [ww_render_labels, pt_render_labels];
 
   return (
     <>
@@ -237,35 +315,161 @@ export default function Tasks({ quarter }: { quarter: number }) {
               </div>
               {/* Bar Chart */}
               <div className="h-fit m-8 px-24 pb-24 border-b-2 border-ocean-400">
-                <div className="grid grid-cols-10 mt-4">
+                <div className="grid grid-cols-12 gap-4 mt-4">
                   <div className="col-span-4 py-4">
-                    <h2 className="text-xl font-semibold">Task Information</h2>
+                    <h2 className="text-xl font-semibold">
+                      Task Information: {task + 1}
+                    </h2>
                     <div>
-                      <h6 className="font-light">Average Score</h6>
-                      <h6 className="font-light">Average Score PCT</h6>
+                      <h6 className="font-light">
+                        Average Score: {ww_task_array[task].ave_score}/
+                        {ww_task_array[task].total}
+                      </h6>
+                      <h6 className="font-light">
+                        Average Score PCT: {ww_task_array[task].ave_score_pct}
+                      </h6>
 
                       <h6 className="font-light">
-                        No. of Students Participated
+                        No. of Students Participated:
+                        {ww_task_array[task].participated}
+                      </h6>
+                      <h6 className="font-light">
+                        No. of Students Passed:
+                        {ww_task_array[task].passed.length +
+                          ww_task_array[task].perfect.length}
                       </h6>
                       <div className="w-full">
                         <PeopleChart
-                          passed_tasks={8}
+                          passed_tasks={Number(
+                            (
+                              ((ww_task_array[task].passed.length +
+                                ww_task_array[task].perfect.length) /
+                                ww_task_array[task].participated) *
+                              10
+                            ).toFixed()
+                          )}
                           length={10}
                           color="yellow"
                         />
                         <p className="font-light text-center">
-                          8 out of 10 students omsim
+                          <span className="font-semibold">
+                            {Number(
+                              (
+                                ((ww_task_array[task].passed.length +
+                                  ww_task_array[task].perfect.length) /
+                                  ww_task_array[task].participated) *
+                                10
+                              ).toFixed()
+                            )}{" "}
+                            out of 10
+                          </span>{" "}
+                          students passed task no. {task + 1}
                         </p>
                       </div>
                     </div>
                   </div>
-                  <div className="col-span-6">
-                    <h2 className="text-3xl font-bold">Task Chart</h2>
-                    <BarChart
-                      indexAxis="y"
-                      labels={render_labels}
-                      datasets={quarter_dataset}
-                    />
+                  <div className="col-span-8 pl-4 border-l">
+                    <h2 className="text-3xl font-bold">Written Works</h2>
+                    <div className="relative">
+                      <div className="z-40 absolute py-8 w-[3vw] h-full bg-white flex flex-col justify-around">
+                        {tasks_buttons[0].map((button, idx) => (
+                          <button
+                            className="text-sm"
+                            onClick={() => {
+                              setTask(idx);
+                            }}
+                          >
+                            {button}
+                          </button>
+                        ))}
+                      </div>
+                      <BarChart
+                        display={false}
+                        indexAxis="y"
+                        labels={tasks_buttons[0]}
+                        datasets={ww_quarter_dataset}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="h-fit pb-24">
+                  <div className="grid grid-cols-12 gap-4 mt-4">
+                    <div className="col-span-4 py-4">
+                      <h2 className="text-xl font-semibold">
+                        Task Information: {pt_task + 1}
+                      </h2>
+                      <div>
+                        <h6 className="font-light">
+                          Average Score: {pt_task_array[pt_task].ave_score}/
+                          {pt_task_array[pt_task].total}
+                        </h6>
+                        <h6 className="font-light">
+                          Average Score PCT:{" "}
+                          {pt_task_array[pt_task].ave_score_pct}
+                        </h6>
+
+                        <h6 className="font-light">
+                          No. of Students Participated:
+                          {pt_task_array[pt_task].participated}
+                        </h6>
+                        <h6 className="font-light">
+                          No. of Students Passed:
+                          {pt_task_array[pt_task].passed.length +
+                            pt_task_array[pt_task].perfect.length}
+                        </h6>
+                        <div className="w-full">
+                          <PeopleChart
+                            passed_tasks={Number(
+                              (
+                                ((pt_task_array[pt_task].passed.length +
+                                  pt_task_array[pt_task].perfect.length) /
+                                  pt_task_array[pt_task].participated) *
+                                10
+                              ).toFixed()
+                            )}
+                            length={10}
+                            color="blue"
+                          />
+                          <p className="font-light text-center">
+                            <span className="font-semibold">
+                              {Number(
+                                (
+                                  ((pt_task_array[pt_task].passed.length +
+                                    pt_task_array[pt_task].perfect.length) /
+                                    pt_task_array[pt_task].participated) *
+                                  10
+                                ).toFixed()
+                              )}{" "}
+                              out of 10
+                            </span>{" "}
+                            students passed task no. {task + 1}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-span-8 pl-4 border-l">
+                      <h2 className="text-3xl font-bold">Performance Tasks</h2>
+                      <div className="relative">
+                        <div className="z-40 absolute py-8 w-[3vw] h-full bg-white flex flex-col justify-around">
+                          {tasks_buttons[1].map((button, idx) => (
+                            <button
+                              className="text-sm"
+                              onClick={() => {
+                                setPtTask(idx);
+                              }}
+                            >
+                              {button}
+                            </button>
+                          ))}
+                        </div>
+                        <BarChart
+                          display={false}
+                          indexAxis="y"
+                          labels={tasks_buttons[1]}
+                          datasets={pt_quarter_dataset}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <p className="italic text-justify mt-8">
@@ -284,6 +488,7 @@ export default function Tasks({ quarter }: { quarter: number }) {
                   consectetuer adipiscing elit, sed
                 </p>
               </div>
+
               {/* Circular Progress Chart */}
               <div className="my-12 grid grid-cols-2 gap-4 h-fit py-24 border-b-2 border-ocean-400">
                 {/* Circular Progress */}

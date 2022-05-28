@@ -89,13 +89,6 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 const capitalize = (string: string) =>
   string.charAt(0).toUpperCase() + string.slice(1);
 
-const getFuzzyValue = (length: number, arr: number[]) => {
-  const new_arr: number[] = [];
-  arr.forEach((item) => {
-    new_arr.push(Number((item / length).toFixed(1)));
-  });
-  return new_arr;
-};
 const getIndexOfMaxNumber = (arr: any[]) => arr.indexOf(Math.max(...arr));
 const getIndexOfMinNumber = (arr: any[]) => arr.indexOf(Math.min(...arr));
 const addOrdinal = (n: number) =>
@@ -589,11 +582,30 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
           <div className="grid grid-cols-9 h-fit gap-4">
             <div className="col-span-5 bg-neutral-50 p-4 rounded-xl">
               <BarChart
+                display={true}
                 indexAxis="x"
                 labels={myquar}
                 datasets={quarter_dataset}
               />
-              <p className="text-sm text-neutral-500">Fluctuation:</p>
+              <div className="border-t mt-3 text-sm text-neutral-500">
+                <div className="flex gap-2">
+                  <p>
+                    Fluctuation:{" "}
+                    {student?.quarter_analysis.fluctuation.toFixed(1)}
+                  </p>
+                  {student?.quarter_analysis.plunge_task.length! > 0 && (
+                    <p>
+                      Plunged:{" "}
+                      {student?.quarter_analysis.plunge_task.join(", ")}
+                    </p>
+                  )}
+                  {student?.quarter_analysis.surge_task.length! > 0 && (
+                    <p>
+                      Surged: {student?.quarter_analysis.surge_task.join(", ")}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
             {/* Overall Performance Assessment */}
             <div className="col-span-4 h-[65vh] overflow-x-auto px-3">
@@ -769,62 +781,62 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                 />
                 <div className="border-t mt-3 text-sm text-neutral-500">
                   <div className="flex justify-between">
-                    <p>Written Works</p>
-                    <div className="flex gap-2">
+                    <div className="flex justify-center items-center gap-2">
+                      <div className="bg-yellow-200 w-5 h-1"></div>
+
                       <p>
                         Fluctuation:{" "}
                         {myStudent.written_tasks_analysis?.fluctuation.toFixed(
                           1
                         )}
                       </p>
-                      <p>
-                        Consistency:{" "}
-                        {myStudent.written_tasks_analysis?.fluctuation.toFixed(
-                          1
-                        )}
-                      </p>
+
                       {myStudent.written_tasks_analysis?.plunge_task.length! >
                         0 && (
                         <p>
                           Plunged:{" "}
-                          {myStudent.written_tasks_analysis?.plunge_task}
+                          {myStudent.written_tasks_analysis?.plunge_task.join(
+                            ", "
+                          )}
                         </p>
                       )}
                       {myStudent.written_tasks_analysis?.surge_task.length! >
                         0 && (
                         <p>
-                          Surged: {myStudent.written_tasks_analysis?.surge_task}
+                          Surged:{" "}
+                          {myStudent.written_tasks_analysis?.surge_task.join(
+                            ", "
+                          )}
                         </p>
                       )}
                     </div>
                   </div>
                   <div className="flex justify-between">
-                    <p>Performance Tasks</p>
-                    <div className="flex gap-2">
+                    <div className="flex justify-center items-center gap-2">
+                      <div className="bg-ocean-200 w-5 h-1"></div>
                       <p>
                         Fluctuation:{" "}
                         {myStudent.performace_tasks_analysis?.fluctuation.toFixed(
                           1
                         )}
                       </p>
-                      <p>
-                        Consistency:{" "}
-                        {myStudent.performace_tasks_analysis?.fluctuation.toFixed(
-                          1
-                        )}
-                      </p>
+
                       {myStudent.performace_tasks_analysis?.plunge_task
                         .length! > 0 && (
                         <p>
                           Plunged:{" "}
-                          {myStudent.performace_tasks_analysis?.plunge_task}
+                          {myStudent.performace_tasks_analysis?.plunge_task.join(
+                            ", "
+                          )}
                         </p>
                       )}
                       {myStudent.performace_tasks_analysis?.surge_task.length! >
                         0 && (
                         <p>
                           Surged:{" "}
-                          {myStudent.performace_tasks_analysis?.surge_task}
+                          {myStudent.performace_tasks_analysis?.surge_task.join(
+                            ", "
+                          )}
                         </p>
                       )}
                     </div>
