@@ -30,6 +30,9 @@ import {
   Tooltip,
 } from "chart.js";
 import Link from "next/link";
+import { classNames, studentInCategory } from "../lib/functions/concat";
+import { getGrade } from "../lib/functions/grade_computation";
+import { getRemarks } from "../lib/functions/formatting";
 
 Chart.register(
   ArcElement,
@@ -57,22 +60,16 @@ Chart.register(
   Tooltip
 );
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
 const StudentDialog = ({
   quarter,
   category,
   open,
   setIsOpen,
-  topStudents,
 }: {
   quarter: number;
   category: string;
   open: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  topStudents: number[];
 }) => {
   const { student } = useSelectedStudent();
   let diffArrow, id: number;
@@ -94,33 +91,77 @@ const StudentDialog = ({
     backgroundColor: string;
     borderColor: string;
   };
-  const labels: string[] = [];
-  const scores: number[] = [];
-  if (category === "Written Works") {
-    student?.quarter![quarter].written_works?.forEach((task) => {
-      const task_label = "Task " + task.tasked_number.toString();
-      const score = (task.score / task.highest_possible_score) * 100;
-      labels.push(task_label);
-      scores.push(score);
-    });
-  } else if (category === "Performance Tasks") {
-    student?.quarter![quarter].performance_tasks?.forEach((task) => {
-      const task_label = "Task " + task.tasked_number.toString();
-      const score = (task.score / task.highest_possible_score) * 100;
-      labels.push(task_label);
-      scores.push(score);
-    });
-  }
-  const dataToRender: DataSet = {
-    label: category,
-    data: scores,
+  const ww_labels: string[] = [];
+  const pt_labels: string[] = [];
+
+  const ww_scores: number[] = [];
+  const pt_scores: number[] = [];
+
+  student?.quarter![quarter].written_works?.forEach((task) => {
+    const task_label = "Task " + task.tasked_number.toString();
+    const grade = getGrade(task.score);
+    const score =
+      (grade === -1 ? 0 : grade / task.highest_possible_score) * 100;
+    ww_labels.push(task_label);
+    ww_scores.push(score);
+  });
+  student?.quarter![quarter].performance_tasks?.forEach((task) => {
+    const task_label = "Task " + task.tasked_number.toString();
+    const grade = getGrade(task.score);
+    const score =
+      (grade === -1 ? 0 : grade / task.highest_possible_score) * 100;
+    pt_labels.push(task_label);
+    pt_scores.push(score);
+  });
+
+  const ww_dataToRender: DataSet = {
+    label: "Written Works",
+    data: ww_scores,
     fill: true,
-    backgroundColor: "rgba(75,192,192,0.2)",
-    borderColor: "rgba(75,192,192,1)",
+    backgroundColor: "rgba(75,192,192,0)",
+    borderColor: "#FFF598",
   };
-  const dataChart = {
-    labels: labels,
-    datasets: [dataToRender],
+  const pt_dataToRender: DataSet = {
+    label: "Performance Tasks",
+    data: pt_scores,
+    fill: true,
+    backgroundColor: "rgba(128,0,128, 0)",
+    borderColor: "#63C7FF",
+  };
+
+  const dataToRender: DataSet[] = [ww_dataToRender, pt_dataToRender];
+
+  const data_to_render =
+    category === "Over All"
+      ? dataToRender
+      : "Written Works"
+      ? [ww_dataToRender]
+      : [pt_dataToRender];
+
+  console.log(data_to_render);
+  type Chart = {
+    labels: string[];
+    datasets: DataSet | DataSet[];
+  };
+
+  const this_labels =
+    category === "Over All"
+      ? ww_labels.length > pt_labels.length
+        ? ww_labels
+        : pt_labels
+      : "Written Works"
+      ? ww_labels
+      : pt_labels;
+  const dataChart: Chart = {
+    labels:
+      category === "Over All"
+        ? ww_labels.length > pt_labels.length
+          ? ww_labels
+          : pt_labels
+        : "Written Works"
+        ? ww_labels
+        : pt_labels,
+    datasets: data_to_render,
   };
 
   const data =
@@ -169,9 +210,9 @@ const StudentDialog = ({
                       <span
                         className={classNames(
                           "border h-16 w-16 rounded-full grid place-items-center",
-                          student?.remarks === "Very Good"
-                            ? "bg-yellow-200"
-                            : "bg-slate-300"
+                          student?.quarter![quarter].remarks === "Very Poor"
+                            ? "bg-red-200"
+                            : "bg-yellow-200"
                         )}
                       >
                         <h1 className="font-bold text-xl">
@@ -211,12 +252,12 @@ const StudentDialog = ({
                   </div>
                   <div className="grid grid-cols-2 mt-2 h-72">
                     <div className="overflow-auto">
-                      {/* {topStudents.includes(id)
-                        ? `Top ${topStudents.indexOf(id) + 1}`
-                        : ""} */}
                       <h4 className="pl-6 font-semibold">{category}</h4>
                       <Line
-                        data={dataChart}
+                        data={{
+                          labels: this_labels,
+                          datasets: data_to_render,
+                        }}
                         options={{
                           scales: {
                             y: { max: 100, min: 0, ticks: { stepSize: 20 } },
@@ -233,6 +274,61 @@ const StudentDialog = ({
                       </pre>
                     </div>
                     <div className="col-start-2 overflow-y-auto">
+                      <div className="h-10 flex gap-2">
+                        <span
+                          className={classNames(
+                            "w-fit  p-2 flex justify-center items-center rounded-full font-semibold",
+                            getRemarks(
+                              getGrade(
+                                category === "Over All"
+                                  ? student!.quarter![quarter].grade_before
+                                  : category === "Written Works"
+                                  ? student!.quarter![quarter]
+                                      .written_percentage?.score!
+                                  : student!.quarter![quarter]
+                                      .performance_percentage?.score!
+                              )
+                            ) === "Very Poor"
+                              ? "bg-red-200"
+                              : "bg-ocean-100"
+                          )}
+                        >
+                          {getRemarks(
+                            getGrade(
+                              category === "Over All"
+                                ? student!.quarter![quarter].grade_before
+                                : category === "Written Works"
+                                ? student!.quarter![quarter].written_percentage
+                                    ?.score!
+                                : student!.quarter![quarter]
+                                    .performance_percentage?.score!
+                            )
+                          )}
+                        </span>
+                        {(category === "Over All"
+                          ? student!.quarter![quarter].ranking!
+                          : category === "Written Works"
+                          ? student?.quarter![quarter].written_percentage
+                              ?.ranking!
+                          : student?.quarter![quarter].performance_percentage
+                              ?.ranking!) < 6 && (
+                          <span
+                            className={classNames(
+                              "w-fit bg-yellow-100 p-2 flex justify-center items-center rounded-full font-semibold"
+                            )}
+                          >
+                            Rank{" "}
+                            {studentInCategory(
+                              category,
+                              student!.quarter![quarter].ranking!,
+                              student?.quarter![quarter].written_percentage
+                                ?.ranking!,
+                              student?.quarter![quarter].performance_percentage
+                                ?.ranking!
+                            )}
+                          </span>
+                        )}
+                      </div>
                       <p className="inline-block text-justify">
                         Assessment: Paragraph (Large) Lorem ipsum dolor sit
                         amet, consectetuer adipiscing elit, sed diam nonummy
