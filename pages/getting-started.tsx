@@ -33,7 +33,7 @@ import { classNames } from "../lib/functions/concat";
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
 
-let errors: boolean[] = [];
+let errors: number[] = [0, 0, 0, 0, 0, 0];
 
 const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
@@ -49,18 +49,18 @@ const gettingStarted = () => {
     let gsheet = await getSurveyList(text);
 
     if (gsheet !== null) {
-      errors[0] = true;
-      console.log(errors[0]);
+      errors[0] = 2;
       if (gsheet) {
-        errors[1] = true;
+        errors[1] = 2;
         setForms(gsheet);
         setMessage("FORMS CONNECTED");
       } else {
-        errors[1] = false;
+        errors[1] = 1;
       }
     } else {
       setMessage("ERROR, INCORRECT TEMPLATE OR THE FORMS IS RESTRICTED");
-      errors[0] = false;
+      errors[0] = 1;
+      errors[1] = 1;
       setForms(null);
       setStudents(null);
       setFileName(null);
@@ -76,7 +76,7 @@ const gettingStarted = () => {
       const file_name = file.name;
       if (file_name.match(".xlsx")) {
         setFileName(file_name);
-        errors[2] = true;
+        errors[2] = 2;
         setMessage("File uploaded successfully");
         const reader = new FileReader();
 
@@ -96,7 +96,7 @@ const gettingStarted = () => {
           let task_length = [] as any;
 
           if (wsname[6] === "DO NOT DELETE") {
-            errors[3] = true;
+            errors[3] = 2;
             wsname.map((value, index) => {
               if (index != wsname.length - 1) {
                 const ws = wb.Sheets[value];
@@ -329,7 +329,7 @@ const gettingStarted = () => {
               localStorage.removeItem("students");
             }
 
-            errors[3] = false;
+            errors[3] = 1;
           }
         };
         reader.readAsBinaryString(file);
@@ -345,8 +345,8 @@ const gettingStarted = () => {
         setMessage(
           "File is incompatible, system only accepts excel files with proper format"
         );
-        errors[2] = false;
-        errors[3] = false;
+        errors[2] = 1;
+        errors[3] = 1;
         console.log("file denied");
       }
     }
