@@ -30,7 +30,9 @@ import { classNames } from "../lib/functions/concat";
 import {
   CheckCircleIcon,
   ExclamationCircleIcon,
+  QuestionMarkCircleIcon,
 } from "@heroicons/react/outline";
+import Intro from "../components/sections/Intro";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
@@ -362,154 +364,176 @@ const gettingStarted = () => {
     "Grading Sheet is in Alphabetical Order",
     "Complete data",
   ];
-  console.log(errors);
+
+  const [page, setPage] = useState<number>(3);
 
   return (
     <React.Fragment>
       <div className="bg-[url('/bg-form.jpg')] bg-cover min-h-screen">
-        <div className="flex justify-center">
-          <div className="space-y-4 bg-ocean-100 w-10/12 my-32 rounded-2xl p-10 xl:w-4/5">
-            <div className="flex justify-between">
-              <div>
-                <h1 className="text-2xl font-bold">Getting Started</h1>
-                <div className="my-4 w-5/6">
-                  <p className="inline-block text-justify">
-                    Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
-                    adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                    laoreet dolore magna. Lorem ipsum dolor sit amet,
-                    consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                    tincidunt ut laoreet dolore magna.
-                  </p>
-                </div>
-              </div>
-              <div className="">
-                <Image
-                  src="/logo.png"
-                  alt="logo picture"
-                  width={250}
-                  height={230}
-                />
-              </div>
-            </div>
-            <div className="px-2 grid grid-cols-2">
-              <div>
-                <div className="space-y-4 pr-6">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
-                      <h3 className="font-bold text-white">1</h3>
-                    </div>
-                    <h3 className="font-semibold text-lg">
-                      Google Sheets Link:
-                    </h3>
-                  </div>
-                  <div className="">
-                    <input
-                      type="text"
-                      placeholder="paste here"
-                      className={classNames(
-                        "px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
-                      )}
-                      onChange={(e) => setText_value(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      className="flex justify-center rounded-xl w-fit py-1 px-10 bg-ocean-400"
-                      onClick={() => handleForms(text_value)}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <LoadingSpinner />
-                      ) : (
-                        <div className="flex gap-2 justify-center items-center">
-                          <p className="text-white font-semibold text-lg">
-                            Submit
-                          </p>
-                        </div>
-                      )}
-                    </button>
+        {page > 2 ? (
+          <div className="flex justify-center">
+            <div className="space-y-4 bg-ocean-100 w-10/12 my-10 rounded-2xl p-10 xl:w-4/5">
+              <div className="flex justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold">Welcome to SPES!</h1>
+                  <div className="my-4 w-5/6">
+                    <p className="inline-block text-justify">
+                      Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
+                      adipiscing elit, sed diam nonummy nibh euismod tincidunt
+                      ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                      consectetuer adipiscing elit, sed diam nonummy nibh
+                      euismod tincidunt ut laoreet dolore magna. Click{" "}
+                      <span
+                        onClick={() => {
+                          setPage(0);
+                        }}
+                        className="cursor-pointer font-bold underline decoration-2 underline-offset-2 text-ocean-400"
+                      >
+                        here
+                      </span>{" "}
+                      for a quick tutorial
+                    </p>
                   </div>
                 </div>
-                <div className="space-y-4 pr-6">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
-                      <h3 className="font-bold text-white">2</h3>
+                <div className="">
+                  <Image
+                    src="/logo.png"
+                    alt="logo picture"
+                    width={250}
+                    height={230}
+                  />
+                </div>
+              </div>
+              <div className="px-2 grid grid-cols-2">
+                <div>
+                  <div className="space-y-4 pr-6">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
+                        <h3 className="font-bold text-white">1</h3>
+                      </div>
+                      <h3 className="font-semibold text-lg">
+                        Google Sheets Link:
+                      </h3>
                     </div>
-                    <h3 className="font-semibold text-lg">
-                      Upload Grading Sheet:
-                    </h3>
+                    <div className="">
+                      <input
+                        type="text"
+                        placeholder="paste here"
+                        className={classNames(
+                          "px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
+                        )}
+                        onChange={(e) => setText_value(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        className="flex justify-center rounded-xl w-fit py-1 px-10 bg-ocean-400"
+                        onClick={() => handleForms(text_value)}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <LoadingSpinner />
+                        ) : (
+                          <div className="flex gap-2 justify-center items-center">
+                            <p className="text-white font-semibold text-lg">
+                              Submit
+                            </p>
+                          </div>
+                        )}
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <form action="">
-                      <div>
-                        <div
-                          className={classNames(
-                            "mt-1 flex justify-center px-6 py-6 border-2 w-full border-gray-300 border-dashed rounded-md",
-                            forms !== null
-                              ? "border-ocean-400"
-                              : "border-gray-300"
-                          )}
-                        >
-                          <div className="space-y-1 text-center">
-                            <div className="flex text-lg text-gray-600">
-                              <label
-                                className={classNames(
-                                  "font-bold",
-                                  forms !== null
-                                    ? "relative cursor-pointer text-ocean-400 hover:text-ocean-400"
-                                    : "text-misc-disable"
-                                )}
-                              >
-                                <span>Upload a file</span>
-                                <input
-                                  id="file-upload"
-                                  name="file-upload"
-                                  type="file"
-                                  className="sr-only"
-                                  onChange={handleFile}
-                                  disabled={forms == null}
-                                />
-                              </label>
+                  <div className="space-y-4 pr-6">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
+                        <h3 className="font-bold text-white">2</h3>
+                      </div>
+                      <h3 className="font-semibold text-lg">
+                        Upload Grading Sheet:
+                      </h3>
+                    </div>
+                    <div>
+                      <form action="">
+                        <div>
+                          <div
+                            className={classNames(
+                              "mt-1 flex justify-center px-6 py-6 border-2 w-full border-gray-300 border-dashed rounded-md",
+                              forms !== null
+                                ? "border-ocean-400"
+                                : "border-gray-300"
+                            )}
+                          >
+                            <div className="space-y-1 text-center">
+                              <div className="flex text-lg text-gray-600">
+                                <label
+                                  className={classNames(
+                                    "font-bold",
+                                    forms !== null
+                                      ? "relative cursor-pointer text-ocean-400 hover:text-ocean-400"
+                                      : "text-misc-disable"
+                                  )}
+                                >
+                                  <span>Upload a file</span>
+                                  <input
+                                    id="file-upload"
+                                    name="file-upload"
+                                    type="file"
+                                    className="sr-only"
+                                    onChange={handleFile}
+                                    disabled={forms == null}
+                                  />
+                                </label>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </form>
+                      </form>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="border-l-2 border-ocean-400 pl-6">
-                <h3 className="text-lg font-semibold">Checking</h3>
-                <div>
-                  {checker_msg.map((msg, idx) => (
-                    <div className="flex gap-4 items-center py-1">
-                      {errors[idx] ? (
-                        <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                      ) : (
-                        <ExclamationCircleIcon className="w-5 h-5 text-red-500" />
-                      )}
-                      <h5>{msg}</h5>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex justify-end mt-8">
-                  {
-                    <Link href={fileName ? "/dashboard" : "#"} passHref>
-                      <button
-                        className={classNames(
-                          "rounded-full w-fit px-4 py-2 bg-ocean-300 text-white text-lg font-bold",
-                          !fileName && "opacity-50 cursor-not-allowed"
+                <div className="border-l-2 border-ocean-400 pl-6">
+                  <h3 className="text-lg font-semibold">Checking</h3>
+                  <div>
+                    {checker_msg.map((msg, idx) => (
+                      <div className="flex gap-4 items-center py-1">
+                        {errors[idx] === 2 ? (
+                          <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                        ) : errors[idx] === 1 ? (
+                          <ExclamationCircleIcon className="w-5 h-5 text-red-500" />
+                        ) : (
+                          <div className="w-5 h-5 bg-neutral-200 rounded-full"></div>
                         )}
-                      >
-                        Generate Evaluation
-                      </button>
-                    </Link>
-                  }
+                        <h5
+                          className={classNames(
+                            idx > 3 ? "text-neutral-400" : ""
+                          )}
+                        >
+                          {msg}
+                        </h5>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-end mt-8">
+                    {
+                      <Link href={fileName ? "/dashboard" : "#"} passHref>
+                        <button
+                          className={classNames(
+                            "rounded-full w-fit px-4 py-2 bg-ocean-300 text-white text-lg font-bold",
+                            !fileName && "opacity-50 cursor-not-allowed"
+                          )}
+                        >
+                          Generate Evaluation
+                        </button>
+                      </Link>
+                    }
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <Intro page={page} setPage={setPage} />
+        )}
       </div>
     </React.Fragment>
   );

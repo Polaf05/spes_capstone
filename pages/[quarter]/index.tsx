@@ -14,7 +14,6 @@ import ProgressComponent from "../../components/ProgressComponent";
 import CardInfo from "../../components/CardInfo";
 import StruggledSections from "../../components/sections/StruggledSections";
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
-import { HashLink } from "react-router-hash-link";
 import { getGrade } from "../../lib/functions/grade_computation";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
