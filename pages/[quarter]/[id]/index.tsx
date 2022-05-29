@@ -572,7 +572,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     ) {
       overall_feedback.push(
         `${
-          student?.gender == "MALE" ? "he" : "she"
+          student?.gender == "MALE" ? "His" : "Her"
         } grades suddenly plunged in ${
           student?.quarter_analysis.plunge_task.length! > 1
             ? "quarters"
@@ -591,7 +591,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     ) {
       overall_feedback.push(
         `${
-          student?.gender == "MALE" ? "he" : "she"
+          student?.gender == "MALE" ? "His" : "Her"
         } grades suddenly plunged in ${
           student?.quarter_analysis.plunge_task.length! > 1
             ? "quarters"
@@ -605,7 +605,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     ) {
       overall_feedback.push(
         `${
-          student?.gender == "MALE" ? "he" : "she"
+          student?.gender == "MALE" ? "His" : "Her"
         } grades suddenly surged  in ${
           student?.quarter_analysis.surge_task.length! > 1
             ? "quarters"
