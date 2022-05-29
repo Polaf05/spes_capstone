@@ -373,6 +373,15 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     tdata.pt.passed += task.status.match(/Passed|Perfect/g) ? 1 : 0;
   });
 
+  let qSum: any = 0;
+  students![0].quarter?.map((quarter) => {
+    qSum +=
+      quarter.written_works?.length! > 0 ||
+      quarter.performance_tasks?.length! > 0
+        ? 1
+        : 0;
+  });
+
   //set underperformed tasks
   tdata.ww.raw_scores.status.map((task, idx) => {
     const _score = tdata.ww.raw_scores.score[idx];
@@ -446,9 +455,9 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     "better at",
     Number(tdiff.toFixed(1))
   );
-  const ave_rank: string = (sum / 4).toFixed(2);
-  const ave_ww_pct: number = Number((ww_qsum / 4).toFixed(1));
-  const ave_pt_pct: number = Number((pt_qsum / 4).toFixed(1));
+  const ave_rank: string = (sum / qSum).toFixed(2);
+  const ave_ww_pct: number = Number((ww_qsum / qSum).toFixed(1));
+  const ave_pt_pct: number = Number((pt_qsum / qSum).toFixed(1));
   let better_at: string = "";
   let flag = "both";
   let margin: number = 0;
