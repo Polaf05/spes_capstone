@@ -86,15 +86,27 @@ export function quarterAnalysis(quarter: Quarter[]) {
   let consistent: number[] = [];
   let temp_consistent: number[] = [];
 
+  let len = 0;
+
   for (let i = 0; i < quarter.length; i++) {
+    if (
+      quarter[i].performance_tasks?.length != 0 &&
+      quarter[i].written_works?.length != 0
+    ) {
+      len = i;
+    }
+  }
+
+  for (let i = 0; i <= len; i++) {
     //Getting the trend
-    if (i < quarter.length - 1) {
+    if (i < len) {
       let sum = quarter[i + 1].grade_before - quarter[i].grade_before;
       trend.push(sum);
 
-      if (sum >= 7) {
+      console.log(sum);
+      if (sum >= 10) {
         surge.push(i + 2);
-      } else if (sum <= -7) {
+      } else if (sum <= -10) {
         plunge.push(i + 2);
       }
     }
