@@ -13,8 +13,8 @@ import { useRouter } from "next/router";
 import ProgressComponent from "../../components/ProgressComponent";
 import CardInfo from "../../components/CardInfo";
 import StruggledSections from "../../components/sections/StruggledSections";
-import { render } from "@headlessui/react/dist/utils/render";
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
+import { getGrade } from "../../lib/functions/grade_computation";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -94,7 +94,9 @@ export default function Tasks({ quarter }: { quarter: number }) {
   const index = quarter - 1;
   //category average
   let ww_cat_sum = 0,
-    pt_cat_sum = 0;
+    pt_cat_sum = 0,
+    ww_ave_cat_sum = 0,
+    pt_ave_cat_sum = 0;
 
   //Written Works
   students![0].quarter![index].written_works?.forEach((task, idx) => {
@@ -137,6 +139,7 @@ export default function Tasks({ quarter }: { quarter: number }) {
     task_info.ave_score_pct = Number(
       ((task_info.ave_score / task_info.total) * 100).toFixed(1)
     );
+    ww_ave_cat_sum += task_info.ave_score_pct;
 
     //get sum of passing percentage
     ww_cat_sum += Number(
@@ -181,7 +184,6 @@ export default function Tasks({ quarter }: { quarter: number }) {
         //score sum
         score_sum += student?.quarter![index].performance_tasks![idx].score;
       }
-      console.log(task_info.population);
       //total population
       task_info.population += 1;
     });
@@ -191,6 +193,8 @@ export default function Tasks({ quarter }: { quarter: number }) {
     task_info.ave_score_pct = Number(
       ((task_info.ave_score / task_info.total) * 100).toFixed(1)
     );
+
+    pt_ave_cat_sum += task_info.ave_score_pct;
 
     //get sum of passing percentage
     pt_cat_sum += Number(
@@ -257,6 +261,57 @@ export default function Tasks({ quarter }: { quarter: number }) {
     },
   ];
 
+  type Info = {
+    student: Student;
+    remarks: string;
+  };
+
+  let ww_remarks: Info[] = [];
+  let pt_remarks: Info[] = [];
+  //average passing rate
+  students?.map((student) => {
+    ww_remarks.push({
+      student: student,
+      remarks: getRemarks(
+        getGrade(student.quarter![quarter - 1].written_percentage?.score!)
+      ),
+    });
+
+    pt_remarks.push({
+      student: student,
+      remarks: getRemarks(
+        getGrade(student.quarter![quarter - 1].performance_percentage?.score!)
+      ),
+    });
+  });
+
+  let pass_ww_info: any[] = [],
+    pass_pt_info: any[] = [];
+  ww_remarks.map((student) => {
+    if (student.remarks !== "Very Poor") pass_ww_info.push(student);
+  });
+  pt_remarks.map((student) => {
+    if (student.remarks !== "Very Poor") pass_pt_info.push(student);
+  });
+
+  const ww_passing_ave = Number(
+    ((pass_ww_info.length / ww_remarks.length) * 100).toFixed(1)
+  );
+  const pt_passing_ave = Number(
+    ((pass_pt_info.length / pt_remarks.length) * 100).toFixed(1)
+  );
+
+  const ww_ave_pct = Number(
+    (
+      ww_ave_cat_sum / students![0].quarter![index].written_works?.length!
+    ).toFixed(1)
+  );
+  const pt_ave_pct = Number(
+    (
+      pt_ave_cat_sum / students![0].quarter![index].performance_tasks?.length!
+    ).toFixed(1)
+  );
+
   const tasks_buttons = [ww_render_labels, pt_render_labels];
 
   return (
@@ -315,8 +370,26 @@ export default function Tasks({ quarter }: { quarter: number }) {
                 <StruggledSections students={students} quarter={quarter} />
               </div>
               {/* Bar Chart */}
-              <div className="h-fit m-8 px-24 pb-24 border-b-2 border-ocean-400">
-                <h1 className="text-3xl font-bold">Tasks Assessment</h1>
+              <div className="h-fit m-8 px-24 border-b-2 border-ocean-400">
+                <div className="flex justify-between">
+                  <div>
+                    <h1 className="text-3xl font-bold">Tasks Assessment</h1>
+                    <div className="flex gap-1 items-center">
+                      <QuestionMarkCircleIcon className="w-4 h-4 text-neutral-500" />
+                      <p className="text-neutral-600 text-sm">
+                        Click on the chart label to view the task info
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <a
+                      href={"#analysis"}
+                      className="text-xl font-semibold underline decoration-2 hover:cursor-pointer hover:text-ocean-400 underline-offset-8"
+                    >
+                      View Analysis
+                    </a>
+                  </div>
+                </div>
                 <div className="grid grid-cols-12 gap-4 mt-4">
                   <div className="col-span-4 py-4">
                     <h2 className="text-xl font-semibold">
@@ -332,11 +405,11 @@ export default function Tasks({ quarter }: { quarter: number }) {
                       </h6>
 
                       <h6 className="font-light">
-                        No. of Students Participated:
+                        No. of Students Participated:{" "}
                         {ww_task_array[task].participated}
                       </h6>
                       <h6 className="font-light">
-                        No. of Students Passed:
+                        No. of Students Passed:{" "}
                         {ww_task_array[task].passed.length +
                           ww_task_array[task].perfect.length}
                       </h6>
@@ -393,7 +466,7 @@ export default function Tasks({ quarter }: { quarter: number }) {
                     </div>
                   </div>
                 </div>
-                <div className="h-fit pb-24">
+                <div className="h-fit pb-12">
                   <div className="grid grid-cols-12 gap-4 mt-4">
                     <div className="col-span-4 py-4">
                       <h2 className="text-xl font-semibold">
@@ -411,11 +484,11 @@ export default function Tasks({ quarter }: { quarter: number }) {
                         </h6>
 
                         <h6 className="font-light">
-                          No. of Students Participated:
+                          No. of Students Participated:{" "}
                           {pt_task_array[pt_task].participated}
                         </h6>
                         <h6 className="font-light">
-                          No. of Students Passed:
+                          No. of Students Passed:{" "}
                           {pt_task_array[pt_task].passed.length +
                             pt_task_array[pt_task].perfect.length}
                         </h6>
@@ -473,25 +546,10 @@ export default function Tasks({ quarter }: { quarter: number }) {
                     </div>
                   </div>
                 </div>
-                <p className="italic text-justify mt-8">
-                  Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sedlor sit amet, consectetuer adipiscing
-                  elit, sedParagraph (Large) Lorem ipsum dolor sit amet,
-                  consectetuer adipiscing elit, sedlor sit amet, consectetuer
-                  adipiscing elit, sedParagraph (Large) Lorem ipsum dolor sit
-                  amet, consectetuer adipiscing elit, sedlor sit amet,
-                  consectetuer adipiscing elit, sedParagraph (Large) Lorem ipsum
-                  dolor sit amet, consectetuer adipiscing elit, sedlor sit amet,
-                  consectetuer adipiscing elit, sedParagraph (Large) Lorem ipsum
-                  dolor sit amet, consectetuer adipiscing elit, sedlor sit amet,
-                  consectetuer adipiscing elit, sedParagraph (Large) Lorem ipsum
-                  dolor sit amet, consectetuer adipiscing elit, sedlor sit amet,
-                  consectetuer adipiscing elit, sed
-                </p>
               </div>
 
               {/* Circular Progress Chart */}
-              <div className="my-12 grid grid-cols-2 gap-4 h-fit py-24 border-b-2 border-ocean-400">
+              <div id="analysis" className="my-12 grid grid-cols-2 gap-4 h-fit">
                 {/* Circular Progress */}
                 <div className="col-span-5 grid grid-cols-12 gap-3">
                   {/* WW Data */}
@@ -508,7 +566,7 @@ export default function Tasks({ quarter }: { quarter: number }) {
                         )}
                       >
                         <ProgressComponent
-                          value={69}
+                          value={ww_passing_ave}
                           title="Written Works"
                           subtitle="Students Passed"
                           pathColor="#FFF598"
@@ -527,7 +585,7 @@ export default function Tasks({ quarter }: { quarter: number }) {
                       </div>
                       <div className="col-span-4 ">
                         <ProgressComponent
-                          value={22}
+                          value={ww_ave_pct}
                           title="Average"
                           subtitle="Score PCT"
                           pathColor="#FFF598"
@@ -543,7 +601,7 @@ export default function Tasks({ quarter }: { quarter: number }) {
                     <div className="grid grid-cols-12 gap-8 mb-4">
                       <div className="col-span-4">
                         <ProgressComponent
-                          value={22}
+                          value={pt_ave_pct}
                           title="Average"
                           subtitle="Score PCT"
                           pathColor="#63C7FF"
@@ -570,7 +628,7 @@ export default function Tasks({ quarter }: { quarter: number }) {
                         )}
                       >
                         <ProgressComponent
-                          value={69}
+                          value={pt_passing_ave}
                           title="Performance Tasks"
                           subtitle="Students Passed"
                           pathColor="#63C7FF"
@@ -581,6 +639,23 @@ export default function Tasks({ quarter }: { quarter: number }) {
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="px-24">
+                <p className="italic text-justify">
+                  Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
+                  adipiscing elit, sedlor sit amet, consectetuer adipiscing
+                  elit, sedParagraph (Large) Lorem ipsum dolor sit amet,
+                  consectetuer adipiscing elit, sedlor sit amet, consectetuer
+                  adipiscing elit, sedParagraph (Large) Lorem ipsum dolor sit
+                  amet, consectetuer adipiscing elit, sedlor sit amet,
+                  consectetuer adipiscing elit, sedParagraph (Large) Lorem ipsum
+                  dolor sit amet, consectetuer adipiscing elit, sedlor sit amet,
+                  consectetuer adipiscing elit, sedParagraph (Large) Lorem ipsum
+                  dolor sit amet, consectetuer adipiscing elit, sedlor sit amet,
+                  consectetuer adipiscing elit, sedParagraph (Large) Lorem ipsum
+                  dolor sit amet, consectetuer adipiscing elit, sedlor sit amet,
+                  consectetuer adipiscing elit, sed
+                </p>
               </div>
             </div>
           </div>

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { DownloadIcon, SearchIcon } from "@heroicons/react/outline";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import * as XLSX from "xlsx";
 import { useClassroom } from "../hooks/useSetClassroom";
 import {
@@ -28,15 +26,18 @@ import {
 import { afterGradeInference, inferenceData } from "../lib/functions/fuzzyis";
 import { getSurveyList } from "../lib/functions/sheets";
 import LoadingSpinner from "../components/Loader";
+import { classNames } from "../lib/functions/concat";
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  QuestionMarkCircleIcon,
+} from "@heroicons/react/outline";
+import Intro from "../components/sections/Intro";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
-let errors: boolean[] = [];
+let errors: number[] = [0, 0, 0, 0, 0, 0];
 
 const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
@@ -51,19 +52,19 @@ const gettingStarted = () => {
     setLoading(true);
     let gsheet = await getSurveyList(text);
 
-    if (gsheet != null) {
-      errors[0] = true;
-      console.log(errors[0]);
+    if (gsheet !== null) {
+      errors[0] = 2;
       if (gsheet) {
-        errors[1] = true;
+        errors[1] = 2;
         setForms(gsheet);
         setMessage("FORMS CONNECTED");
       } else {
-        errors[1] = false;
+        errors[1] = 1;
       }
     } else {
       setMessage("ERROR, INCORRECT TEMPLATE OR THE FORMS IS RESTRICTED");
-      errors[0] = false;
+      errors[0] = 1;
+      errors[1] = 1;
       setForms(null);
       setStudents(null);
       setFileName(null);
@@ -79,7 +80,7 @@ const gettingStarted = () => {
       const file_name = file.name;
       if (file_name.match(".xlsx")) {
         setFileName(file_name);
-        errors[2] = true;
+        errors[2] = 2;
         setMessage("File uploaded successfully");
         const reader = new FileReader();
 
@@ -99,7 +100,7 @@ const gettingStarted = () => {
           let task_length = [] as any;
 
           if (wsname[6] === "DO NOT DELETE") {
-            errors[3] = true;
+            errors[3] = 2;
             wsname.map((value, index) => {
               if (index != wsname.length - 1) {
                 const ws = wb.Sheets[value];
@@ -332,7 +333,7 @@ const gettingStarted = () => {
               localStorage.removeItem("students");
             }
 
-            errors[3] = false;
+            errors[3] = 1;
           }
         };
         reader.readAsBinaryString(file);
@@ -348,118 +349,191 @@ const gettingStarted = () => {
         setMessage(
           "File is incompatible, system only accepts excel files with proper format"
         );
-        errors[2] = false;
-        errors[3] = false;
+        errors[2] = 1;
+        errors[3] = 1;
         console.log("file denied");
       }
     }
   };
+  const checker_msg = [
+    "Link is correct and not restricted",
+    "Sheet template format is correct",
+    "Uploaded file format is korik (.xlsx)",
+    "DepEd Grading Sheet Template is met",
+    "Names of the students are correct",
+    "Grading Sheet is in Alphabetical Order",
+    "Complete data",
+  ];
+
+  const [page, setPage] = useState<number>(3);
+
   return (
     <React.Fragment>
       <div className="bg-[url('/bg-form.jpg')] bg-cover min-h-screen">
-        <div className="flex justify-center">
-          <div className="flex flex-row justify-between bg-ocean-100 w-10/12 border border-black  my-32 rounded-xl p-20 xl:w-3/5">
-            <section className="grid justify-items-start w-2/3">
-              <h1 className="text-2xl font-bold">Getting Started</h1>
-              <section className="m-4">
-                <h6 className="text-lg font-bold">Instructions</h6>
-                <p className="inline-block text-justify">
-                  Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna.
-                </p>
-              </section>
-              <section className="m-4 space-y-4">
-                <div className="mb-3 pt-0">
-                  <input
-                    type="text"
-                    placeholder="Placeholder"
-                    className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
-                    onChange={(e) => setText_value(e.target.value)}
+        {page > 2 ? (
+          <div className="flex justify-center">
+            <div className="space-y-4 bg-ocean-100 w-10/12 my-10 rounded-2xl p-10 xl:w-4/5">
+              <div className="flex justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold">Welcome to SPES!</h1>
+                  <div className="my-4 w-5/6">
+                    <p className="inline-block text-justify">
+                      Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
+                      adipiscing elit, sed diam nonummy nibh euismod tincidunt
+                      ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                      consectetuer adipiscing elit, sed diam nonummy nibh
+                      euismod tincidunt ut laoreet dolore magna. Click{" "}
+                      <span
+                        onClick={() => {
+                          setPage(0);
+                        }}
+                        className="cursor-pointer font-bold underline decoration-2 underline-offset-2 text-ocean-400"
+                      >
+                        here
+                      </span>{" "}
+                      for a quick tutorial
+                    </p>
+                  </div>
+                </div>
+                <div className="">
+                  <Image
+                    src="/logo.png"
+                    alt="logo picture"
+                    width={250}
+                    height={230}
                   />
                 </div>
-                <button
-                  className="flex justify-center rounded-xl w-52 h-10 bg-ocean-400"
-                  onClick={() => handleForms(text_value)}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <LoadingSpinner />
-                  ) : (
-                    <SearchIcon className="text-white w-7 h-9" />
-                  )}
-                </button>
-
+              </div>
+              <div className="px-2 grid grid-cols-2">
                 <div>
-                  <div>
-                    {students ? (
-                      <h6 className="text-lg font-bold">
-                        Uploaded File: {fileName}
-                      </h6>
-                    ) : (
-                      <h6 className="text-lg font-bold">
-                        Please upload your file here:
-                      </h6>
-                    )}
+                  <div className="space-y-4 pr-6">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
+                        <h3 className="font-bold text-white">1</h3>
+                      </div>
+                      <h3 className="font-semibold text-lg">
+                        Google Sheets Link:
+                      </h3>
+                    </div>
+                    <div className="">
+                      <input
+                        type="text"
+                        placeholder="paste here"
+                        className={classNames(
+                          "px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
+                        )}
+                        onChange={(e) => setText_value(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        className="flex justify-center rounded-xl w-fit py-1 px-10 bg-ocean-400"
+                        onClick={() => handleForms(text_value)}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <LoadingSpinner />
+                        ) : (
+                          <div className="flex gap-2 justify-center items-center">
+                            <p className="text-white font-semibold text-lg">
+                              Submit
+                            </p>
+                          </div>
+                        )}
+                      </button>
+                    </div>
                   </div>
-
-                  <form action="">
+                  <div className="space-y-4 pr-6">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
+                        <h3 className="font-bold text-white">2</h3>
+                      </div>
+                      <h3 className="font-semibold text-lg">
+                        Upload Grading Sheet:
+                      </h3>
+                    </div>
                     <div>
-                      <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 w-full border-gray-300 border-dashed rounded-md">
-                        <div className="space-y-1 text-center">
-                          <div className="flex text-lg text-gray-600">
-                            <label
-                              className={classNames(
-                                "font-bold focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ocean-400",
-                                forms != null
-                                  ? "relative cursor-pointer text-ocean-400 hover:text-ocean-400"
-                                  : "text-misc-disable"
-                              )}
-                            >
-                              <span>Upload a file</span>
-                              <input
-                                id="file-upload"
-                                name="file-upload"
-                                type="file"
-                                className="sr-only"
-                                onChange={handleFile}
-                                disabled={forms == null}
-                              />
-                            </label>
+                      <form action="">
+                        <div>
+                          <div
+                            className={classNames(
+                              "mt-1 flex justify-center px-6 py-6 border-2 w-full border-gray-300 border-dashed rounded-md",
+                              forms !== null
+                                ? "border-ocean-400"
+                                : "border-gray-300"
+                            )}
+                          >
+                            <div className="space-y-1 text-center">
+                              <div className="flex text-lg text-gray-600">
+                                <label
+                                  className={classNames(
+                                    "font-bold",
+                                    forms !== null
+                                      ? "relative cursor-pointer text-ocean-400 hover:text-ocean-400"
+                                      : "text-misc-disable"
+                                  )}
+                                >
+                                  <span>Upload a file</span>
+                                  <input
+                                    id="file-upload"
+                                    name="file-upload"
+                                    type="file"
+                                    className="sr-only"
+                                    onChange={handleFile}
+                                    disabled={forms == null}
+                                  />
+                                </label>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </form>
                     </div>
-                  </form>
+                  </div>
                 </div>
-              </section>
-            </section>
-            <section className="relative space-y-24 w-1/3">
-              <div className="grid justify-end">
-                <Image
-                  src="/logo.png"
-                  alt="logo picture"
-                  width={150}
-                  height={130}
-                />
+                <div className="border-l-2 border-ocean-400 pl-6">
+                  <h3 className="text-lg font-semibold">Checking</h3>
+                  <div>
+                    {checker_msg.map((msg, idx) => (
+                      <div className="flex gap-4 items-center py-1">
+                        {errors[idx] === 2 ? (
+                          <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                        ) : errors[idx] === 1 ? (
+                          <ExclamationCircleIcon className="w-5 h-5 text-red-500" />
+                        ) : (
+                          <div className="w-5 h-5 bg-neutral-200 rounded-full"></div>
+                        )}
+                        <h5
+                          className={classNames(
+                            idx > 3 ? "text-neutral-400" : ""
+                          )}
+                        >
+                          {msg}
+                        </h5>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-end mt-8">
+                    {
+                      <Link href={fileName ? "/dashboard" : "#"} passHref>
+                        <button
+                          className={classNames(
+                            "rounded-full w-fit px-4 py-2 bg-ocean-300 text-white text-lg font-bold",
+                            !fileName && "opacity-50 cursor-not-allowed"
+                          )}
+                        >
+                          Generate Evaluation
+                        </button>
+                      </Link>
+                    }
+                  </div>
+                </div>
               </div>
-              <div className="w-full m-8 space-y-12">
-                <h6 className="text-base font-bold whitespace-normal">
-                  {message}
-                </h6>
-                {fileName && (
-                  <Link href={"/dashboard"} passHref>
-                    <button className="rounded-full w-56 h-14 bg-ocean-300 text-white text-lg font-bold">
-                      Continue
-                    </button>
-                  </Link>
-                )}
-              </div>
-            </section>
+            </div>
           </div>
-        </div>
+        ) : (
+          <Intro page={page} setPage={setPage} />
+        )}
       </div>
     </React.Fragment>
   );

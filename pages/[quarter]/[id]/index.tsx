@@ -45,6 +45,8 @@ import {
 import { tasks } from "googleapis/build/src/apis/tasks";
 import { Router, useRouter } from "next/router";
 import { type } from "os";
+import { formatArray, getRemarks } from "../../../lib/functions/formatting";
+import { fluctuation } from "../../../lib/functions/analysis";
 
 Chart.register(
   ArcElement,
@@ -373,6 +375,15 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     tdata.pt.passed += task.status.match(/Passed|Perfect/g) ? 1 : 0;
   });
 
+  let qSum: any = 0;
+  students![0].quarter?.map((quarter) => {
+    qSum +=
+      quarter.written_works?.length! > 0 ||
+      quarter.performance_tasks?.length! > 0
+        ? 1
+        : 0;
+  });
+
   //set underperformed tasks
   tdata.ww.raw_scores.status.map((task, idx) => {
     const _score = tdata.ww.raw_scores.score[idx];
@@ -446,25 +457,206 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     "better at",
     Number(tdiff.toFixed(1))
   );
-  const ave_rank: string = (sum / 4).toFixed(2);
-  const ave_ww_pct: number = Number((ww_qsum / 4).toFixed(1));
-  const ave_pt_pct: number = Number((pt_qsum / 4).toFixed(1));
+  const ave_rank: string = (sum / qSum).toFixed(2);
+  const ave_ww_pct: number = Number((ww_qsum / qSum).toFixed(1));
+  const ave_pt_pct: number = Number((pt_qsum / qSum).toFixed(1));
   let better_at: string = "";
+  let better: string = "";
+  let better_score: number = 0;
+  let lower_score: number = 0;
   let flag = "both";
   let margin: number = 0;
   if (ave_pt_pct === ave_ww_pct) {
     better_at = "good with both Written Works and Performance Tasks";
+    better = "Both";
   } else if (ave_pt_pct > ave_ww_pct) {
     better_at = "better in Performance Tasks";
+    better = "Performance Tasks";
+    better_score = ave_pt_pct;
+    lower_score = ave_ww_pct;
     flag = "pt";
     margin = ave_pt_pct - ave_ww_pct;
   } else {
     better_at = "better in Written Works";
+    better = "Written Works";
+    better_score = ave_ww_pct;
+    lower_score = ave_pt_pct;
     flag = "ww";
     margin = ave_ww_pct - ave_pt_pct;
   }
 
   margin = Number(margin.toFixed(1));
+
+  const getOverallFeedback = () => {
+    let overall_feedback: string[] = [];
+
+    if (
+      student?.final_grade_before! >= 83 &&
+      student?.inference_result?.external_elements.value! >= 0.5
+    ) {
+      overall_feedback.push(
+        `Student performed ${student?.remarks} in ${
+          student?.gender == "MALE" ? "his" : "her"
+        } studies because ${
+          student?.gender == "MALE" ? "his" : "her"
+        } external factors is ${
+          student?.inference_result?.external_elements.linguistic
+        }.`
+      );
+    } else if (
+      student?.final_grade_before! < 83 &&
+      student?.inference_result?.external_elements.value! >= 0.5
+    ) {
+      overall_feedback.push(
+        `Student performed ${student?.remarks} in ${
+          student?.gender == "MALE" ? "his" : "her"
+        } studies even though ${
+          student?.gender == "MALE" ? "his" : "her"
+        } external factors is ${
+          student?.inference_result?.external_elements.linguistic
+        }.`
+      );
+    } else if (
+      student?.final_grade_before! >= 83 &&
+      student?.inference_result?.external_elements.value! < 0.5
+    ) {
+      overall_feedback.push(
+        `Student performed ${student?.remarks} in ${
+          student?.gender == "MALE" ? "his" : "her"
+        } studies even though ${
+          student?.gender == "MALE" ? "his" : "her"
+        } external factors is ${
+          student?.inference_result?.external_elements.linguistic
+        }.`
+      );
+    } else if (
+      student?.final_grade_before! < 83 &&
+      student?.inference_result?.external_elements.value! < 0.5
+    ) {
+      overall_feedback.push(
+        `Student performed ${student?.remarks} in ${
+          student?.gender == "MALE" ? "his" : "her"
+        } studies because ${
+          student?.gender == "MALE" ? "his" : "her"
+        } external factors is ${
+          student?.inference_result?.external_elements.linguistic
+        }.`
+      );
+    }
+
+    if (
+      student?.quarter_analysis.fluctuation! > 3 ||
+      student?.quarter_analysis.fluctuation! < -3
+    ) {
+      overall_feedback.push(
+        `Students grade is not consistent and has a high fluctuation rate.`
+      );
+    } else if (student?.quarter_analysis.fluctuation! == 0) {
+      overall_feedback.push(
+        `Students grade is consistent and doesn’t fluctuate.`
+      );
+    } else if (
+      (student?.quarter_analysis.fluctuation! > 0 &&
+        student?.quarter_analysis.fluctuation! <= 3) ||
+      (student?.quarter_analysis.fluctuation! < 0 &&
+        student?.quarter_analysis.fluctuation! >= 3)
+    ) {
+      overall_feedback.push(
+        `Student grade is almost consistent, and his fluctuation rate is low.`
+      );
+    }
+
+    if (
+      student?.quarter_analysis.plunge_task.length! > 0 &&
+      student?.quarter_analysis.surge_task.length! > 0
+    ) {
+      overall_feedback.push(
+        `${
+          student?.gender == "MALE" ? "His" : "Her"
+        } grades suddenly plunged in ${
+          student?.quarter_analysis.plunge_task.length! > 1
+            ? "quarters"
+            : " quarter"
+        } ${formatArray(
+          student?.quarter_analysis.plunge_task
+        )} while it surged  in ${
+          student?.quarter_analysis.surge_task.length! > 1
+            ? "quarters"
+            : "quarter"
+        }  ${formatArray(student?.quarter_analysis.surge_task)}.`
+      );
+    } else if (
+      student?.quarter_analysis.plunge_task.length! > 0 &&
+      student?.quarter_analysis.surge_task.length! == 0
+    ) {
+      overall_feedback.push(
+        `${
+          student?.gender == "MALE" ? "His" : "Her"
+        } grades suddenly plunged in ${
+          student?.quarter_analysis.plunge_task.length! > 1
+            ? "quarters"
+            : "quarter"
+        } ${formatArray(student?.quarter_analysis.plunge_task)}.`
+      );
+    }
+    if (
+      student?.quarter_analysis.plunge_task.length! == 0 &&
+      student?.quarter_analysis.surge_task.length! > 0
+    ) {
+      overall_feedback.push(
+        `${
+          student?.gender == "MALE" ? "His" : "Her"
+        } grades suddenly surged  in ${
+          student?.quarter_analysis.surge_task.length! > 1
+            ? "quarters"
+            : "quarter"
+        }  ${formatArray(student?.quarter_analysis.surge_task)}.`
+      );
+    }
+
+    // else if (
+    //   student?.quarter_analysis.plunge_task.length! == 0 &&
+    //   student?.quarter_analysis.surge_task.length! == 0
+    // ) {
+    //   overall_feedback.push(
+    //     `${
+    //       student?.gender == "MALE" ? "he" : "she"
+    //     } grades suddenly plunge in ${student?.quarter_analysis.plunge_task.join()}`
+    //   );
+    // }
+
+    if (margin == 0 && ave_pt_pct >= 83 && ave_ww_pct >= 83) {
+      overall_feedback.push(
+        "Student both performs better in Performance Tasks and Written Works"
+      );
+    } else if (margin <= 3 && ave_pt_pct >= 83 && ave_ww_pct >= 83) {
+      overall_feedback.push(
+        `Student performs slightly better in ${better} with a margin of (${margin})`
+      );
+    } else if (margin > 3 && better_score >= 78) {
+      overall_feedback.push(
+        `Student performs better in ${better} with a margin of (${margin})`
+      );
+    } else if (margin > 3 && ave_pt_pct >= 78 && ave_ww_pct >= 83) {
+      overall_feedback.push(
+        `Student performs better in ${better} with a margin of (${margin})`
+      );
+    } else if (margin > 3 && better_score >= 78 && lower_score < 75) {
+      overall_feedback.push(
+        `Student performs better in ${better}however student needs attention in variable 2 since ${
+          student?.gender == "MALE" ? "his" : "her"
+        } performance is very poor `
+      );
+    } else if (better_score <= 77) {
+      overall_feedback.push(
+        `Student need attention in both Performance Tasks and Written Works because ${
+          student?.gender == "MALE" ? "he" : "she"
+        } performed poorly `
+      );
+    }
+
+    return overall_feedback.join(" ");
+  };
 
   const quarter_dataset: DataSet[] = [
     {
@@ -566,15 +758,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
       {/* General Section */}
       <div className="bg-ocean-100 h-[110vh] flex flex-col justify-between">
         <div className="mx-12 py-8">
-          <h3 className="text-justify mb-4">
-            Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
-            consectetuer adipiscing elit, sed diam nonummy nibh euismod
-            tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
-            consectetuer adipiscing elit, sed diam nonummy nibh euismod
-            tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
-            consectetuer adipiscing elit, sed diam nonummy nibh euismod
-            tincidunt ut laoreet dolore magna.
-          </h3>
+          <h3 className="text-justify mb-4">{getOverallFeedback()}</h3>
           <h2 className="font-bold text-2xl">
             Final Grade: {student?.final_grade_after}
           </h2>

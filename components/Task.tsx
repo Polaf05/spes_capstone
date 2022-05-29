@@ -5,24 +5,14 @@ import { useClassroom } from "../hooks/useSetClassroom";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
 import { Student } from "../types/Students";
 import StudentDialog from "./StudentDialog";
-import { useRouter } from "next/router";
-import { GetServerSideProps } from "next";
+import {
+  displayData,
+  getGrade,
+  getRemarks,
+} from "../lib/functions/grade_computation";
+import { classNames } from "../lib/functions/concat";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
-const getRemarks = (grade: number) => {
-  return grade < 75
-    ? "Very Poor"
-    : grade < 83
-    ? "Poor"
-    : grade < 90
-    ? "Average"
-    : grade < 97
-    ? "Good"
-    : "Very Good";
-};
-
-const getGrade = (grade: any) =>
-  typeof grade === "string" ? "no data" : grade;
 
 export const Task = ({
   category,
@@ -43,7 +33,6 @@ export const Task = ({
   const [filteredStudents, setFilteredStudents] = useState<Student[] | null>(
     students!
   );
-  const [topStudents, setTopStudents] = useState([] as number[]);
   useEffect(() => {
     if (students) {
       setFilteredStudents([
@@ -90,6 +79,7 @@ export const Task = ({
   }, [sortingMethod]);
 
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
+
   var count = [0, 0, 0, 0, 0];
   students?.map((student) => {
     const i = labels.indexOf(
@@ -101,6 +91,7 @@ export const Task = ({
               : student.quarter![quarter].performance_percentage?.score!
           )
     );
+
     count[i] += 1;
   });
 
@@ -186,7 +177,20 @@ export const Task = ({
               {students &&
                 students?.map((student, idx) => (
                   <tr
-                    className="odd:bg-yellow-50 hover:cursor-pointer text-center"
+                    className={classNames(
+                      "hover:cursor-pointer text-center",
+                      (category === "Over All"
+                        ? student.quarter![quarter].grade_before
+                        : getGrade(
+                            category === "Written Works"
+                              ? student.quarter![quarter].written_percentage
+                                  ?.score
+                              : student.quarter![quarter].performance_percentage
+                                  ?.score
+                          )) > 75
+                        ? "odd:bg-yellow-50"
+                        : "bg-red-200"
+                    )}
                     onClick={() => {
                       setStudent(student);
                       setIsOpen(true);
@@ -199,12 +203,14 @@ export const Task = ({
                     <td>
                       {category === "Over All"
                         ? student.quarter![quarter].grade_before
-                        : getGrade(
-                            category === "Written Works"
-                              ? student.quarter![quarter].written_percentage
-                                  ?.score
-                              : student.quarter![quarter].performance_percentage
-                                  ?.score
+                        : displayData(
+                            getGrade(
+                              category === "Written Works"
+                                ? student.quarter![quarter].written_percentage
+                                    ?.score
+                                : student.quarter![quarter]
+                                    .performance_percentage?.score
+                            )
                           )}
                     </td>
                     <td className="text-base">
@@ -217,12 +223,14 @@ export const Task = ({
                     <td>
                       {category === "Over All"
                         ? student.quarter![quarter].grade_after
-                        : getGrade(
-                            category === "Written Works"
-                              ? student.quarter![quarter].written_percentage
-                                  ?.score
-                              : student.quarter![quarter].performance_percentage
-                                  ?.score
+                        : displayData(
+                            getGrade(
+                              category === "Written Works"
+                                ? student.quarter![quarter].written_percentage
+                                    ?.score
+                                : student.quarter![quarter]
+                                    .performance_percentage?.score
+                            )
                           )}
                     </td>
                     <td className="pr-4 text-right">
@@ -303,7 +311,6 @@ export const Task = ({
           <StudentDialog
             quarter={quarter}
             category={category}
-            topStudents={topStudents}
             open={open}
             setIsOpen={setIsOpen}
           />
