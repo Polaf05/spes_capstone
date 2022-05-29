@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { DownloadIcon, SearchIcon } from "@heroicons/react/outline";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import * as XLSX from "xlsx";
 import { useClassroom } from "../hooks/useSetClassroom";
 import {
@@ -29,6 +27,10 @@ import { afterGradeInference, inferenceData } from "../lib/functions/fuzzyis";
 import { getSurveyList } from "../lib/functions/sheets";
 import LoadingSpinner from "../components/Loader";
 import { classNames } from "../lib/functions/concat";
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/outline";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
@@ -404,7 +406,9 @@ const gettingStarted = () => {
                     <input
                       type="text"
                       placeholder="paste here"
-                      className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
+                      className={classNames(
+                        "px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
+                      )}
                       onChange={(e) => setText_value(e.target.value)}
                     />
                   </div>
@@ -438,12 +442,19 @@ const gettingStarted = () => {
                   <div>
                     <form action="">
                       <div>
-                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 w-full border-gray-300 border-dashed rounded-md">
+                        <div
+                          className={classNames(
+                            "mt-1 flex justify-center px-6 py-6 border-2 w-full border-gray-300 border-dashed rounded-md",
+                            forms !== null
+                              ? "border-ocean-400"
+                              : "border-gray-300"
+                          )}
+                        >
                           <div className="space-y-1 text-center">
                             <div className="flex text-lg text-gray-600">
                               <label
                                 className={classNames(
-                                  "font-bold focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ocean-400",
+                                  "font-bold",
                                   forms !== null
                                     ? "relative cursor-pointer text-ocean-400 hover:text-ocean-400"
                                     : "text-misc-disable"
@@ -472,12 +483,11 @@ const gettingStarted = () => {
                 <div>
                   {checker_msg.map((msg, idx) => (
                     <div className="flex gap-4 items-center py-1">
-                      <div
-                        className={classNames(
-                          "w-5 h-5 rounded-full",
-                          errors[idx] ? "bg-neutral-400" : "bg-neutral-100"
-                        )}
-                      ></div>
+                      {errors[idx] ? (
+                        <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                      ) : (
+                        <ExclamationCircleIcon className="w-5 h-5 text-red-500" />
+                      )}
                       <h5>{msg}</h5>
                     </div>
                   ))}
