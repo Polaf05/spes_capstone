@@ -40,7 +40,12 @@ import {
   getAverageGrade,
   getGrade,
   getGradeArray,
+  getScorePCT,
+  getTaskScores,
 } from "../lib/functions/grade_computation";
+import { getRemarks, getTask } from "../lib/functions/formatting";
+import { Score, TaskScores } from "../types/Task";
+import { classNames } from "../lib/functions/concat";
 Chart.register(
   ArcElement,
   LineElement,
@@ -73,6 +78,10 @@ const Dashboard = () => {
   const router = useRouter();
   const [ww_ave_grade, setWWAveGrade] = useState<number | null>(null);
   const [pt_ave_grade, setPTAveGrade] = useState<number | null>(null);
+  const [q_ave_grade, setQAveGrade] = useState<number | null>(null);
+  const [ave_remarks, setAveRemarks] = useState<string | undefined>("");
+  const [ww_ave_pct, setWWAvePCT] = useState<number | null>(null);
+  const [pt_ave_pct, setPTAvePCT] = useState<number | null>(null);
 
   useEffect(() => {
     if (!students) {
@@ -89,8 +98,10 @@ const Dashboard = () => {
 
       // grade list
       const ww_grades: number[][] = getGradeArray("wworks", students, qSum);
+
       // ave grade per quarter list
       const ww_ave_grades: number[] = getAverageGrade(ww_grades);
+
       // ave grade for available quarters
       setWWAveGrade(getAverageGrade([ww_ave_grades])[0]);
 
@@ -100,6 +111,42 @@ const Dashboard = () => {
       const pt_ave_grades: number[] = getAverageGrade(pt_grades);
       // ave grade for available quarters
       setPTAveGrade(getAverageGrade([pt_ave_grades])[0]);
+
+      // get passing rate
+      const quarter_grades: number[][] = getGradeArray(
+        "quarter",
+        students,
+        qSum
+      );
+      //get average of quarter grades
+      const ave_quarter_grades: number[] = getAverageGrade(quarter_grades);
+
+      //ave quarter grades list
+      const q_ave_grade = getAverageGrade([ave_quarter_grades])[0];
+      //ave quarter grade
+      setQAveGrade(q_ave_grade);
+      //ave remarks
+      setAveRemarks(getRemarks(q_ave_grade));
+
+      const task_scores: TaskScores[][] = getTaskScores(students, qSum);
+      const arr_ww_ave_pct: number[] = [];
+      const arr_pt_ave_pct: number[] = [];
+      task_scores.map((quarters) => {
+        const arr_ww_ave: number[] = [];
+        const arr_pt_ave: number[] = [];
+        quarters.map((student) => {
+          arr_ww_ave.push(student.written_works.ave_score_pct);
+          arr_pt_ave.push(student.performance_tasks.ave_score_pct);
+        });
+        arr_ww_ave_pct.push(getAverageGrade([arr_ww_ave])[0]);
+        arr_pt_ave_pct.push(getAverageGrade([arr_pt_ave])[0]);
+      });
+
+      const ww_ave_pct: number = getAverageGrade([arr_ww_ave_pct])[0];
+      const pt_ave_pct: number = getAverageGrade([arr_pt_ave_pct])[0];
+
+      setWWAvePCT(ww_ave_pct);
+      setPTAvePCT(pt_ave_pct);
 
       var buttons: number[] = [];
       for (var i = 1; i <= qSum; i++) {
@@ -158,7 +205,7 @@ const Dashboard = () => {
                 </p>
               </div>
             )}
-            <div className="grid grid-cols-9 h-fit gap-8">
+            <div className="grid grid-cols-9 h-fit gap-8 mt-4">
               <div className="col-span-5 bg-neutral-50 p-4 rounded-xl">
                 <BarChart
                   display={true}
@@ -199,14 +246,21 @@ const Dashboard = () => {
                 <div className="pt-2 border-t">
                   <h4 className="font-semibold text-lg">
                     Average performance of a student:{" "}
-                    <span className="underline font-bold">Good</span>
+                    <span className="underline font-bold">
+                      {ave_remarks} ({q_ave_grade})
+                    </span>
                   </h4>
                   <div className="grid grid-cols-2 gap-2 mt-2">
-                    <div className="bg-green-100 py-3 px-5 rounded-2xl">
+                    <div
+                      className={classNames(
+                        "py-3 px-5 rounded-2xl",
+                        ww_ave_grade! < 75 ? "bg-red-100" : "bg-green-100"
+                      )}
+                    >
                       <h6 className="">Written Works</h6>
                       <div className="flex justify-between">
                         <div className="flex flex-col justify-center">
-                          <p className="font-semibold">72%</p>
+                          <p className="font-semibold">{ww_ave_pct}%</p>
                           <p className="italic text-sm">Score PCT</p>
                         </div>
                         <div className="flex flex-col justify-center">
@@ -215,11 +269,16 @@ const Dashboard = () => {
                         </div>
                       </div>{" "}
                     </div>
-                    <div className="bg-green-100 py-3 px-5 rounded-2xl">
+                    <div
+                      className={classNames(
+                        "py-3 px-5 rounded-2xl",
+                        pt_ave_grade! < 75 ? "bg-red-100" : "bg-green-100"
+                      )}
+                    >
                       <h6 className="">Performance Tasks</h6>
                       <div className="flex justify-between">
                         <div className="flex flex-col justify-center">
-                          <p className="font-semibold">72%</p>
+                          <p className="font-semibold">{pt_ave_pct}%</p>
                           <p className="italic text-sm">Score PCT</p>
                         </div>
                         <div className="flex flex-col justify-center">
