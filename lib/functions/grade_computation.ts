@@ -127,3 +127,20 @@ export const getGradeArray = (
   }
   return grade_array;
 };
+
+export const transmuteGrade = (grade: number) => {
+  const equivalent: number[] = [
+    99.99, 98.39, 96.79, 95.19, 93.59, 91.99, 90.39, 88.79, 87.19, 85.59, 83.99,
+    82.39, 80.79, 79.19, 77.59, 75.99, 74.39, 72.19, 69.59, 67.99, 66.39, 64.79,
+    63.19, 61.59, 59.99, 55.99, 51.99, 47.99, 43.99, 39.99, 31.99, 27.99, 23.99,
+    19.99, 15.99, 11.99, 7.99, 3.99,
+  ];
+
+  let transmuted_grade = 100;
+  for (let i = 0; i < equivalent.length; i++) {
+    if (equivalent[i] < grade) break;
+    transmuted_grade -= 1;
+  }
+
+  return transmuted_grade;
+};

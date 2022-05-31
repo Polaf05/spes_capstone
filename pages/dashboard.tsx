@@ -42,12 +42,14 @@ import {
   getGradeArray,
   getScorePCT,
   getTaskScores,
+  transmuteGrade,
 } from "../lib/functions/grade_computation";
 import { getRemarks, getTask } from "../lib/functions/formatting";
 import { Dataset, Remarks, Score, TaskScores } from "../types/Task";
 import { classNames } from "../lib/functions/concat";
 import { setDatasets } from "react-chartjs-2/dist/utils";
 import { getLabels } from "../lib/functions/chart";
+import { generateFeedback } from "../lib/functions/feedback";
 Chart.register(
   ArcElement,
   LineElement,
@@ -215,6 +217,8 @@ const Dashboard = () => {
       });
 
       setFailedStudents(getScorePCT(remarks.very_poor.length, students.length));
+      const message = generateFeedback(100 - failedStudents);
+      console.log("Transmuted Grade: ", transmuteGrade(89) - 1);
 
       var buttons: number[] = [];
       for (var i = 1; i <= qSum; i++) {
