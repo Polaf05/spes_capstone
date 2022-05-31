@@ -1,3 +1,5 @@
+import { Student } from "../../types/Students";
+
 export const getRemarks = (grade: number) => {
   return grade < 75
     ? "Very Poor"
