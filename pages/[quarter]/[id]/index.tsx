@@ -1147,7 +1147,9 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
               </div>
               {/* Line Chart Assessment */}
               <div className="h-[45vh] overflow-x-auto px-3">
-                <h5 className="text-justify">Assessment:</h5>
+                <h5 className="text-justify">
+                  Assessment: {performanceAnalysis(quar)}
+                </h5>
               </div>
             </div>
             <div className="grid grid-cols-9 gap-4 mx-4 py-6 h-fit">

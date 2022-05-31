@@ -49,7 +49,6 @@ const gettingStarted = () => {
   const [text_value, setText_value] = useState("");
   const [message, setMessage] = useState<string | null>(INITIAL_MESSAGE);
   const [isLoading, setLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
 
   let handleForms = async (text: string) => {
     setLoading(true);
@@ -66,6 +65,9 @@ const gettingStarted = () => {
       }
       setStudents(null);
       setFileName(null);
+
+      errors[2] = 0;
+      errors[3] = 0;
     } else {
       setMessage("ERROR, INCORRECT TEMPLATE OR THE FORMS IS RESTRICTED");
       errors[0] = 1;
@@ -74,9 +76,6 @@ const gettingStarted = () => {
       setStudents(null);
       setFileName(null);
     }
-    setError(errors);
-    errors[2] = 0;
-    error[3] = 0;
     setLoading(false);
   };
 
@@ -325,8 +324,6 @@ const gettingStarted = () => {
             let class_list = getRanking(classroom, task_length);
             console.log(class_list);
             setStudents(class_list);
-            setError(errors);
-            console.log(error);
           } else {
             console.log(
               "excel file did not match the template, please upload another file"
