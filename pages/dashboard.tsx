@@ -44,8 +44,10 @@ import {
   getTaskScores,
 } from "../lib/functions/grade_computation";
 import { getRemarks, getTask } from "../lib/functions/formatting";
-import { Score, TaskScores } from "../types/Task";
+import { Dataset, Remarks, Score, TaskScores } from "../types/Task";
 import { classNames } from "../lib/functions/concat";
+import { setDatasets } from "react-chartjs-2/dist/utils";
+import { getLabels } from "../lib/functions/chart";
 Chart.register(
   ArcElement,
   LineElement,
@@ -82,6 +84,9 @@ const Dashboard = () => {
   const [ave_remarks, setAveRemarks] = useState<string | undefined>("");
   const [ww_ave_pct, setWWAvePCT] = useState<number | null>(null);
   const [pt_ave_pct, setPTAvePCT] = useState<number | null>(null);
+  const [remarks, setRemarks] = useState<Remarks[]>([]);
+  const [dataset, setDataset] = useState<Dataset | null>(null);
+  const [failedStudents, setFailedStudents] = useState<number>(0);
 
   useEffect(() => {
     if (!students) {
@@ -118,6 +123,7 @@ const Dashboard = () => {
         students,
         qSum
       );
+
       //get average of quarter grades
       const ave_quarter_grades: number[] = getAverageGrade(quarter_grades);
 
@@ -128,6 +134,49 @@ const Dashboard = () => {
       //ave remarks
       setAveRemarks(getRemarks(q_ave_grade));
 
+      let arr_remarks: Remarks[] = [];
+      quarter_grades.map((quarter) => {
+        let remarks: Remarks = {
+          very_good: [],
+          good: [],
+          average: [],
+          poor: [],
+          very_poor: [],
+        };
+        quarter.map((grade, idx) => {
+          if (grade < 75) remarks.very_poor.push(students[idx]);
+          else if (grade < 83) remarks.poor.push(students[idx]);
+          else if (grade < 90) remarks.average.push(students[idx]);
+          else if (grade < 97) remarks.good.push(students[idx]);
+          else remarks.very_good.push(students[idx]);
+        });
+        arr_remarks.push(remarks);
+      });
+
+      let chart_dataset: Dataset = {
+        set_a: [],
+        set_b: [],
+      };
+      for (let i = 0; i < qSum; i++) {
+        chart_dataset.set_a.push(
+          getScorePCT(
+            arr_remarks[i].very_good.length +
+              arr_remarks[i].good.length +
+              arr_remarks[i].average.length,
+            students.length
+          )
+        );
+        chart_dataset.set_b.push(
+          getScorePCT(
+            arr_remarks[i].very_poor.length + arr_remarks[i].poor.length,
+            students.length
+          )
+        );
+      }
+      setDataset(chart_dataset);
+      setRemarks(arr_remarks);
+
+      //get average task score pct
       const task_scores: TaskScores[][] = getTaskScores(students, qSum);
       const arr_ww_ave_pct: number[] = [];
       const arr_pt_ave_pct: number[] = [];
@@ -147,6 +196,25 @@ const Dashboard = () => {
 
       setWWAvePCT(ww_ave_pct);
       setPTAvePCT(pt_ave_pct);
+
+      // get final grades
+      const final_grades: number[] = getGradeArray("final", students, qSum)[0];
+      let remarks: Remarks = {
+        very_good: [],
+        good: [],
+        average: [],
+        poor: [],
+        very_poor: [],
+      };
+      final_grades.map((grade, idx) => {
+        if (grade < 75) remarks.very_poor.push(students[idx]);
+        else if (grade < 83) remarks.poor.push(students[idx]);
+        else if (grade < 90) remarks.average.push(students[idx]);
+        else if (grade < 97) remarks.good.push(students[idx]);
+        else remarks.very_good.push(students[idx]);
+      });
+
+      setFailedStudents(getScorePCT(remarks.very_poor.length, students.length));
 
       var buttons: number[] = [];
       for (var i = 1; i <= qSum; i++) {
@@ -198,7 +266,7 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="flex gap-1 items-center">
-                <ExclamationCircleIcon className="w-5 h-5 text-orange-500" />
+                <ExclamationCircleIcon className="w-5 h-5 text-yellow-500" />
                 <p className="font-light">
                   Grading Sheet is still incomplete. Displaying{" "}
                   {quarters.length} of 4 quarters only
@@ -210,18 +278,18 @@ const Dashboard = () => {
                 <BarChart
                   display={true}
                   indexAxis="x"
-                  labels={["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"]}
+                  labels={getLabels("Quarter ", dataset?.set_a.length!)}
                   datasets={[
                     {
                       label: "Very Good, Good, & Average",
-                      data: [93, 80, 77, 92],
+                      data: dataset?.set_a!,
                       fill: true,
                       backgroundColor: "#FFF598",
                       borderColor: "#FFF598",
                     },
                     {
                       label: "Poor & Very Poor",
-                      data: [7, 20, 23, 8],
+                      data: dataset?.set_b!,
                       fill: true,
                       backgroundColor: "#63C7FF",
                       borderColor: "#63C7FF",
@@ -232,14 +300,23 @@ const Dashboard = () => {
               <div className="col-span-4">
                 <div className="pb-4">
                   <h4 className="font-semibold text-lg">Passing Rate:</h4>
-                  <PeopleChart passed_tasks={7} length={10} color="yellow" />
+                  <PeopleChart
+                    passed_tasks={10 - Number((failedStudents / 10).toFixed())}
+                    length={10}
+                    color="yellow"
+                  />
                   <div className="flex justify-center">
                     <p className="font-light">
-                      Not too bad, <span className="font-semibold">73.2%</span>{" "}
+                      Not too bad,{" "}
+                      <span className="font-semibold">
+                        {100 - failedStudents}%
+                      </span>{" "}
                       of the classroom or{" "}
-                      <span className="font-semibold">7</span> out of{" "}
-                      <span className="font-semibold">10</span> passed the
-                      school year
+                      <span className="font-semibold">
+                        {10 - Number((failedStudents / 10).toFixed())}
+                      </span>{" "}
+                      out of <span className="font-semibold">10</span> passed
+                      the school year
                     </p>
                   </div>
                 </div>

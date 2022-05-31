@@ -31,6 +31,7 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon,
   QuestionMarkCircleIcon,
+  XCircleIcon,
 } from "@heroicons/react/outline";
 import Intro from "../components/sections/Intro";
 
@@ -420,7 +421,12 @@ const gettingStarted = () => {
                         type="text"
                         placeholder="paste here"
                         className={classNames(
-                          "px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
+                          "px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm shadow outline-none w-full",
+                          errors[0] === 1 || errors[1] === 1
+                            ? "border-2 border-red-400"
+                            : errors[0] === 2 || errors[1] === 2
+                            ? "border-2 border-green-400"
+                            : ""
                         )}
                         onChange={(e) => setText_value(e.target.value)}
                       />
@@ -498,10 +504,12 @@ const gettingStarted = () => {
                       <div className="flex gap-4 items-center py-1">
                         {errors[idx] === 2 ? (
                           <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                        ) : errors[idx] === 1 ? (
-                          <ExclamationCircleIcon className="w-5 h-5 text-red-500" />
+                        ) : errors[idx] === 0 ? (
+                          <ExclamationCircleIcon className="w-5 h-5 text-orange-500" />
+                        ) : errors[idx] === -1 ? (
+                          <div className="w-4 h-4 bg-neutral-300 rounded-full"></div>
                         ) : (
-                          <div className="w-5 h-5 bg-neutral-200 rounded-full"></div>
+                          <XCircleIcon className="w-5 h-5 text-red-500" />
                         )}
                         <h5
                           className={classNames(

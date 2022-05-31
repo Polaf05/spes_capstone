@@ -1,4 +1,5 @@
 import { Student } from "../../types/Students";
+import { Score, TaskScores } from "../../types/Task";
 
 export const getRemarks = (grade: number) => {
   return grade < 75
@@ -18,7 +19,8 @@ export const getGrade = (grade: any) =>
 export const displayData = (grade: number) =>
   grade === -1 ? "no data" : grade;
 
-export const getSum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
+export const getScorePCT = (score: number, total: number) =>
+  Number(((score / total) * 100).toFixed(1));
 export const getAverageGrade = (arr: number[][]) => {
   //get array length
   const length = arr.length;
@@ -32,6 +34,67 @@ export const getAverageGrade = (arr: number[][]) => {
   });
   return ave_grade_per_quarter;
 };
+export const getTaskScores = (students: Student[], quarter_length: number) => {
+  let array_task_scores: TaskScores[][] = [];
+  for (let i = 0; i < quarter_length; i++) {
+    let task_scores: TaskScores[] = [];
+    // get tasks info per student
+    students.map((student) => {
+      let task_scores_per_quarter: TaskScores = {
+        written_works: {
+          scores: [],
+          ave_score_pct: 0,
+        },
+        performance_tasks: {
+          scores: [],
+          ave_score_pct: 0,
+        },
+      };
+      // get task info for written works
+      let arr_ww_score_pct: number[] = [];
+      student.quarter![i].written_works?.map((task) => {
+        const score: Score = {
+          score: task.score,
+          hp_score: task.highest_possible_score,
+          score_pct: getScorePCT(task.score, task.highest_possible_score),
+        };
+        arr_ww_score_pct.push(
+          getScorePCT(task.score, task.highest_possible_score)
+        );
+        task_scores_per_quarter.written_works.scores.push(score);
+      });
+
+      //get task info for performance tasks
+      let arr_pt_score_pct: number[] = [];
+      student.quarter![i].performance_tasks?.map((task) => {
+        const score: Score = {
+          score: task.score,
+          hp_score: task.highest_possible_score,
+          score_pct: getScorePCT(task.score, task.highest_possible_score),
+        };
+        arr_pt_score_pct.push(
+          getScorePCT(task.score, task.highest_possible_score)
+        );
+        task_scores_per_quarter.performance_tasks.scores.push(score);
+      });
+
+      // ave score pct for written works and performance tasks
+      task_scores_per_quarter.written_works.ave_score_pct = getAverageGrade([
+        arr_ww_score_pct,
+      ])[0];
+      task_scores_per_quarter.performance_tasks.ave_score_pct = getAverageGrade(
+        [arr_pt_score_pct]
+      )[0];
+
+      task_scores.push(task_scores_per_quarter);
+    });
+
+    array_task_scores.push(task_scores);
+  }
+
+  return array_task_scores;
+};
+export const getSum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
 
 export const getGradeArray = (
   option: string,
@@ -48,7 +111,11 @@ export const getGradeArray = (
       const grade = getGrade(
         option === "wworks"
           ? student.quarter![i].written_percentage?.score
-          : student.quarter![i].performance_percentage?.score
+          : option === "ptasks"
+          ? student.quarter![i].performance_percentage?.score
+          : option === "quarter"
+          ? student.quarter![i].grade_before
+          : student.final_grade_before
       );
       //if student has data
       if (grade !== -1) {
