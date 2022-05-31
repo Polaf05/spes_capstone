@@ -37,7 +37,7 @@ import Intro from "../components/sections/Intro";
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
 
-let errors: number[] = [0, 0, 0, 0, 0, 0];
+let errors: number[] = [0, 0, 0, 0, -1, -1, -1];
 
 const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
@@ -519,7 +519,9 @@ const gettingStarted = () => {
                         <button
                           className={classNames(
                             "rounded-full w-fit px-4 py-2 bg-ocean-300 text-white text-lg font-bold",
-                            !fileName && "opacity-50 cursor-not-allowed"
+                            errors.includes(0) || errors.includes(1)
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
                           )}
                         >
                           Generate Evaluation
