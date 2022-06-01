@@ -658,6 +658,124 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
     return overall_feedback.join(" ");
   };
 
+  const performanceAnalysis = (i: number) => {
+    let quarter: string[] = [];
+
+    if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation == 0 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation == 0
+    ) {
+      quarter.push(
+        `The students written works and performance task is consistent in this quarter.`
+      );
+    } else if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation == 0 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 3
+    ) {
+      quarter.push(
+        `The student’s written works is consistent while ${
+          student?.gender == "MALE" ? "his" : "her"
+        } performance task is inconsistent in this quarter.`
+      );
+    } else if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation! > 3 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! == 0
+    ) {
+      quarter.push(
+        `The student’s written works is inconsistent while ${
+          student?.gender == "MALE" ? "his" : "her"
+        } performance task is consistent in this quarter.`
+      );
+    } else if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation! > 3 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! == 0
+    ) {
+      quarter.push(
+        `The student’s written works is inconsistent while ${
+          student?.gender == "MALE" ? "his" : "her"
+        } performance task is consistent in this quarter.`
+      );
+    } else if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].written_tasks_analysis?.fluctuation! <= 3 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! == 0
+    ) {
+      quarter.push(
+        `The student’s written work is slightly consistent while ${
+          student?.gender == "MALE" ? "his" : "her"
+        } performance task is consistent in this quarter.`
+      );
+    } else if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].written_tasks_analysis?.fluctuation! <= 3 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! <= 3
+    ) {
+      quarter.push(
+        `The students written work and performance task are both slightly consistent in this quarter.`
+      );
+    } else if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation! == 0 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! <= 3
+    ) {
+      quarter.push(
+        `The student’s written work is consistent while ${
+          student?.gender == "MALE" ? "his" : "her"
+        } performance task is slightly consistent in this quarter.`
+      );
+    } else if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].written_tasks_analysis?.fluctuation! <= 3 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! <= 3
+    ) {
+      quarter.push(
+        `The student’s written work is consistent while ${
+          student?.gender == "MALE" ? "his" : "her"
+        } performance task is slightly consistent in this quarter.`
+      );
+    } else if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].written_tasks_analysis?.fluctuation! <= 3 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! <= 3
+    ) {
+      quarter.push(
+        `The students written work and performance task are both slightly consistent in this quarter.`
+      );
+    } else if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! <= 3
+    ) {
+      quarter.push(
+        `The student’s written work is not consistent while ${
+          student?.gender == "MALE" ? "his" : "her"
+        } performance task is slightly consistent in this quarter.`
+      );
+    } else if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].written_tasks_analysis?.fluctuation! <= 3 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! == 0
+    ) {
+      quarter.push(
+        `The student’s written work is slightly consistent while ${
+          student?.gender == "MALE" ? "his" : "her"
+        } performance task is not consistent in this quarter.`
+      );
+    } else if (
+      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
+      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0
+    ) {
+      quarter.push(
+        `The students written works and performance task is not consistent in this quarter.`
+      );
+    }
+
+    return quarter.join(" ");
+  };
+
   const quarter_dataset: DataSet[] = [
     {
       label: "Grade",
@@ -1030,33 +1148,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
               {/* Line Chart Assessment */}
               <div className="h-[45vh] overflow-x-auto px-3">
                 <h5 className="text-justify">
-                  Assessment: Paragraph (Large) Lorem ipsum dolor sit amet,
-                  consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                  tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
-                  consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                  tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit amet,
-                  consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                  tincidunt ut laoreet dolore magna.Assessment: Paragraph
-                  (Large) Lorem ipsum dolor sit amet, consectetuer adipiscing
-                  elit, sed diam nonummy nibh euismod tincidunt ut laoreet
-                  dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna.Assessment: Paragraph (Large) Lorem ipsum
-                  dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
-                  nibh euismod tincidunt ut laoreet dolore magna. Lorem ipsum
-                  dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
-                  nibh euismod tincidunt ut laoreet dolore magna. Lorem ipsum
-                  dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
-                  nibh euismod tincidunt ut laoreet dolore magna.Assessment:
-                  Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna.
+                  Assessment: {performanceAnalysis(quar)}
                 </h5>
               </div>
             </div>
@@ -1071,7 +1163,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                       : "No data available for student  "}
                   </h3>
                   <div className="grid grid-cols-2 gap-2 mt-4">
-                    {tdata.ww.raw_scores.score[ww_best_task!] != -1 && (
+                    {tdata.ww.raw_scores.score[ww_best_task!] > 0 && (
                       <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between">
                         <h6 className="px-4 ">
                           Written Work {ww_best_task! + 1}:
@@ -1084,7 +1176,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                         </div>
                       </div>
                     )}
-                    {tdata.pt.raw_scores.score[pt_best_task!] != -1 && (
+                    {tdata.pt.raw_scores.score[pt_best_task!] > 0 && (
                       <div className=" h-24 bg-ocean-100 py-2 rounded-3xl flex flex-col justify-between">
                         <h6 className="px-4">
                           Performance Task {pt_best_task! + 1} :
