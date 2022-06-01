@@ -4,42 +4,18 @@ import Image from "next/image";
 import { useClassroom } from "../../hooks/useSetClassroom";
 import { Tab } from "@headlessui/react";
 import { Task } from "../../components/Task";
-import { GetServerSideProps, GetStaticProps } from "next";
 import BarChart from "../../components/BarChart";
 import { DataSet, Student } from "../../types/Students";
-import CircularProgress from "../../components/CircularProgress";
 import PeopleChart from "../../components/PeopleChart";
 import { useRouter } from "next/router";
 import ProgressComponent from "../../components/ProgressComponent";
-import CardInfo from "../../components/CardInfo";
 import StruggledSections from "../../components/sections/StruggledSections";
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import { getGrade } from "../../lib/functions/grade_computation";
+import { useSelectedQuarter } from "../../hooks/useSelectedQuarter";
+import { classNames } from "../../lib/functions/concat";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
-// export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-//   const { quarter } = query;
-//   return {
-//     props: {
-//       quarter: Number(quarter),
-//     },
-//   };
-// };
-
-// export const getServerSideProps: GetStaticProps = async (context: any) => {
-//   const quarter = context.query.quarter;
-//   return {
-//     props: {
-//       // quarter: Number(quarter),
-//       quarter: Number(quarter),
-//     },
-//   };
-// };
 
 const getRemarks = (grade: number) => {
   return grade < 75
@@ -55,16 +31,30 @@ const getRemarks = (grade: number) => {
 
 export default function Tasks() {
   const { students } = useClassroom();
+  const { quarter } = useSelectedQuarter();
   const [open, setIsOpen] = useState<boolean>(false);
   const [task, setTask] = useState<number>(0);
   const [pt_task, setPtTask] = useState<number>(0);
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   const router = useRouter();
-  const { quarter: q } = router.query;
-  const quarter = Number(q);
+  // const { quarter: q } = router.query;
+  // const quarter = Number(q);
   var count = [0, 0, 0, 0, 0];
+  let quarter_index = quarter;
+  //const [quarter, setQuarter] = useState<number>(quarter_index);
+  // on load get quarter
+  // useEffect(() => {
+  //   const localQuarter = localStorage.getItem("quarter");
+  //   console.log("hehehe:", localQuarter);
 
-  if (!students || !quarter) router.back();
+  //   if (localQuarter) {
+  //     setQuarter(Number(JSON.parse(localQuarter)));
+  //     quarter_index = Number(localQuarter);
+  //     console.log("q:", quarter_index);
+  //   }
+  // });
+
+  //if (!students || !quarter) router.back();
   const myStudent = students![0].quarter![0];
   // get weighted omsim of a written works and performance task
   const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
@@ -103,7 +93,8 @@ export default function Tasks() {
   let ww_task_array: TaskInfo[] = [];
   let pt_task_array: TaskInfo[] = [];
 
-  const index = quarter - 1;
+  const index = quarter_index;
+
   //category average
   let ww_cat_sum = 0,
     pt_cat_sum = 0,
@@ -285,14 +276,14 @@ export default function Tasks() {
     ww_remarks.push({
       student: student,
       remarks: getRemarks(
-        getGrade(student.quarter![quarter - 1].written_percentage?.score!)
+        getGrade(student.quarter![index].written_percentage?.score!)
       ),
     });
 
     pt_remarks.push({
       student: student,
       remarks: getRemarks(
-        getGrade(student.quarter![quarter - 1].performance_percentage?.score!)
+        getGrade(student.quarter![index].performance_percentage?.score!)
       ),
     });
   });
@@ -369,7 +360,7 @@ export default function Tasks() {
                       setIsOpen={setIsOpen}
                       category={category.title}
                       assessment={category.value}
-                      quarter={quarter - 1}
+                      quarter={quarter_index}
                     />
                   </Tab.Panel>
                 ))}
@@ -379,7 +370,10 @@ export default function Tasks() {
               {/* Omsim Chart */}
               {/* Student Cards */}
               <div className="m-8 pb-24">
-                <StruggledSections students={students} quarter={quarter} />
+                <StruggledSections
+                  students={students}
+                  quarter={quarter_index}
+                />
               </div>
               {/* Bar Chart */}
               <div className="h-fit m-8 px-24 border-b-2 border-ocean-400">

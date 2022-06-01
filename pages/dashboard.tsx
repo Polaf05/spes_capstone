@@ -50,6 +50,7 @@ import { classNames } from "../lib/functions/concat";
 import { setDatasets } from "react-chartjs-2/dist/utils";
 import { getLabels } from "../lib/functions/chart";
 import { generateFeedback } from "../lib/functions/feedback";
+import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 Chart.register(
   ArcElement,
   LineElement,
@@ -78,6 +79,7 @@ Chart.register(
 
 const Dashboard = () => {
   const { students } = useClassroom();
+  const { quarter, setQuarter } = useSelectedQuarter();
   const [quarters, setQuarters] = useState<number[]>([]);
   const router = useRouter();
   const [ww_ave_grade, setWWAveGrade] = useState<number | null>(null);
@@ -251,7 +253,12 @@ const Dashboard = () => {
               {quarters.map((button, idx) => (
                 <div key={idx}>
                   <Link href={`/${button}`} passHref>
-                    <button className="rounded-3xl w-60 h-40 bg-ocean-100 grid place-items-center">
+                    <button
+                      onClick={() => {
+                        setQuarter(idx);
+                      }}
+                      className="rounded-3xl w-60 h-40 bg-ocean-100 grid place-items-center"
+                    >
                       <h3 className="font-semibold text-lg">
                         Quarter {button}
                       </h3>
