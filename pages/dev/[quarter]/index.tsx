@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import Image from "next/image";
-import { useClassroom } from "../../hooks/useSetClassroom";
+import { useClassroom } from "../../../hooks/useSetClassroom";
 import { Tab } from "@headlessui/react";
-import { Task } from "../../components/Task";
+import { Task } from "../../../components/Task";
 import { GetServerSideProps, GetStaticProps } from "next";
-import BarChart from "../../components/BarChart";
-import { DataSet, Student } from "../../types/Students";
-import CircularProgress from "../../components/CircularProgress";
-import PeopleChart from "../../components/PeopleChart";
+import BarChart from "../../../components/BarChart";
+import { DataSet, Student } from "../../../types/Students";
+import CircularProgress from "../../../components/CircularProgress";
+import PeopleChart from "../../../components/PeopleChart";
 import { useRouter } from "next/router";
-import ProgressComponent from "../../components/ProgressComponent";
-import CardInfo from "../../components/CardInfo";
-import StruggledSections from "../../components/sections/StruggledSections";
+import ProgressComponent from "../../../components/ProgressComponent";
+import CardInfo from "../../../components/CardInfo";
+import StruggledSections from "../../../components/sections/StruggledSections";
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
-import { getGrade } from "../../lib/functions/grade_computation";
+import { getGrade } from "../../../lib/functions/grade_computation";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -31,15 +31,15 @@ function classNames(...classes: string[]) {
 //   };
 // };
 
-// export const getServerSideProps: GetStaticProps = async (context: any) => {
-//   const quarter = context.query.quarter;
-//   return {
-//     props: {
-//       // quarter: Number(quarter),
-//       quarter: Number(quarter),
-//     },
-//   };
-// };
+export const getServerSideProps: GetStaticProps = async (context: any) => {
+  const quarter = context.query.quarter;
+  return {
+    props: {
+      // quarter: Number(quarter),
+      quarter: Number(quarter),
+    },
+  };
+};
 
 const getRemarks = (grade: number) => {
   return grade < 75
@@ -53,14 +53,13 @@ const getRemarks = (grade: number) => {
     : "Very Good";
 };
 
-export default function Tasks() {
+export default function Tasks({ quarter }: { quarter: number }) {
   const { students } = useClassroom();
   const [open, setIsOpen] = useState<boolean>(false);
   const [task, setTask] = useState<number>(0);
   const [pt_task, setPtTask] = useState<number>(0);
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   const router = useRouter();
-  const { quarter } = router.query;
   var count = [0, 0, 0, 0, 0];
 
   if (!students) router.back();
