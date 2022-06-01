@@ -116,6 +116,10 @@ const StudentInfo = () => {
   const { student } = useSelectedStudent();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!students || !student) router.back();
+  });
+
   const { quarter } = useSelectedQuarter();
   let myquar: string[] = [];
 

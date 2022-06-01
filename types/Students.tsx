@@ -50,7 +50,7 @@ export interface Student {
   id: number;
   name: string;
   gender: string;
-  quarter: Quarter[] | null;
+  quarter: Quarter[];
   quarter_analysis: TaskAnalysis;
   final_grade_before: number;
   final_grade_after: number;
@@ -75,14 +75,14 @@ export interface Quarter {
   grade_after: number;
   remarks: string;
   diff: number;
-  written_works: TaskData[] | null;
-  performance_tasks: TaskData[] | null;
-  written_percentage: scoreData | null;
-  written_weighted_score: scoreData | null;
-  performance_percentage: scoreData | null;
-  performance_weighted_score: scoreData | null;
-  written_tasks_analysis: TaskAnalysis | null;
-  performace_tasks_analysis: TaskAnalysis | null;
+  written_works: TaskData[];
+  performance_tasks: TaskData[];
+  written_percentage: scoreData;
+  written_weighted_score: scoreData;
+  performance_percentage: scoreData;
+  performance_weighted_score: scoreData;
+  written_tasks_analysis: TaskAnalysis;
+  performace_tasks_analysis: TaskAnalysis;
   ranking: number | null;
 }
 

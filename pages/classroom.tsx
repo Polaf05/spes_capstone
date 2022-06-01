@@ -30,7 +30,7 @@ const getRemarks = (grade: number) => {
     : "Very Good";
 };
 
-export default function Tasks() {
+export default function ClassroomInfo() {
   const { students } = useClassroom();
   const { quarter } = useSelectedQuarter();
   const [open, setIsOpen] = useState<boolean>(false);
@@ -44,7 +44,7 @@ export default function Tasks() {
   }, []);
 
   let quarter_index = quarter;
-  const myStudent = students![0].quarter![0];
+  const myStudent = students![0].quarter![quarter];
   // get weighted omsim of a written works and performance task
   const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
   const wgh_pt = myStudent.performance_weighted_score?.highest_possible_score;
