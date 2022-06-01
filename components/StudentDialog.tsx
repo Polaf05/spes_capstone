@@ -343,7 +343,7 @@ const StudentDialog = ({
                   </div>
                 </div>
                 <div className="flex justify-end">
-                  <Link href={`/${quarter + 1}/${student?.id}`} passHref>
+                  <Link href={`/student`} passHref>
                     <button
                       type="button"
                       className="inline-flex justify-center rounded-md border border-transparent bg-ocean-100 px-4 py-2 text-base font-medium text-ocean-400 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"

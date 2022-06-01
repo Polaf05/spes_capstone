@@ -11,7 +11,7 @@ export const SelectedQuarterContext = createContext<SelectedQuarter>(
 );
 
 export const SelectedQuarterProvider: React.FC = ({ children }) => {
-  const [quarter, setQuarter] = useState<number>(-1);
+  const [quarter, setQuarter] = useState<number>(0);
 
   // on load get students
   useEffect(() => {

@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import Image from "next/image";
-import { useClassroom } from "../../hooks/useSetClassroom";
+import { useClassroom } from "../hooks/useSetClassroom";
 import { Tab } from "@headlessui/react";
-import { Task } from "../../components/Task";
-import BarChart from "../../components/BarChart";
-import { DataSet, Student } from "../../types/Students";
-import PeopleChart from "../../components/PeopleChart";
+import { Task } from "../components/Task";
+import BarChart from "../components/BarChart";
+import { DataSet, Student } from "../types/Students";
+import PeopleChart from "../components/PeopleChart";
 import { useRouter } from "next/router";
-import ProgressComponent from "../../components/ProgressComponent";
-import StruggledSections from "../../components/sections/StruggledSections";
+import ProgressComponent from "../components/ProgressComponent";
+import StruggledSections from "../components/sections/StruggledSections";
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
-import { getGrade } from "../../lib/functions/grade_computation";
-import { useSelectedQuarter } from "../../hooks/useSelectedQuarter";
-import { classNames } from "../../lib/functions/concat";
-import { TaskInfo } from "../../types/Task";
+import { getGrade } from "../lib/functions/grade_computation";
+import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
+import { classNames } from "../lib/functions/concat";
+import { TaskInfo } from "../types/Task";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
