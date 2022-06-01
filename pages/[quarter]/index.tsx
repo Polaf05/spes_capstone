@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useClassroom } from "../../hooks/useSetClassroom";
 import { Tab } from "@headlessui/react";
 import { Task } from "../../components/Task";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, GetStaticProps } from "next";
 import BarChart from "../../components/BarChart";
 import { DataSet, Student } from "../../types/Students";
 import CircularProgress from "../../components/CircularProgress";
@@ -22,10 +22,20 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const { quarter } = query;
+// export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+//   const { quarter } = query;
+//   return {
+//     props: {
+//       quarter: Number(quarter),
+//     },
+//   };
+// };
+
+export const getServerSideProps: GetStaticProps = async (context: any) => {
+  const quarter = context.query.quarter;
   return {
     props: {
+      // quarter: Number(quarter),
       quarter: Number(quarter),
     },
   };
