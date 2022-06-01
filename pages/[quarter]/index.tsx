@@ -64,7 +64,7 @@ export default function Tasks() {
   const quarter = Number(q);
   var count = [0, 0, 0, 0, 0];
 
-  if (!students || quarter) router.back();
+  if (!students || !quarter) router.back();
   const myStudent = students![0].quarter![0];
   // get weighted omsim of a written works and performance task
   const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
