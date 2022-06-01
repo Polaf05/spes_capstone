@@ -92,7 +92,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!students) {
-      router.back();
+      //router.back();
     } else {
       let qSum: any = 0;
       students[0].quarter?.map((quarter) => {

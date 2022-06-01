@@ -87,8 +87,8 @@ export interface Quarter {
 }
 
 export type Classroom = {
-  students: Student[] | null;
-  setStudents: Dispatch<SetStateAction<Student[] | null>>;
+  students: Student[];
+  setStudents: Dispatch<SetStateAction<Student[]>>;
 };
 
 export type TestStudent = {

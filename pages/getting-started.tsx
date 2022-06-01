@@ -67,7 +67,7 @@ const gettingStarted = () => {
       errors[0] = 1;
       errors[1] = 1;
       setForms(null);
-      setStudents(null);
+      setStudents([]);
       setFileName(null);
     }
     setError(errors);
@@ -330,7 +330,7 @@ const gettingStarted = () => {
 
             setFileName(null);
             if (students) {
-              setStudents(null);
+              setStudents([]);
               localStorage.removeItem("students");
             }
 
@@ -343,7 +343,7 @@ const gettingStarted = () => {
       } else {
         setFileName(null);
         if (students) {
-          setStudents(null);
+          setStudents([]);
           localStorage.removeItem("students");
         }
 

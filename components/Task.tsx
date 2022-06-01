@@ -28,13 +28,13 @@ export const Task = ({
   quarter: number;
 }) => {
   const { students } = useClassroom();
-  const [sortingMethod, setSorting] = useState("Name");
+  const [sortingMethod, setSorting] = useState<string>("Name");
   const { setStudent } = useSelectedStudent();
   const [filteredStudents, setFilteredStudents] = useState<Student[] | null>(
-    students!
+    students ? students : null
   );
   useEffect(() => {
-    if (students) {
+    if (students && sortingMethod !== null) {
       setFilteredStudents([
         ...students!.sort((a, b) => {
           switch (sortingMethod) {
@@ -81,19 +81,18 @@ export const Task = ({
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
 
   var count = [0, 0, 0, 0, 0];
-  students?.map((student) => {
-    const i = labels.indexOf(
-      category === "Over All"
-        ? student.quarter![quarter].remarks
-        : getRemarks(
-            category === "Written Works"
-              ? student.quarter![quarter].written_percentage?.score!
-              : student.quarter![quarter].performance_percentage?.score!
-          )
-    );
-
-    count[i] += 1;
-  });
+  // students?.map((student) => {
+  //   const i = labels.indexOf(
+  //     category === "Over All"
+  //       ? student!.quarter![quarter].remarks
+  //       : getRemarks(
+  //           category === "Written Works"
+  //             ? student!.quarter![quarter].written_percentage?.score!
+  //             : student!.quarter![quarter].performance_percentage?.score!
+  //         )
+  //   );
+  //   count[i] += 1;
+  // });
 
   const data = {
     labels: labels,
@@ -180,13 +179,13 @@ export const Task = ({
                     className={classNames(
                       "hover:cursor-pointer text-center",
                       (category === "Over All"
-                        ? student.quarter![quarter].grade_before
+                        ? student!.quarter![quarter].grade_before
                         : getGrade(
                             category === "Written Works"
-                              ? student.quarter![quarter].written_percentage
+                              ? student!.quarter![quarter].written_percentage
                                   ?.score
-                              : student.quarter![quarter].performance_percentage
-                                  ?.score
+                              : student!.quarter![quarter]
+                                  .performance_percentage?.score
                           )) > 75
                         ? "odd:bg-yellow-50"
                         : "bg-red-200"
@@ -198,17 +197,17 @@ export const Task = ({
                     key={idx}
                   >
                     <td className="pl-4 font-semibold text-left">
-                      {student.name}
+                      {student!.name}
                     </td>
                     <td>
                       {category === "Over All"
-                        ? student.quarter![quarter].grade_before
+                        ? student!.quarter![quarter].grade_before
                         : displayData(
                             getGrade(
                               category === "Written Works"
-                                ? student.quarter![quarter].written_percentage
+                                ? student!.quarter![quarter].written_percentage
                                     ?.score
-                                : student.quarter![quarter]
+                                : student!.quarter![quarter]
                                     .performance_percentage?.score
                             )
                           )}
@@ -216,32 +215,32 @@ export const Task = ({
                     <td className="text-base">
                       (
                       {category === "Over All"
-                        ? student.quarter![quarter].diff
+                        ? student!.quarter![quarter].diff
                         : 0}
                       )
                     </td>
                     <td>
                       {category === "Over All"
-                        ? student.quarter![quarter].grade_after
+                        ? student!.quarter![quarter].grade_after
                         : displayData(
                             getGrade(
                               category === "Written Works"
-                                ? student.quarter![quarter].written_percentage
+                                ? student!.quarter![quarter].written_percentage
                                     ?.score
-                                : student.quarter![quarter]
+                                : student!.quarter![quarter]
                                     .performance_percentage?.score
                             )
                           )}
                     </td>
                     <td className="pr-4 text-right">
                       {category === "Over All"
-                        ? student.quarter![quarter].remarks
+                        ? student!.quarter![quarter].remarks
                         : getRemarks(
                             category === "Written Works"
-                              ? student.quarter![quarter].written_percentage
+                              ? student!.quarter![quarter].written_percentage
                                   ?.score!
-                              : student.quarter![quarter].performance_percentage
-                                  ?.score!
+                              : student!.quarter![quarter]
+                                  .performance_percentage?.score!
                           )}
                     </td>
                   </tr>

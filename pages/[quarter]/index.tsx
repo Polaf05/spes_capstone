@@ -61,10 +61,16 @@ export default function Tasks() {
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   const router = useRouter();
   const { quarter: q } = router.query;
-  const quarter = Number(q);
+  const [quarter, setQuarter] = useState<number>(0);
+
+  if (typeof q === "undefined") {
+    setQuarter(0);
+  } else {
+    setQuarter(Number(q));
+  }
   var count = [0, 0, 0, 0, 0];
 
-  if (!students || !quarter) router.back();
+  //if (!students || !quarter) {router.back();}
   const myStudent = students![0].quarter![0];
   // get weighted omsim of a written works and performance task
   const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
@@ -224,7 +230,12 @@ export default function Tasks() {
   const pt_cat_ave =
     pt_cat_sum / students![0].quarter![index].performance_tasks?.length!;
 
-  const [categories] = useState([
+  type Category = {
+    title: string;
+    value: string;
+  };
+
+  const [categories] = useState<Category[]>([
     {
       title: "Over All",
       value: getRemarks((ww_cat_ave + pt_cat_ave) / 2),
@@ -376,7 +387,6 @@ export default function Tasks() {
               </Tab.Panels>
             </Tab.Group>
             <div className="bg-white h-fit px-12 py-10">
-              {/* Omsim Chart */}
               {/* Student Cards */}
               <div className="m-8 pb-24">
                 <StruggledSections students={students} quarter={quarter} />
