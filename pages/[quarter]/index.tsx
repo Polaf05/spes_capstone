@@ -60,10 +60,11 @@ export default function Tasks() {
   const [pt_task, setPtTask] = useState<number>(0);
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   const router = useRouter();
-  const { quarter } = router.query;
+  const { quarter: q } = router.query;
+  const quarter = Number(q);
   var count = [0, 0, 0, 0, 0];
 
-  if (!students) router.back();
+  if (!students || quarter) router.back();
   const myStudent = students![0].quarter![0];
   // get weighted omsim of a written works and performance task
   const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
