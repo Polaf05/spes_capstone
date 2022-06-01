@@ -1134,9 +1134,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
               </div>
               {/* Line Chart Assessment */}
               <div className="h-[45vh] overflow-x-auto px-3">
-                <h5 className="text-justify">
-                  Assessment: {performanceAnalysis(quar)}
-                </h5>
+                <h5 className="text-justify">Assessment:</h5>
               </div>
             </div>
             <div className="grid grid-cols-9 gap-4 mx-4 py-6 h-fit">
@@ -1150,7 +1148,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                       : "No data available for student  "}
                   </h3>
                   <div className="grid grid-cols-2 gap-2 mt-4">
-                    {tdata.ww.raw_scores.score[ww_best_task!] > 0 && (
+                    {tdata.ww.raw_scores.score[ww_best_task!] != -1 && (
                       <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between">
                         <h6 className="px-4 ">
                           Written Work {ww_best_task! + 1}:
@@ -1163,7 +1161,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                         </div>
                       </div>
                     )}
-                    {tdata.pt.raw_scores.score[pt_best_task!] > 0 && (
+                    {tdata.pt.raw_scores.score[pt_best_task!] != -1 && (
                       <div className=" h-24 bg-ocean-100 py-2 rounded-3xl flex flex-col justify-between">
                         <h6 className="px-4">
                           Performance Task {pt_best_task! + 1} :
