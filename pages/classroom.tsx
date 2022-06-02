@@ -39,15 +39,24 @@ export default function ClassroomInfo() {
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   const router = useRouter();
 
+  const [wgh_ww, setWghWW] = useState<number>(0);
+  const [wgh_pt, setWghPT] = useState<number>(0);
+
   useEffect(() => {
-    if (!students) router.back();
+    if (!students) {
+      router.back();
+    } else {
+      const myStudent = students![0].quarter![quarter];
+      // get weighted omsim of a written works and performance task
+      const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
+      const wgh_pt =
+        myStudent.performance_weighted_score?.highest_possible_score;
+      setWghWW(wgh_ww ? wgh_ww : 0);
+      setWghPT(wgh_pt ? wgh_pt : 0);
+    }
   }, []);
 
   let quarter_index = quarter;
-  const myStudent = students![0].quarter![quarter];
-  // get weighted omsim of a written works and performance task
-  const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
-  const wgh_pt = myStudent.performance_weighted_score?.highest_possible_score;
 
   var count = [0, 0, 0, 0, 0];
   const data = {
@@ -70,127 +79,141 @@ export default function ClassroomInfo() {
   let ww_task_array: TaskInfo[] = [];
   let pt_task_array: TaskInfo[] = [];
 
-  const index = quarter_index;
   //category average
   let ww_cat_sum = 0,
     pt_cat_sum = 0,
     ww_ave_cat_sum = 0,
     pt_ave_cat_sum = 0;
 
-  //Written Works
-  students![0].quarter![index].written_works?.forEach((task, idx) => {
-    //initialized values
-    const task_info: TaskInfo = {
-      task_no: idx + 1,
-      total: 0,
-      ave_score: 0,
-      ave_score_pct: 0,
-      population: 0, // total classroom population
-      participated: 0, // students participated
-      no_data: [], // students absent/no data found
-      passed: [], //passed students
-      perfect: [],
-      failed: [],
-      considerable: [],
-    };
-    let score_sum = 0;
-    students?.map((student, no) => {
-      const status = student?.quarter![index].written_works![idx].status;
-      if (status === "??") {
-        task_info.no_data.push(student);
-      } else {
-        if (status === "Perfect") task_info.perfect.push(student);
-        else if (status === "Passed") task_info.passed.push(student);
-        else if (status === "Considerable")
-          task_info.considerable.push(student);
-        else task_info.failed.push(student);
-        //particpants
-        task_info.participated += 1;
-        //score sum
-        score_sum += student?.quarter![index].written_works![idx].score;
-      }
-      //total population
-      task_info.population += 1;
+  if (students) {
+    //Written Works
+    students![0].quarter![quarter_index].written_works?.forEach((task, idx) => {
+      //initialized values
+      const task_info: TaskInfo = {
+        task_no: idx + 1,
+        total: 0,
+        ave_score: 0,
+        ave_score_pct: 0,
+        population: 0, // total classroom population
+        participated: 0, // students participated
+        no_data: [], // students absent/no data found
+        passed: [], //passed students
+        perfect: [],
+        failed: [],
+        considerable: [],
+      };
+      let score_sum = 0;
+      students?.map((student, no) => {
+        const status =
+          student?.quarter![quarter_index].written_works![idx].status;
+        if (status === "??") {
+          task_info.no_data.push(student);
+        } else {
+          if (status === "Perfect") task_info.perfect.push(student);
+          else if (status === "Passed") task_info.passed.push(student);
+          else if (status === "Considerable")
+            task_info.considerable.push(student);
+          else task_info.failed.push(student);
+          //particpants
+          task_info.participated += 1;
+          //score sum
+          score_sum +=
+            student?.quarter![quarter_index].written_works![idx].score;
+        }
+        //total population
+        task_info.population += 1;
+      });
+      //total score
+      task_info.total = task.highest_possible_score;
+      task_info.ave_score = Number((score_sum / students?.length!).toFixed(1));
+      task_info.ave_score_pct = Number(
+        ((task_info.ave_score / task_info.total) * 100).toFixed(1)
+      );
+      ww_ave_cat_sum += task_info.ave_score_pct;
+
+      //get sum of passing percentage
+      ww_cat_sum += Number(
+        (
+          ((task_info.passed.length + task_info.perfect.length) /
+            task_info.participated) *
+          100
+        ).toFixed(1)
+      );
+      ww_task_array.push(task_info);
     });
-    //total score
-    task_info.total = task.highest_possible_score;
-    task_info.ave_score = Number((score_sum / students?.length!).toFixed(1));
-    task_info.ave_score_pct = Number(
-      ((task_info.ave_score / task_info.total) * 100).toFixed(1)
-    );
-    ww_ave_cat_sum += task_info.ave_score_pct;
 
-    //get sum of passing percentage
-    ww_cat_sum += Number(
-      (
-        ((task_info.passed.length + task_info.perfect.length) /
-          task_info.participated) *
-        100
-      ).toFixed(1)
-    );
-    ww_task_array.push(task_info);
-  });
+    //Performance Tasks
+    students![0].quarter![quarter_index].performance_tasks?.forEach(
+      (task, idx) => {
+        //initialized values
+        const task_info: TaskInfo = {
+          task_no: idx + 1,
+          total: 0,
+          ave_score: 0,
+          ave_score_pct: 0,
+          population: 0, // total classroom population
+          participated: 0, // students participated
+          no_data: [], // students absent/no data found
+          passed: [], //passed students
+          perfect: [],
+          failed: [],
+          considerable: [],
+        };
+        let score_sum = 0;
+        students?.map((student, no) => {
+          const status =
+            student?.quarter![quarter_index].performance_tasks![idx].status;
+          if (status === "??") {
+            task_info.no_data.push(student);
+          } else {
+            if (status === "Perfect") task_info.perfect.push(student);
+            else if (status === "Passed") task_info.passed.push(student);
+            else if (status === "Considerable")
+              task_info.considerable.push(student);
+            else task_info.failed.push(student);
+            //particpants
+            task_info.participated += 1;
+            //score sum
+            score_sum +=
+              student?.quarter![quarter_index].performance_tasks![idx].score;
+          }
+          //total population
+          task_info.population += 1;
+        });
+        //total score
+        task_info.total = task.highest_possible_score;
+        task_info.ave_score = Number(
+          (score_sum / students?.length!).toFixed(1)
+        );
+        task_info.ave_score_pct = Number(
+          ((task_info.ave_score / task_info.total) * 100).toFixed(1)
+        );
 
-  //Performance Tasks
-  students![0].quarter![index].performance_tasks?.forEach((task, idx) => {
-    //initialized values
-    const task_info: TaskInfo = {
-      task_no: idx + 1,
-      total: 0,
-      ave_score: 0,
-      ave_score_pct: 0,
-      population: 0, // total classroom population
-      participated: 0, // students participated
-      no_data: [], // students absent/no data found
-      passed: [], //passed students
-      perfect: [],
-      failed: [],
-      considerable: [],
-    };
-    let score_sum = 0;
-    students?.map((student, no) => {
-      const status = student?.quarter![index].performance_tasks![idx].status;
-      if (status === "??") {
-        task_info.no_data.push(student);
-      } else {
-        if (status === "Perfect") task_info.perfect.push(student);
-        else if (status === "Passed") task_info.passed.push(student);
-        else if (status === "Considerable")
-          task_info.considerable.push(student);
-        else task_info.failed.push(student);
-        //particpants
-        task_info.participated += 1;
-        //score sum
-        score_sum += student?.quarter![index].performance_tasks![idx].score;
+        pt_ave_cat_sum += task_info.ave_score_pct;
+
+        //get sum of passing percentage
+        pt_cat_sum += Number(
+          (
+            ((task_info.passed.length + task_info.perfect.length) /
+              task_info.participated) *
+            100
+          ).toFixed(1)
+        );
+        pt_task_array.push(task_info);
       }
-      //total population
-      task_info.population += 1;
-    });
-    //total score
-    task_info.total = task.highest_possible_score;
-    task_info.ave_score = Number((score_sum / students?.length!).toFixed(1));
-    task_info.ave_score_pct = Number(
-      ((task_info.ave_score / task_info.total) * 100).toFixed(1)
     );
-
-    pt_ave_cat_sum += task_info.ave_score_pct;
-
-    //get sum of passing percentage
-    pt_cat_sum += Number(
-      (
-        ((task_info.passed.length + task_info.perfect.length) /
-          task_info.participated) *
-        100
-      ).toFixed(1)
-    );
-    pt_task_array.push(task_info);
-  });
+  }
 
   const ww_cat_ave =
-    ww_cat_sum / students![0].quarter![index].written_works?.length!;
+    ww_cat_sum /
+    (students
+      ? students![0].quarter![quarter_index].written_works?.length!
+      : 0);
   const pt_cat_ave =
-    pt_cat_sum / students![0].quarter![index].performance_tasks?.length!;
-
+    pt_cat_sum /
+    (students
+      ? students![0].quarter![quarter_index].performance_tasks?.length!
+      : 0);
   const [categories] = useState([
     {
       title: "Over All",
@@ -252,14 +275,14 @@ export default function ClassroomInfo() {
     ww_remarks.push({
       student: student,
       remarks: getRemarks(
-        getGrade(student.quarter![index].written_percentage?.score!)
+        getGrade(student.quarter![quarter_index].written_percentage?.score!)
       ),
     });
 
     pt_remarks.push({
       student: student,
       remarks: getRemarks(
-        getGrade(student.quarter![index].performance_percentage?.score!)
+        getGrade(student.quarter![quarter_index].performance_percentage?.score!)
       ),
     });
   });
@@ -282,12 +305,18 @@ export default function ClassroomInfo() {
 
   const ww_ave_pct = Number(
     (
-      ww_ave_cat_sum / students![0].quarter![index].written_works?.length!
+      ww_ave_cat_sum /
+      (students
+        ? students![0].quarter![quarter_index].written_works?.length!
+        : 0)
     ).toFixed(1)
   );
   const pt_ave_pct = Number(
     (
-      pt_ave_cat_sum / students![0].quarter![index].performance_tasks?.length!
+      pt_ave_cat_sum /
+      (students
+        ? students![0].quarter![quarter_index].performance_tasks?.length!
+        : 0)
     ).toFixed(1)
   );
 
