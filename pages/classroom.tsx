@@ -1,45 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import Image from "next/image";
-import { useClassroom } from "../../hooks/useSetClassroom";
+import { useClassroom } from "../hooks/useSetClassroom";
 import { Tab } from "@headlessui/react";
-import { Task } from "../../components/Task";
-import { GetServerSideProps, GetStaticProps } from "next";
-import BarChart from "../../components/BarChart";
-import { DataSet, Student } from "../../types/Students";
-import CircularProgress from "../../components/CircularProgress";
-import PeopleChart from "../../components/PeopleChart";
+import { Task } from "../components/Task";
+import BarChart from "../components/BarChart";
+import { DataSet, Student } from "../types/Students";
+import PeopleChart from "../components/PeopleChart";
 import { useRouter } from "next/router";
-import ProgressComponent from "../../components/ProgressComponent";
-import CardInfo from "../../components/CardInfo";
-import StruggledSections from "../../components/sections/StruggledSections";
+import ProgressComponent from "../components/ProgressComponent";
+import StruggledSections from "../components/sections/StruggledSections";
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
-import { getGrade } from "../../lib/functions/grade_computation";
+import { getGrade } from "../lib/functions/grade_computation";
+import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
+import { classNames } from "../lib/functions/concat";
+import { TaskInfo } from "../types/Task";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
-// export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-//   const { quarter } = query;
-//   return {
-//     props: {
-//       quarter: Number(quarter),
-//     },
-//   };
-// };
-
-export const getServerSideProps: GetStaticProps = async (context: any) => {
-  const quarter = context.query.quarter;
-  return {
-    props: {
-      // quarter: Number(quarter),
-      quarter: Number(quarter),
-    },
-  };
-};
 
 const getRemarks = (grade: number) => {
   return grade < 75
@@ -53,21 +30,35 @@ const getRemarks = (grade: number) => {
     : "Very Good";
 };
 
-export default function Tasks({ quarter }: { quarter: number }) {
+export default function ClassroomInfo() {
   const { students } = useClassroom();
+  const { quarter } = useSelectedQuarter();
   const [open, setIsOpen] = useState<boolean>(false);
   const [task, setTask] = useState<number>(0);
   const [pt_task, setPtTask] = useState<number>(0);
   const labels = ["Very Good", "Good", "Average", "Poor", "Very Poor"];
   const router = useRouter();
+
+  const [wgh_ww, setWghWW] = useState<number>(0);
+  const [wgh_pt, setWghPT] = useState<number>(0);
+
+  useEffect(() => {
+    if (!students) {
+      router.back();
+    } else {
+      const myStudent = students![0].quarter![quarter];
+      // get weighted omsim of a written works and performance task
+      const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
+      const wgh_pt =
+        myStudent.performance_weighted_score?.highest_possible_score;
+      setWghWW(wgh_ww ? wgh_ww : 0);
+      setWghPT(wgh_pt ? wgh_pt : 0);
+    }
+  }, []);
+
+  let quarter_index = quarter;
+
   var count = [0, 0, 0, 0, 0];
-
-  if (!students) router.back();
-  const myStudent = students![0].quarter![0];
-  // get weighted omsim of a written works and performance task
-  const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
-  const wgh_pt = myStudent.performance_weighted_score?.highest_possible_score;
-
   const data = {
     labels: labels,
     datasets: [
@@ -85,143 +76,144 @@ export default function Tasks({ quarter }: { quarter: number }) {
     ],
   };
 
-  type TaskInfo = {
-    task_no: number;
-    total: number;
-    ave_score: number;
-    ave_score_pct: number;
-    population: number; // total classroom population
-    participated: number; // students participated
-    no_data: Student[]; // students absent/no data found
-    passed: Student[]; //passed students
-    perfect: Student[];
-    failed: Student[];
-    considerable: Student[];
-  };
   let ww_task_array: TaskInfo[] = [];
   let pt_task_array: TaskInfo[] = [];
 
-  const index = quarter - 1;
   //category average
   let ww_cat_sum = 0,
     pt_cat_sum = 0,
     ww_ave_cat_sum = 0,
     pt_ave_cat_sum = 0;
 
-  //Written Works
-  students![0].quarter![index].written_works?.forEach((task, idx) => {
-    //initialized values
-    const task_info: TaskInfo = {
-      task_no: idx + 1,
-      total: 0,
-      ave_score: 0,
-      ave_score_pct: 0,
-      population: 0, // total classroom population
-      participated: 0, // students participated
-      no_data: [], // students absent/no data found
-      passed: [], //passed students
-      perfect: [],
-      failed: [],
-      considerable: [],
-    };
-    let score_sum = 0;
-    students?.map((student, no) => {
-      const status = student?.quarter![index].written_works![idx].status;
-      if (status === "??") {
-        task_info.no_data.push(student);
-      } else {
-        if (status === "Perfect") task_info.perfect.push(student);
-        else if (status === "Passed") task_info.passed.push(student);
-        else if (status === "Considerable")
-          task_info.considerable.push(student);
-        else task_info.failed.push(student);
-        //particpants
-        task_info.participated += 1;
-        //score sum
-        score_sum += student?.quarter![index].written_works![idx].score;
-      }
-      //total population
-      task_info.population += 1;
+  if (students) {
+    //Written Works
+    students![0].quarter![quarter_index].written_works?.forEach((task, idx) => {
+      //initialized values
+      const task_info: TaskInfo = {
+        task_no: idx + 1,
+        total: 0,
+        ave_score: 0,
+        ave_score_pct: 0,
+        population: 0, // total classroom population
+        participated: 0, // students participated
+        no_data: [], // students absent/no data found
+        passed: [], //passed students
+        perfect: [],
+        failed: [],
+        considerable: [],
+      };
+      let score_sum = 0;
+      students?.map((student, no) => {
+        const status =
+          student?.quarter![quarter_index].written_works![idx].status;
+        if (status === "??") {
+          task_info.no_data.push(student);
+        } else {
+          if (status === "Perfect") task_info.perfect.push(student);
+          else if (status === "Passed") task_info.passed.push(student);
+          else if (status === "Considerable")
+            task_info.considerable.push(student);
+          else task_info.failed.push(student);
+          //particpants
+          task_info.participated += 1;
+          //score sum
+          score_sum +=
+            student?.quarter![quarter_index].written_works![idx].score;
+        }
+        //total population
+        task_info.population += 1;
+      });
+      //total score
+      task_info.total = task.highest_possible_score;
+      task_info.ave_score = Number((score_sum / students?.length!).toFixed(1));
+      task_info.ave_score_pct = Number(
+        ((task_info.ave_score / task_info.total) * 100).toFixed(1)
+      );
+      ww_ave_cat_sum += task_info.ave_score_pct;
+
+      //get sum of passing percentage
+      ww_cat_sum += Number(
+        (
+          ((task_info.passed.length + task_info.perfect.length) /
+            task_info.participated) *
+          100
+        ).toFixed(1)
+      );
+      ww_task_array.push(task_info);
     });
-    //total score
-    task_info.total = task.highest_possible_score;
-    task_info.ave_score = Number((score_sum / students?.length!).toFixed(1));
-    task_info.ave_score_pct = Number(
-      ((task_info.ave_score / task_info.total) * 100).toFixed(1)
-    );
-    ww_ave_cat_sum += task_info.ave_score_pct;
 
-    //get sum of passing percentage
-    ww_cat_sum += Number(
-      (
-        ((task_info.passed.length + task_info.perfect.length) /
-          task_info.participated) *
-        100
-      ).toFixed(1)
-    );
-    ww_task_array.push(task_info);
-  });
+    //Performance Tasks
+    students![0].quarter![quarter_index].performance_tasks?.forEach(
+      (task, idx) => {
+        //initialized values
+        const task_info: TaskInfo = {
+          task_no: idx + 1,
+          total: 0,
+          ave_score: 0,
+          ave_score_pct: 0,
+          population: 0, // total classroom population
+          participated: 0, // students participated
+          no_data: [], // students absent/no data found
+          passed: [], //passed students
+          perfect: [],
+          failed: [],
+          considerable: [],
+        };
+        let score_sum = 0;
+        students?.map((student, no) => {
+          const status =
+            student?.quarter![quarter_index].performance_tasks![idx].status;
+          if (status === "??") {
+            task_info.no_data.push(student);
+          } else {
+            if (status === "Perfect") task_info.perfect.push(student);
+            else if (status === "Passed") task_info.passed.push(student);
+            else if (status === "Considerable")
+              task_info.considerable.push(student);
+            else task_info.failed.push(student);
+            //particpants
+            task_info.participated += 1;
+            //score sum
+            score_sum +=
+              student?.quarter![quarter_index].performance_tasks![idx].score;
+          }
+          //total population
+          task_info.population += 1;
+        });
+        //total score
+        task_info.total = task.highest_possible_score;
+        task_info.ave_score = Number(
+          (score_sum / students?.length!).toFixed(1)
+        );
+        task_info.ave_score_pct = Number(
+          ((task_info.ave_score / task_info.total) * 100).toFixed(1)
+        );
 
-  //Performance Tasks
-  students![0].quarter![index].performance_tasks?.forEach((task, idx) => {
-    //initialized values
-    const task_info: TaskInfo = {
-      task_no: idx + 1,
-      total: 0,
-      ave_score: 0,
-      ave_score_pct: 0,
-      population: 0, // total classroom population
-      participated: 0, // students participated
-      no_data: [], // students absent/no data found
-      passed: [], //passed students
-      perfect: [],
-      failed: [],
-      considerable: [],
-    };
-    let score_sum = 0;
-    students?.map((student, no) => {
-      const status = student?.quarter![index].performance_tasks![idx].status;
-      if (status === "??") {
-        task_info.no_data.push(student);
-      } else {
-        if (status === "Perfect") task_info.perfect.push(student);
-        else if (status === "Passed") task_info.passed.push(student);
-        else if (status === "Considerable")
-          task_info.considerable.push(student);
-        else task_info.failed.push(student);
-        //particpants
-        task_info.participated += 1;
-        //score sum
-        score_sum += student?.quarter![index].performance_tasks![idx].score;
+        pt_ave_cat_sum += task_info.ave_score_pct;
+
+        //get sum of passing percentage
+        pt_cat_sum += Number(
+          (
+            ((task_info.passed.length + task_info.perfect.length) /
+              task_info.participated) *
+            100
+          ).toFixed(1)
+        );
+        pt_task_array.push(task_info);
       }
-      //total population
-      task_info.population += 1;
-    });
-    //total score
-    task_info.total = task.highest_possible_score;
-    task_info.ave_score = Number((score_sum / students?.length!).toFixed(1));
-    task_info.ave_score_pct = Number(
-      ((task_info.ave_score / task_info.total) * 100).toFixed(1)
     );
-
-    pt_ave_cat_sum += task_info.ave_score_pct;
-
-    //get sum of passing percentage
-    pt_cat_sum += Number(
-      (
-        ((task_info.passed.length + task_info.perfect.length) /
-          task_info.participated) *
-        100
-      ).toFixed(1)
-    );
-    pt_task_array.push(task_info);
-  });
+  }
 
   const ww_cat_ave =
-    ww_cat_sum / students![0].quarter![index].written_works?.length!;
+    ww_cat_sum /
+    (students
+      ? students![0].quarter![quarter_index].written_works?.length!
+      : 0);
   const pt_cat_ave =
-    pt_cat_sum / students![0].quarter![index].performance_tasks?.length!;
-
+    pt_cat_sum /
+    (students
+      ? students![0].quarter![quarter_index].performance_tasks?.length!
+      : 0);
   const [categories] = useState([
     {
       title: "Over All",
@@ -283,14 +275,14 @@ export default function Tasks({ quarter }: { quarter: number }) {
     ww_remarks.push({
       student: student,
       remarks: getRemarks(
-        getGrade(student.quarter![quarter - 1].written_percentage?.score!)
+        getGrade(student.quarter![quarter_index].written_percentage?.score!)
       ),
     });
 
     pt_remarks.push({
       student: student,
       remarks: getRemarks(
-        getGrade(student.quarter![quarter - 1].performance_percentage?.score!)
+        getGrade(student.quarter![quarter_index].performance_percentage?.score!)
       ),
     });
   });
@@ -313,12 +305,18 @@ export default function Tasks({ quarter }: { quarter: number }) {
 
   const ww_ave_pct = Number(
     (
-      ww_ave_cat_sum / students![0].quarter![index].written_works?.length!
+      ww_ave_cat_sum /
+      (students
+        ? students![0].quarter![quarter_index].written_works?.length!
+        : 0)
     ).toFixed(1)
   );
   const pt_ave_pct = Number(
     (
-      pt_ave_cat_sum / students![0].quarter![index].performance_tasks?.length!
+      pt_ave_cat_sum /
+      (students
+        ? students![0].quarter![quarter_index].performance_tasks?.length!
+        : 0)
     ).toFixed(1)
   );
 
@@ -367,7 +365,7 @@ export default function Tasks({ quarter }: { quarter: number }) {
                       setIsOpen={setIsOpen}
                       category={category.title}
                       assessment={category.value}
-                      quarter={quarter - 1}
+                      quarter={quarter_index}
                     />
                   </Tab.Panel>
                 ))}
@@ -377,7 +375,10 @@ export default function Tasks({ quarter }: { quarter: number }) {
               {/* Omsim Chart */}
               {/* Student Cards */}
               <div className="m-8 pb-24">
-                <StruggledSections students={students} quarter={quarter} />
+                <StruggledSections
+                  students={students}
+                  quarter={quarter_index}
+                />
               </div>
               {/* Bar Chart */}
               <div className="h-fit m-8 px-24 border-b-2 border-ocean-400">

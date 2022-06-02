@@ -30,11 +30,11 @@ const StruggledSections = ({
         },
       },
 
-      pt_length: student?.quarter![quarter - 1].written_works?.length!,
-      ww_length: student?.quarter![quarter - 1].performance_tasks?.length!,
+      pt_length: student?.quarter![quarter].written_works?.length!,
+      ww_length: student?.quarter![quarter].performance_tasks?.length!,
     };
     //let nodata_tasks: number[] | null = null;
-    student?.quarter![quarter - 1].written_works?.map((task, idx) => {
+    student?.quarter![quarter].written_works?.map((task, idx) => {
       if (task.status === "Perfect") {
         thisStudent.passedTasks.ww.perfect.push(task.tasked_number);
       } else if (task.status === "Passed") {
@@ -43,7 +43,7 @@ const StruggledSections = ({
         thisStudent.failedTasks.ww.push(task.tasked_number);
       }
     });
-    student?.quarter![quarter - 1].performance_tasks?.map((task, idx) => {
+    student?.quarter![quarter].performance_tasks?.map((task, idx) => {
       if (task.status === "Perfect") {
         thisStudent.passedTasks.pt.perfect.push(task.tasked_number);
       } else if (task.status === "Passed") {
@@ -54,7 +54,7 @@ const StruggledSections = ({
     });
 
     const half_length = Number(
-      (student?.quarter![quarter - 1].written_works!.length * 0.5).toFixed()
+      (student?.quarter![quarter].written_works!.length * 0.5).toFixed()
     );
     struggledStudents.push(thisStudent);
   });
