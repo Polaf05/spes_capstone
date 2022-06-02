@@ -60,7 +60,7 @@ const Test = (students: any) => {
 
   useEffect(() => {
     if (!students) {
-      router.back();
+      //router.back();
     } else {
       console.log("NOREM");
 
