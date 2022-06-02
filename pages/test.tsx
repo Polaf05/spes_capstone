@@ -15,11 +15,18 @@ import { getGrade, getRemarks } from "../lib/functions/grade_computation";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { classNames } from "../lib/functions/concat";
 import { TaskInfo } from "../types/Task";
-
+import { students_json } from "../public/json/grades.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const Test = () => {
-  const { students } = useClassroom();
+export const getStaticProps = async () => {
+  return {
+    props: {
+      students: students_json,
+    },
+  };
+};
+
+const Test = (students: any) => {
   const { quarter } = useSelectedQuarter();
   const [open, setIsOpen] = useState<boolean>(false);
   const [task, setTask] = useState<number>(0);
@@ -53,7 +60,7 @@ const Test = () => {
 
   useEffect(() => {
     if (!students) {
-      router.back();
+      //router.back();
     } else {
       console.log("NOREM");
 
