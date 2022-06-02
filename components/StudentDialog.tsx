@@ -138,7 +138,6 @@ const StudentDialog = ({
       ? [ww_dataToRender]
       : [pt_dataToRender];
 
-  console.log(data_to_render);
   type Chart = {
     labels: string[];
     datasets: DataSet | DataSet[];

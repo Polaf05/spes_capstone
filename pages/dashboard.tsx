@@ -220,7 +220,6 @@ const Dashboard = () => {
 
       setFailedStudents(getScorePCT(remarks.very_poor.length, students.length));
       const message = generateFeedback(100 - failedStudents);
-      console.log("Transmuted Grade: ", transmuteGrade(89) - 1);
 
       var buttons: number[] = [];
       for (var i = 1; i <= qSum; i++) {
