@@ -56,8 +56,8 @@ export interface Student {
   final_grade_after: number;
   final_remarks: string;
   remarks: string;
-  survey_result: SurveyResult | null;
-  inference_result: DataInference | null;
+  survey_result: SurveyResult;
+  inference_result: DataInference;
   ranking: number | null;
 }
 
@@ -100,8 +100,8 @@ export type TestStudent = {
 };
 
 export interface ScoreTotal {
-  written_works: TaskData[] | null;
-  performance_work: TaskData[] | null;
+  written_works: TaskData[];
+  performance_work: TaskData[];
   written_percentage: number;
   written_weighted_score: number;
   performance_percentage: number;

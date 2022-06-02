@@ -86,7 +86,7 @@ export function quarterAnalysis(quarter: Quarter[]) {
   let consistent: number[] = [];
   let temp_consistent: number[] = [];
 
-  let len = 0;
+  let len = -1;
 
   for (let i = 0; i < quarter.length; i++) {
     if (
@@ -134,6 +134,31 @@ export function quarterAnalysis(quarter: Quarter[]) {
   );
 
   let fluctuate = sumWithInitial / trend.length;
+
+  let trends = "";
+
+  let positive = 0;
+  let negative = 0;
+  let alternating = true;
+  let linear = true;
+  let fluctuating;
+
+  for (let i = 0; i < trend.length; i++) {
+    if (i + 1 != trend.length) {
+      if (Math.sign(trend[i]) == Math.sign(trend[i + 1])) {
+        alternating = false;
+      }
+    }
+
+    if (trend[i] != trend[0]) {
+      linear = false;
+    }
+    if (trend[i] < 0) {
+      negative++;
+    } else if (trend[i] > 0) {
+      positive++;
+    }
+  }
 
   const quarterData: TaskAnalysis = {
     fluctuation: fluctuate,
