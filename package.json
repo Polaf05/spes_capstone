@@ -26,7 +26,8 @@
     "react-mui-tooltip": "^1.0.0",
     "react-router-hash-link": "^2.4.3",
     "react-tooltip": "^4.2.21",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "@types/node": "17.0.21",

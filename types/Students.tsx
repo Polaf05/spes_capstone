@@ -49,6 +49,7 @@ export type TaskAnalysis = {
   consistency: number[];
   plunge_task: number[];
   surge_task: number[];
+  trends: string;
 };
 
 export interface Student {
