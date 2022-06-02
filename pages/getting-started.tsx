@@ -279,7 +279,7 @@ const gettingStarted = () => {
 
             students.map((item: any, index: number) => {
               let quarter_grade: Quarter[] = [];
-              quarter.map((quart: any) => {
+              quarter.map((quart: any, idx: number) => {
                 quarter_grade.push(quart[index]);
               });
 
@@ -317,18 +317,20 @@ const gettingStarted = () => {
                   survey == undefined ? ([] as any) : inferenceData(survey),
                 ranking: null,
               };
-              console.log(student_info);
+              //console.log(student_info);
               classroom.push(student_info);
             });
             let class_list = getRanking(classroom, task_length);
-            console.log(class_list);
-            let upload = uploadJson(class_list);
-            setJson(upload);
+            console.log("Class List:", class_list);
+            let upload: string | null = uploadJson(class_list);
+            console.log("Class ID:", upload);
+
+            setJson("62987f8c402a5b380219b752");
 
             //let upload = fetchJson("62987f8c402a5b380219b752");
             setStudents(class_list);
             setError(errors);
-            console.log(error);
+            console.log("Error:", error);
           } else {
             console.log(
               "excel file did not match the template, please upload another file"

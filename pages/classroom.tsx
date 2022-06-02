@@ -34,8 +34,13 @@ const getRemarks = (grade: number) => {
 };
 
 export const getStaticProps = async () => {
-  const { json, setJson } = useJson();
-  let students_json = fetchJson(json);
+  const { json } = useJson();
+  let students_json: Student[] = [];
+  if (json) {
+    students_json = fetchJson(json);
+  }
+
+  console.log("here: ", students_json);
   return {
     props: {
       classroom: students_json,

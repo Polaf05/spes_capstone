@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   InferenceDetails,
   scoreData,
@@ -300,13 +299,14 @@ export function uploadJson(student: Student[]) {
   // console.log(data);
   let request = new XMLHttpRequest();
 
+  let response_str: string | null = null;
   request.onreadystatechange = () => {
     if (request.readyState == XMLHttpRequest.DONE) {
       //console.log(request.responseText);
 
       response = JSON.parse(request.response);
-
-      console.log(response.metadata.id);
+      response_str = response.metadata.id;
+      console.log(response_str);
     }
   };
 
@@ -319,9 +319,7 @@ export function uploadJson(student: Student[]) {
   request.setRequestHeader("X-Bin-Name", "students");
   request.setRequestHeader("X-Bin-Private", "false");
 
-  request.send(JSON.stringify(student));
-
-  return response?.metadata.id;
+  return response_str;
 }
 
 export function fetchJson(id: string) {

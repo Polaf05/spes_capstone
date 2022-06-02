@@ -51,6 +51,7 @@ import { setDatasets } from "react-chartjs-2/dist/utils";
 import { getLabels } from "../lib/functions/chart";
 import { generateFeedback } from "../lib/functions/feedback";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
+import { useJson } from "../hooks/useSetJson";
 Chart.register(
   ArcElement,
   LineElement,
@@ -79,6 +80,7 @@ Chart.register(
 
 const Dashboard = () => {
   const { students } = useClassroom();
+  const { json } = useJson();
   const { quarter, setQuarter } = useSelectedQuarter();
   const [quarters, setQuarters] = useState<number[]>([]);
   const router = useRouter();
@@ -245,7 +247,7 @@ const Dashboard = () => {
             <div>
               <h1 className="text-2xl font-bold">
                 Classroom Evaluation:{" "}
-                <span className="font-bold underline decoration-2">Good</span>
+                <span className="font-bold underline decoration-2">{json}</span>
               </h1>
             </div>
             <div className="flex gap-4">
