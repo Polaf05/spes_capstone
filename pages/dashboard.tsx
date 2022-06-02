@@ -252,7 +252,7 @@ const Dashboard = () => {
             <div className="flex gap-4">
               {quarters.map((button, idx) => (
                 <div key={idx}>
-                  <Link href={`/classroom`} passHref>
+                  <Link href={`/test`} passHref>
                     <button
                       onClick={() => {
                         setQuarter(idx);
