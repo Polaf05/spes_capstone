@@ -41,3 +41,44 @@ export type Categories = {
   title: string;
   value: string;
 };
+
+export interface TaskDataScores {
+  ww: {
+    raw_scores: {
+      score: any[];
+      pct: any[];
+      hp: any[];
+      total: any[];
+      task: any[];
+      status: any[];
+    };
+    scores: number[];
+    hp_scores: number[];
+    scores_pct: number[];
+    score_sum: number;
+    total_item: number;
+    passed: number;
+    total: number;
+    percentage: number;
+  };
+  pt: {
+    raw_scores: {
+      score: any[];
+      pct: any[];
+      hp: any[];
+      total: any[];
+      task: any[];
+      status: any[];
+    };
+    scores: number[];
+    hp_scores: number[];
+    scores_pct: number[];
+    score_sum: number;
+    total_item: number;
+    passed: number;
+    total: number;
+    percentage: number;
+  };
+  better_at: string;
+  underperformed_tasks: any[];
+}

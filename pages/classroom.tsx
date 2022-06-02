@@ -15,6 +15,7 @@ import { getGrade } from "../lib/functions/grade_computation";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { classNames } from "../lib/functions/concat";
 import { TaskInfo } from "../types/Task";
+import { students_json } from "../public/json/grades.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -30,8 +31,16 @@ const getRemarks = (grade: number) => {
     : "Very Good";
 };
 
-export default function ClassroomInfo() {
-  const { students } = useClassroom();
+export const getStaticProps = async () => {
+  return {
+    props: {
+      classroom: students_json,
+    },
+  };
+};
+
+export default function ClassroomInfo({ classroom }: any) {
+  const students: Student[] = classroom;
   const { quarter } = useSelectedQuarter();
   const [open, setIsOpen] = useState<boolean>(false);
   const [task, setTask] = useState<number>(0);
@@ -46,6 +55,7 @@ export default function ClassroomInfo() {
     if (!students) {
       router.back();
     } else {
+      console.log(students);
       const myStudent = students![0].quarter![quarter];
       // get weighted omsim of a written works and performance task
       const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
@@ -361,6 +371,7 @@ export default function ClassroomInfo() {
                   <Tab.Panel key={idx} className="h-[90vh] bg-ocean-100 pt-10">
                     {/* Content Section */}
                     <Task
+                      students={students}
                       open={open}
                       setIsOpen={setIsOpen}
                       category={category.title}

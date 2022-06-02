@@ -33,6 +33,7 @@ import Link from "next/link";
 import { classNames, studentInCategory } from "../lib/functions/concat";
 import { getGrade } from "../lib/functions/grade_computation";
 import { getRemarks } from "../lib/functions/formatting";
+import { Student } from "../types/Students";
 
 Chart.register(
   ArcElement,
@@ -61,11 +62,13 @@ Chart.register(
 );
 
 const StudentDialog = ({
+  students,
   quarter,
   category,
   open,
   setIsOpen,
 }: {
+  students: Student[];
   quarter: number;
   category: string;
   open: boolean;
@@ -281,11 +284,11 @@ const StudentDialog = ({
                               getRemarks(
                                 getGrade(
                                   category === "Over All"
-                                    ? student!.quarter![quarter].grade_before
+                                    ? student?.quarter![quarter].grade_before
                                     : category === "Written Works"
-                                    ? student!.quarter![quarter]
+                                    ? student?.quarter![quarter]
                                         .written_percentage?.score!
-                                    : student!.quarter![quarter]
+                                    : student?.quarter![quarter]
                                         .performance_percentage?.score!
                                 )
                               ) === "Very Poor"
@@ -296,17 +299,17 @@ const StudentDialog = ({
                             {getRemarks(
                               getGrade(
                                 category === "Over All"
-                                  ? student!.quarter![quarter].grade_before
+                                  ? student?.quarter![quarter].grade_before
                                   : category === "Written Works"
-                                  ? student!.quarter![quarter]
+                                  ? student?.quarter![quarter]
                                       .written_percentage?.score!
-                                  : student!.quarter![quarter]
+                                  : student?.quarter![quarter]
                                       .performance_percentage?.score!
                               )
                             )}
                           </span>
                           {(category === "Over All"
-                            ? student!.quarter![quarter].ranking!
+                            ? student?.quarter![quarter].ranking!
                             : category === "Written Works"
                             ? student?.quarter![quarter].written_percentage
                                 ?.ranking!
@@ -320,7 +323,7 @@ const StudentDialog = ({
                               Rank{" "}
                               {studentInCategory(
                                 category,
-                                student!.quarter![quarter].ranking!,
+                                student?.quarter![quarter].ranking!,
                                 student?.quarter![quarter].written_percentage
                                   ?.ranking!,
                                 student?.quarter![quarter]
