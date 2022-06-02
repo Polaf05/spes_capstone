@@ -15,7 +15,10 @@ export function fluctuation(task: TaskData[], possible: TaskData[]) {
   let temp_consistent: number[] = [];
   let percent: number[] = [];
 
+  let x: number[] = [];
+
   for (let i = 0; i < task.length; i++) {
+    x.push(i);
     if (task[i].score == undefined) {
       task[i].score = 0;
     }
@@ -61,12 +64,21 @@ export function fluctuation(task: TaskData[], possible: TaskData[]) {
 
   let fluctuate = sumWithInitial / trend.length;
 
+  let trends = "";
+
+  let lines = findLineByLeastSquares(x, percent);
+
+  console.log(lines);
+
+  trends = lines as string;
+
   const taskData: TaskAnalysis = {
     fluctuation: fluctuate,
     trend: trend,
     consistency: consistent,
     plunge_task: plunge,
     surge_task: surge,
+    trends: trends,
   };
 
   return taskData;
@@ -103,7 +115,6 @@ export function quarterAnalysis(quarter: Quarter[]) {
       let sum = quarter[i + 1].grade_before - quarter[i].grade_before;
       trend.push(sum);
 
-      console.log(sum);
       if (sum >= 10) {
         surge.push(i + 2);
       } else if (sum <= -10) {
@@ -141,7 +152,6 @@ export function quarterAnalysis(quarter: Quarter[]) {
   let negative = 0;
   let alternating = true;
   let linear = true;
-  let fluctuating;
 
   for (let i = 0; i < trend.length; i++) {
     if (i + 1 != trend.length) {
@@ -160,12 +170,27 @@ export function quarterAnalysis(quarter: Quarter[]) {
     }
   }
 
+  if (!linear) {
+    if (!alternating) {
+      if (positive > negative) {
+        trends = "upward";
+      } else {
+        trends = "downward";
+      }
+    } else {
+      trends = "fluctuating";
+    }
+  } else {
+    trends = "linear";
+  }
+
   const quarterData: TaskAnalysis = {
     fluctuation: fluctuate,
     trend: trend,
     consistency: consistent,
     plunge_task: plunge,
     surge_task: surge,
+    trends: trends,
   };
 
   return quarterData;
@@ -326,4 +351,75 @@ export function getRanking(classroom: Student[], task_length: any) {
   });
 
   return class_list;
+}
+
+function findLineByLeastSquares(values_x: number[], values_y: number[]) {
+  var sum_x = 0;
+  var sum_y = 0;
+  var sum_xy = 0;
+  var sum_xx = 0;
+  var count = 0;
+
+  /*
+   * We'll use those variables for faster read/write access.
+   */
+  var x = 0;
+  var y = 0;
+  var values_length = values_x.length;
+
+  if (values_length != values_y.length) {
+    throw new Error(
+      "The parameters values_x and values_y need to have same size!"
+    );
+  }
+
+  /*
+   * Nothing to do.
+   */
+  if (values_length === 0) {
+    return [[], []];
+  }
+
+  /*
+   * Calculate the sum for each of the parts necessary.
+   */
+  for (var v = 0; v < values_length; v++) {
+    x = values_x[v];
+    y = values_y[v];
+    sum_x += x;
+    sum_y += y;
+    sum_xx += x * x;
+    sum_xy += x * y;
+    count++;
+  }
+
+  /*
+   * Calculate m and b for the formular:
+   * y = x * m + b
+   */
+  var m = (count * sum_xy - sum_x * sum_y) / (count * sum_xx - sum_x * sum_x);
+  var b = sum_y / count - (m * sum_x) / count;
+
+  /*
+   * We will make the x and y result line now
+   */
+  var result_values_x = [];
+  var result_values_y = [];
+
+  for (var v = 0; v < values_length; v++) {
+    x = values_x[v];
+    y = x * m + b;
+    result_values_x.push(x);
+    result_values_y.push(y);
+  }
+
+  console.log(result_values_x, result_values_y);
+
+  if (result_values_y[values_length - 1] == result_values_y[0]) {
+    return "consistent linear";
+  } else if (result_values_y[values_length - 1] > result_values_y[0]) {
+    return "upward";
+  } else {
+    return "downward";
+  }
 }
