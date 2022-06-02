@@ -12,11 +12,13 @@ import {
   DataInference,
 } from "../types/Students";
 import {
+  fetchJson,
   getGradeAfter,
   getRemarks,
   getSurveyResults,
   getTask,
   getWeighted,
+  uploadJson,
 } from "../lib/functions/formatting";
 import {
   fluctuation,
@@ -318,6 +320,7 @@ const gettingStarted = () => {
             });
             let class_list = getRanking(classroom, task_length);
             console.log(class_list);
+            //let upload = fetchJson("62987f8c402a5b380219b752");
             setStudents(class_list);
             setError(errors);
             console.log(error);

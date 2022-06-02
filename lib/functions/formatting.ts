@@ -1,6 +1,8 @@
+import axios from "axios";
 import {
   InferenceDetails,
   scoreData,
+  Student,
   SurveyResult,
 } from "../../types/Students";
 
@@ -287,4 +289,58 @@ export function formatArray(arr: any) {
     outStr = arr.slice(0, -1).join(", ") + ", and " + arr.slice(-1);
   }
   return outStr;
+}
+
+export function uploadJson(student: Student[]) {
+  let response: any;
+  // const data = await axios
+  //   .post("/api/json", { classroom: student })
+  //   .then((res) => res.data);
+
+  // console.log(data);
+  let request = new XMLHttpRequest();
+
+  request.onreadystatechange = () => {
+    if (request.readyState == XMLHttpRequest.DONE) {
+      //console.log(request.responseText);
+
+      response = JSON.parse(request.response);
+
+      console.log(response.metadata.id);
+    }
+  };
+
+  request.open("POST", "https://api.jsonbin.io/v3/b", true);
+  request.setRequestHeader("Content-Type", "application/json");
+  request.setRequestHeader(
+    "X-Master-Key",
+    "$2b$10$wnfLIJ3QgmRaWVd8uqIWc.SxSIXMJdLAVTLdAKRcJIquIN82p.GcS"
+  );
+  request.setRequestHeader("X-Bin-Name", "students");
+  request.setRequestHeader("X-Bin-Private", "false");
+
+  request.send(JSON.stringify(student));
+
+  return response?.metadata.id;
+}
+
+export function fetchJson(id: string) {
+  let req = new XMLHttpRequest();
+
+  req.onreadystatechange = () => {
+    if (req.readyState == XMLHttpRequest.DONE) {
+      console.log(req.responseText);
+    }
+  };
+
+  req.open("GET", `https://api.jsonbin.io/v3/b/${id}`, true);
+  req.setRequestHeader(
+    "X-Master-Key",
+    "$2b$10$wnfLIJ3QgmRaWVd8uqIWc.SxSIXMJdLAVTLdAKRcJIquIN82p.GcS"
+  );
+  req.setRequestHeader(
+    "X-Access-Key",
+    "$2b$10$3jwfnPzq3VTkd8Gf3xAd0Od1FIFqq/scYeJ7AyZqFjdMfCjLurtGi"
+  );
+  req.send();
 }
