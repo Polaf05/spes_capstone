@@ -36,6 +36,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/outline";
 import Intro from "../components/sections/Intro";
+import { useJson } from "../hooks/useSetJson";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
@@ -44,6 +45,7 @@ let errors: number[] = [0, 0, 0, 0, -1, -1, -1];
 
 const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
+  const { json, setJson } = useJson();
   const [fileName, setFileName] = useState(null);
   const [forms, setForms] = useState<SurveyResult[] | null>(null);
   const [text_value, setText_value] = useState("");
@@ -320,6 +322,9 @@ const gettingStarted = () => {
             });
             let class_list = getRanking(classroom, task_length);
             console.log(class_list);
+            let upload = uploadJson(class_list);
+            setJson(upload);
+
             //let upload = fetchJson("62987f8c402a5b380219b752");
             setStudents(class_list);
             setError(errors);

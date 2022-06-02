@@ -325,11 +325,13 @@ export function uploadJson(student: Student[]) {
 }
 
 export function fetchJson(id: string) {
+  let response: any;
   let req = new XMLHttpRequest();
 
   req.onreadystatechange = () => {
     if (req.readyState == XMLHttpRequest.DONE) {
       console.log(req.responseText);
+      response = JSON.parse(req.response);
     }
   };
 
@@ -343,4 +345,6 @@ export function fetchJson(id: string) {
     "$2b$10$3jwfnPzq3VTkd8Gf3xAd0Od1FIFqq/scYeJ7AyZqFjdMfCjLurtGi"
   );
   req.send();
+
+  return response.record;
 }

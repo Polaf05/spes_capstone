@@ -16,6 +16,8 @@ import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { classNames } from "../lib/functions/concat";
 import { TaskInfo } from "../types/Task";
 import { students_json } from "../public/json/grades.js";
+import { fetchJson } from "../lib/functions/formatting";
+import { useJson } from "../hooks/useSetJson";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -32,6 +34,8 @@ const getRemarks = (grade: number) => {
 };
 
 export const getStaticProps = async () => {
+  const { json, setJson } = useJson();
+  let students_json = fetchJson(json);
   return {
     props: {
       classroom: students_json,
