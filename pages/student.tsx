@@ -33,7 +33,7 @@ import { Bar, Line, Radar } from "react-chartjs-2";
 import { StarIcon } from "@heroicons/react/solid";
 import { CheckIcon, XIcon } from "@heroicons/react/outline";
 import BarChart from "../components/BarChart";
-import { DataSet, Student } from "../types/Students";
+import { DataSet, Quarter, Student, TaskData } from "../types/Students";
 import CardInfo from "../components/CardInfo";
 import CircularProgress from "../components/CircularProgress";
 import { useClassroom } from "../hooks/useSetClassroom";
@@ -48,6 +48,7 @@ import { type } from "os";
 import { formatArray, getRemarks } from "../lib/functions/formatting";
 import { fluctuation } from "../lib/functions/analysis";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
+import { TaskDataScores } from "../types/Task";
 
 Chart.register(
   ArcElement,
@@ -80,7 +81,7 @@ const classNames = (...classes: string[]) => {
 };
 // methods
 const capitalize = (string: string) =>
-  string.charAt(0).toUpperCase() + string.slice(1);
+  string ? string.charAt(0).toUpperCase() + string.slice(1) : "";
 
 const getIndexOfMaxNumber = (arr: any[]) => arr.indexOf(Math.max(...arr));
 const getIndexOfMinNumber = (arr: any[]) => arr.indexOf(Math.min(...arr));
@@ -114,40 +115,48 @@ const getTask = (option: any, arr: number[]) => {
 const StudentInfo = () => {
   const { students } = useClassroom();
   const { student } = useSelectedStudent();
+  //set data of student for the quarter
+  const [myStudent, setMyStudent] = useState<Quarter | null>(null);
+  const { quarter, setQuarter } = useSelectedQuarter();
+
+  const [myquar, setMyquar] = useState<string[]>([]);
+  const [ww_available_scores, set_ww_available_scores] = useState<number[]>([]);
+  const [pt_available_scores, set_pt_available_scores] = useState<number[]>([]);
+  const [buttons, setButtons] = useState<string[]>([]);
+  const [qSum, setQSum] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
     if (!students || !student) router.back();
-  });
+    else {
+      setMyStudent(student?.quarter![quarter]!);
+      console.log(student.name);
+      let ww_available_scores: number[] = [];
+      let pt_available_scores: number[] = [];
 
-  const { quarter } = useSelectedQuarter();
-  let myquar: string[] = [];
+      let qSum: number = 0;
+      students[0]?.quarter?.map((q) => {
+        qSum +=
+          q.written_works?.length! > 0 || q.performance_tasks?.length! > 0
+            ? 1
+            : 0;
+      });
 
-  //set quarter page to render
-  const [quar, setQuar] = useState<number>(quarter);
-  let ww_available_scores = [];
-  let pt_available_scores = [];
-  if (!students || !student) {
-    //TO FIX: ROUTE BACK USER
-  } else {
-    let qSum: any = 0;
-    students![0].quarter?.map((quarter) => {
-      qSum += quarter.written_works?.length! > 0 ? 1 : 0;
-    });
+      let buttons: string[] = [];
+      for (var i = 0; i < qSum; i++) {
+        buttons.push(`Quarter ${i + 1}`);
+        const ww_grade = student?.quarter![i].written_percentage?.score;
+        const pt_grade = student?.quarter![i].performance_percentage?.score;
 
-    var buttons: string[] = [];
-    for (var i = 1; i <= qSum; i++) {
-      buttons.push("Quarter " + i);
-      const ww_grade = student?.quarter![i - 1].written_percentage?.score;
-      const pt_grade = student?.quarter![i - 1].performance_percentage?.score;
-
-      ww_available_scores.push(typeof ww_grade === "string" ? 0 : ww_grade);
-      pt_available_scores.push(typeof pt_grade === "string" ? 0 : pt_grade);
+        ww_available_scores.push(typeof ww_grade === "string" ? 0 : ww_grade);
+        pt_available_scores.push(typeof pt_grade === "string" ? 0 : pt_grade);
+      }
+      set_ww_available_scores(ww_available_scores);
+      set_pt_available_scores(pt_available_scores);
+      setButtons(buttons);
+      setMyquar(buttons);
     }
-    myquar = buttons;
-  }
-  //set data of student for the quarter
-  const [myStudent, setMyStudent] = useState(student?.quarter![quarter]!);
+  }, []);
 
   //set quarter data
   const quarter_grades = {
@@ -242,47 +251,6 @@ const StudentInfo = () => {
   const pt_labels: string[] = [];
   const pt_status: string[] = [];
 
-  // get all passed scores
-  interface TaskDataScores {
-    ww: {
-      raw_scores: {
-        score: any[];
-        pct: any[];
-        hp: any[];
-        total: any[];
-        task: any[];
-        status: any[];
-      };
-      scores: number[];
-      hp_scores: number[];
-      scores_pct: number[];
-      score_sum: number;
-      total_item: number;
-      passed: number;
-      total: number;
-      percentage: number;
-    };
-    pt: {
-      raw_scores: {
-        score: any[];
-        pct: any[];
-        hp: any[];
-        total: any[];
-        task: any[];
-        status: any[];
-      };
-      scores: number[];
-      hp_scores: number[];
-      scores_pct: number[];
-      score_sum: number;
-      total_item: number;
-      passed: number;
-      total: number;
-      percentage: number;
-    };
-    better_at: string;
-    underperformed_tasks: any[];
-  }
   // get task data
   let tdata: TaskDataScores = {
     ww: {
@@ -297,10 +265,10 @@ const StudentInfo = () => {
       scores: [],
       hp_scores: [],
       scores_pct: [],
-      score_sum: ww_sum[quar],
-      total_item: hps_ww[quar],
+      score_sum: ww_sum[quarter],
+      total_item: hps_ww[quarter],
       passed: 0,
-      total: myStudent.written_works?.length!,
+      total: myStudent?.written_works?.length!,
       percentage: 0,
     },
     pt: {
@@ -315,17 +283,16 @@ const StudentInfo = () => {
       scores: [],
       hp_scores: [],
       scores_pct: [],
-      score_sum: pt_sum[quar],
-      total_item: hps_pt[quar],
+      score_sum: pt_sum[quarter],
+      total_item: hps_pt[quarter],
       passed: 0,
-      total: myStudent.performance_tasks?.length!,
+      total: myStudent?.performance_tasks?.length!,
       percentage: 0,
     },
     better_at: "",
     underperformed_tasks: [],
   };
-
-  myStudent.written_works?.forEach((task) => {
+  myStudent?.written_works?.forEach((task: TaskData) => {
     const task_label = "Task " + task.tasked_number.toString();
     ww_labels.push(task_label);
     ww_status.push(task.status);
@@ -348,7 +315,7 @@ const StudentInfo = () => {
     tdata.ww.raw_scores.hp.push(task.highest_possible_score);
     tdata.ww.passed += task.status.match(/Passed|Perfect/g) ? 1 : 0;
   });
-  myStudent.performance_tasks?.forEach((task) => {
+  myStudent?.performance_tasks?.forEach((task: TaskData) => {
     const task_label = "Task " + task.tasked_number.toString();
     pt_labels.push(task_label);
     pt_status.push(task.status);
@@ -370,15 +337,6 @@ const StudentInfo = () => {
     }
     tdata.pt.raw_scores.hp.push(task.highest_possible_score);
     tdata.pt.passed += task.status.match(/Passed|Perfect/g) ? 1 : 0;
-  });
-
-  let qSum: any = 0;
-  students![0].quarter?.map((quarter) => {
-    qSum +=
-      quarter.written_works?.length! > 0 ||
-      quarter.performance_tasks?.length! > 0
-        ? 1
-        : 0;
   });
 
   //set underperformed tasks
@@ -420,7 +378,7 @@ const StudentInfo = () => {
   });
 
   //student rank
-  const my_ranking = Math.trunc(myStudent.written_percentage?.ranking!);
+  const my_ranking = Math.trunc(myStudent?.written_percentage?.ranking!);
   //sum of surpassed
   let ww_surp_sum = 0;
   let pt_surp_sum = 0;
@@ -432,8 +390,8 @@ const StudentInfo = () => {
   const ww_pct = Number(((ww_surp_sum / students?.length!) * 100).toFixed(1));
   const pt_pct = Number(((pt_surp_sum / students?.length!) * 100).toFixed(1));
   // get weighted omsim of a written works and performance task
-  const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
-  const wgh_pt = myStudent.performance_weighted_score?.highest_possible_score;
+  const wgh_ww = myStudent?.written_weighted_score?.highest_possible_score;
+  const wgh_pt = myStudent?.performance_weighted_score?.highest_possible_score;
 
   // get best written task accomplished
   let ww_best_task: number | null = getTask("best", tdata.ww.raw_scores.pct);
@@ -790,11 +748,6 @@ const StudentInfo = () => {
     },
   ];
 
-  let diffArrow, stud_id: number;
-  if (student) {
-    diffArrow =
-      myStudent.diff > 0 ? "up" : myStudent.diff === 0 ? "neutral" : "down";
-  }
   const dataToRender: DataSet[] = [
     {
       label: "Written Works",
@@ -844,9 +797,10 @@ const StudentInfo = () => {
   }
 
   let no_data_found = [false, false];
-  if (count_nd[0] === myStudent.written_works?.length!) no_data_found[0] = true;
+  if (count_nd[0] === myStudent?.written_works?.length!)
+    no_data_found[0] = true;
 
-  if (count_nd[1] === myStudent.performance_tasks?.length!)
+  if (count_nd[1] === myStudent?.performance_tasks?.length!)
     no_data_found[1] = true;
   const percentage: number = 0;
 
@@ -1000,18 +954,19 @@ const StudentInfo = () => {
         </div>
         {/* Toggle Quarter */}
         <div className="flex justify-end">
-          {myquar.map((quarter, idx) => (
+          {myquar.map((q, idx) => (
             <div
               key={idx}
               className={classNames(
                 "px-12 pt-4 pb-1 text-xl rounded-t-xl",
-                quar === idx ? "bg-white" : ""
+                quarter === idx ? "bg-white" : ""
               )}
             >
               <button
                 onClick={() => {
-                  setQuar(idx);
+                  setQuarter(idx);
                   setMyStudent(student?.quarter![idx]!);
+                  console.log(student?.quarter[idx]);
                 }}
               >
                 {myquar[idx]}
@@ -1027,7 +982,7 @@ const StudentInfo = () => {
             <div className="grid grid-cols-2">
               <div>
                 <h1 className="font-bold text-2xl">Performance Analysis</h1>
-                <h3 className="italic">{myquar[quar]} Evaluation</h3>
+                <h3 className="italic">{myquar[quarter]} Evaluation</h3>
               </div>
               {/* Grade Component */}
               <div className="col-span-1 flex justify-end gap-4">
@@ -1035,14 +990,14 @@ const StudentInfo = () => {
                   <h1 className="text-lg font-semibold">Quarter Grade:</h1>
                   <h3 className="text-base">
                     Suggested Grade:{" "}
-                    <span className="font-bold">{myStudent.grade_after}</span>
+                    <span className="font-bold">{myStudent?.grade_after}</span>
                   </h3>
                   <div className="flex gap-3">
                     <h3>
                       Class Ranking:{" "}
-                      <span className="font-bold">{myStudent.ranking}</span>
+                      <span className="font-bold">{myStudent?.ranking}</span>
                     </h3>
-                    {myStudent.ranking! <= 4 && (
+                    {myStudent?.ranking! <= 4 && (
                       <StarIcon className="h-5 text-tallano_gold-300" />
                     )}
                   </div>
@@ -1050,7 +1005,7 @@ const StudentInfo = () => {
                 <div className="grid place-content-center">
                   <div className="grid place-content-center w-28 h-28 rounded-full bg-tallano_gold-200">
                     <h1 className="font-bold text-3xl">
-                      {myStudent.grade_before}
+                      {myStudent?.grade_before}
                     </h1>
                   </div>
                 </div>
@@ -1085,25 +1040,25 @@ const StudentInfo = () => {
 
                       <p>
                         Fluctuation:{" "}
-                        {myStudent.written_tasks_analysis?.fluctuation.toFixed(
+                        {myStudent?.written_tasks_analysis?.fluctuation.toFixed(
                           1
                         )}
                       </p>
 
-                      {myStudent.written_tasks_analysis?.plunge_task.length! >
+                      {myStudent?.written_tasks_analysis?.plunge_task.length! >
                         0 && (
                         <p>
                           Plunged:{" "}
-                          {myStudent.written_tasks_analysis?.plunge_task.join(
+                          {myStudent?.written_tasks_analysis?.plunge_task.join(
                             ", "
                           )}
                         </p>
                       )}
-                      {myStudent.written_tasks_analysis?.surge_task.length! >
+                      {myStudent?.written_tasks_analysis?.surge_task.length! >
                         0 && (
                         <p>
                           Surged:{" "}
-                          {myStudent.written_tasks_analysis?.surge_task.join(
+                          {myStudent?.written_tasks_analysis?.surge_task.join(
                             ", "
                           )}
                         </p>
@@ -1115,25 +1070,28 @@ const StudentInfo = () => {
                       <div className="bg-ocean-200 w-5 h-1"></div>
                       <p>
                         Fluctuation:{" "}
-                        {myStudent.performace_tasks_analysis?.fluctuation.toFixed(
+                        {
+                          69
+                          /* {myStudent?.performace_tasks_analysis?.fluctuation.toFixed(
                           1
-                        )}
+                        )} */
+                        }
                       </p>
 
-                      {myStudent.performace_tasks_analysis?.plunge_task
+                      {myStudent?.performace_tasks_analysis?.plunge_task
                         .length! > 0 && (
                         <p>
                           Plunged:{" "}
-                          {myStudent.performace_tasks_analysis?.plunge_task.join(
+                          {myStudent?.performace_tasks_analysis?.plunge_task.join(
                             ", "
                           )}
                         </p>
                       )}
-                      {myStudent.performace_tasks_analysis?.surge_task.length! >
-                        0 && (
+                      {myStudent?.performace_tasks_analysis?.surge_task
+                        .length! > 0 && (
                         <p>
                           Surged:{" "}
-                          {myStudent.performace_tasks_analysis?.surge_task.join(
+                          {myStudent?.performace_tasks_analysis?.surge_task.join(
                             ", "
                           )}
                         </p>
@@ -1145,7 +1103,7 @@ const StudentInfo = () => {
               {/* Line Chart Assessment */}
               <div className="h-[45vh] overflow-x-auto px-3">
                 <h5 className="text-justify">
-                  Assessment: {performanceAnalysis(quar)}
+                  Assessment: {performanceAnalysis(quarter)}
                 </h5>
               </div>
             </div>

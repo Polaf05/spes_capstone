@@ -65,7 +65,7 @@ export interface Student {
 export interface DataSet {
   label: string;
   data: any[];
-  fill: true;
+  fill: boolean;
   backgroundColor: string;
   borderColor: string;
 }
