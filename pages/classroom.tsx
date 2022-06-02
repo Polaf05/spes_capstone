@@ -34,12 +34,13 @@ const getRemarks = (grade: number) => {
 export const getStaticProps = async () => {
   return {
     props: {
-      students: students_json,
+      classroom: students_json,
     },
   };
 };
 
-export default function ClassroomInfo(students: Student[]) {
+export default function ClassroomInfo({ classroom }: any) {
+  const students: Student[] = classroom;
   const { quarter } = useSelectedQuarter();
   const [open, setIsOpen] = useState<boolean>(false);
   const [task, setTask] = useState<number>(0);
@@ -54,6 +55,7 @@ export default function ClassroomInfo(students: Student[]) {
     if (!students) {
       router.back();
     } else {
+      console.log(students);
       const myStudent = students![0].quarter![quarter];
       // get weighted omsim of a written works and performance task
       const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
@@ -369,6 +371,7 @@ export default function ClassroomInfo(students: Student[]) {
                   <Tab.Panel key={idx} className="h-[90vh] bg-ocean-100 pt-10">
                     {/* Content Section */}
                     <Task
+                      students={students}
                       open={open}
                       setIsOpen={setIsOpen}
                       category={category.title}

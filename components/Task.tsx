@@ -15,19 +15,20 @@ import { classNames } from "../lib/functions/concat";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export const Task = ({
+  students,
   category,
   assessment,
   open,
   setIsOpen,
   quarter,
 }: {
+  students: Student[];
   category: string;
   assessment: string;
   setIsOpen: any;
   open: boolean;
   quarter: number;
 }) => {
-  const { students } = useClassroom();
   const [sortingMethod, setSorting] = useState("Name");
   const { setStudent } = useSelectedStudent();
   const [filteredStudents, setFilteredStudents] = useState<Student[] | null>(
@@ -309,6 +310,7 @@ export const Task = ({
       <div className="w-96">
         {
           <StudentDialog
+            students={students}
             quarter={quarter}
             category={category}
             open={open}

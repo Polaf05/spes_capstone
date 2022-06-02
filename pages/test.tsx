@@ -26,7 +26,7 @@ export const getStaticProps = async () => {
   };
 };
 
-const Test = (students: any) => {
+const Test = ({ students }: any) => {
   const { quarter } = useSelectedQuarter();
   const [open, setIsOpen] = useState<boolean>(false);
   const [task, setTask] = useState<number>(0);
@@ -62,8 +62,6 @@ const Test = (students: any) => {
     if (!students) {
       //router.back();
     } else {
-      console.log("NOREM");
-
       let ww_task_array: TaskInfo[] = [];
       let pt_task_array: TaskInfo[] = [];
 
