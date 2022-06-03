@@ -323,7 +323,7 @@ const gettingStarted = () => {
             let class_list = getRanking(classroom, task_length);
 
             console.log("Class List:", class_list);
-            let upload = uploadJson(class_list);
+            let upload = await uploadJson(class_list);
             console.log("Class ID:", upload);
 
             setJsonFile(upload);

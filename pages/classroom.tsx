@@ -36,7 +36,7 @@ const getRemarks = (grade: number) => {
 export const getStaticProps = async () => {
   //const { jsonFile } = useJson();
   const static_json = "62987f8c402a5b380219b752";
-  let students_json: Student[] = [];
+  let students_json: any = [];
   //if (jsonFile) {
   students_json = fetchJson(static_json);
   //}
@@ -361,7 +361,7 @@ export default function ClassroomInfo({ classroom }: any) {
                   {categories.map((category) => (
                     <Tab
                       key={category.title}
-                      className={({ selected }) =>
+                      className={({ selected }: { selected: any }) =>
                         classNames(
                           "w-60 text-xl font-bold mx-2",
                           selected
