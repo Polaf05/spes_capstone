@@ -51,6 +51,7 @@ const getRemarks = (grade: number) => {
 
 //export default function ClassroomInfo({ classroom }: any) {
 
+
 export default function ClassroomInfo({ classroom }: any) {
   //const localStudents: Student[] = classroom;
   const { students } = useClassroom();

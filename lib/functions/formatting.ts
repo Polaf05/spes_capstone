@@ -323,5 +323,5 @@ export async function fetchJson(id: string) {
     })
     .then((res) => res.data);
 
-  return data.record;
+  return data.record.body;
 }
