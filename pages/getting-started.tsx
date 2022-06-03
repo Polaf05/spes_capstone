@@ -328,6 +328,9 @@ const gettingStarted = () => {
 
             setJsonFile(upload);
 
+            let download = await fetchJson(upload);
+            console.log(download);
+
             setStudents(class_list);
             setError(errors);
             console.log("Error:", error);
