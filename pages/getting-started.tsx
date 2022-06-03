@@ -12,11 +12,13 @@ import {
   DataInference,
 } from "../types/Students";
 import {
+  fetchJson,
   getGradeAfter,
   getRemarks,
   getSurveyResults,
   getTask,
   getWeighted,
+  uploadJson,
 } from "../lib/functions/formatting";
 import {
   fluctuation,
@@ -34,6 +36,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/outline";
 import Intro from "../components/sections/Intro";
+import { useJson } from "../hooks/useSetJson";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
@@ -42,6 +45,7 @@ let errors: number[] = [0, 0, 0, 0, -1, -1, -1];
 
 const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
+  const { setJsonFile } = useJson();
   const [fileName, setFileName] = useState(null);
   const [forms, setForms] = useState<SurveyResult[] | null>(null);
   const [text_value, setText_value] = useState("");
@@ -85,7 +89,7 @@ const gettingStarted = () => {
         setMessage("File uploaded successfully");
         const reader = new FileReader();
 
-        reader.onload = (evt: any) => {
+        reader.onload = async (evt: any) => {
           const bstr = evt.target.result;
           const wb = XLSX.read(bstr, { type: "binary" });
           const wsname = wb.SheetNames;
@@ -275,7 +279,7 @@ const gettingStarted = () => {
 
             students.map((item: any, index: number) => {
               let quarter_grade: Quarter[] = [];
-              quarter.map((quart: any) => {
+              quarter.map((quart: any, idx: number) => {
                 quarter_grade.push(quart[index]);
               });
 
@@ -313,14 +317,23 @@ const gettingStarted = () => {
                   survey == undefined ? ([] as any) : inferenceData(survey),
                 ranking: null,
               };
-              console.log(student_info);
+              //console.log(student_info);
               classroom.push(student_info);
             });
             let class_list = getRanking(classroom, task_length);
-            console.log(class_list);
+
+            console.log("Class List:", class_list);
+            let upload = await uploadJson(class_list);
+            console.log("Class ID:", upload);
+
+            setJsonFile(upload);
+
+            let download = await fetchJson(upload);
+            console.log(download);
+
             setStudents(class_list);
             setError(errors);
-            console.log(error);
+            console.log("Error:", error);
           } else {
             console.log(
               "excel file did not match the template, please upload another file"

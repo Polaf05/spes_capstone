@@ -1,6 +1,8 @@
+import axios from "axios";
 import {
   InferenceDetails,
   scoreData,
+  Student,
   SurveyResult,
 } from "../../types/Students";
 
@@ -287,4 +289,39 @@ export function formatArray(arr: any) {
     outStr = arr.slice(0, -1).join(", ") + ", and " + arr.slice(-1);
   }
   return outStr;
+}
+
+export async function uploadJson(student: Student[]) {
+  const data = await axios
+    .post(
+      "https://api.jsonbin.io/v3/b",
+      { body: student },
+      {
+        headers: {
+          "X-Master-Key":
+            "$2b$10$wnfLIJ3QgmRaWVd8uqIWc.SxSIXMJdLAVTLdAKRcJIquIN82p.GcS",
+          "Contetnt-Type": "application/json",
+          "X-Bin-Name": "students",
+        },
+      }
+    )
+    .then((res) => res.data);
+
+  return data.metadata.id;
+}
+
+export async function fetchJson(id: string) {
+  const data = await axios
+    .get(`https://api.jsonbin.io/v3/b/${id}`, {
+      headers: {
+        "X-Master-Key":
+          "$2b$10$wnfLIJ3QgmRaWVd8uqIWc.SxSIXMJdLAVTLdAKRcJIquIN82p.GcS",
+        "Contetnt-Type": "application/json",
+        "X-Access-Key":
+          "$2b$10$3jwfnPzq3VTkd8Gf3xAd0Od1FIFqq/scYeJ7AyZqFjdMfCjLurtGi",
+      },
+    })
+    .then((res) => res.data);
+
+  return data.record.body;
 }

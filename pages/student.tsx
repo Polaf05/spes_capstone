@@ -151,6 +151,7 @@ const StudentInfo = () => {
         ww_available_scores.push(typeof ww_grade === "string" ? 0 : ww_grade);
         pt_available_scores.push(typeof pt_grade === "string" ? 0 : pt_grade);
       }
+      setQSum(qSum);
       set_ww_available_scores(ww_available_scores);
       set_pt_available_scores(pt_available_scores);
       setButtons(buttons);
@@ -199,11 +200,11 @@ const StudentInfo = () => {
   //get average grade per quarter
   const ave_quarter_grade = [0, 0, 0, 0];
   for (let i = 0; i < myquar.length; i++) {
-    let sum: number = 0;
+    let a_sum: number = 0;
     students?.map((student, idx) => {
-      sum += student!.quarter![i].grade_before;
+      a_sum += student!.quarter![i].grade_before;
     });
-    const ave = Number((sum / students?.length!).toFixed(1));
+    const ave = Number((a_sum / students?.length!).toFixed(1));
     ave_quarter_grade[i] = ave;
   }
 

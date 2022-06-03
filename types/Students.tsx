@@ -1,5 +1,10 @@
 import { Dispatch, SetStateAction } from "react";
 
+export type QuarterGrades = {
+  written_works: number[];
+  performance_tasks: number[];
+};
+
 //TASK DATA, BOTH WRITTEN AND PERFORMANCE
 export type TaskData = {
   tasked_number: number;
@@ -44,6 +49,7 @@ export type TaskAnalysis = {
   consistency: number[];
   plunge_task: number[];
   surge_task: number[];
+  trends: string;
 };
 
 export interface Student {
