@@ -1,11 +1,10 @@
+import axios from "axios";
 import {
   InferenceDetails,
   scoreData,
   Student,
   SurveyResult,
 } from "../../types/Students";
-
-import { XMLHttpRequest } from "xmlhttprequest";
 
 //function that dynamically formats highest possible score, written task and performance task
 export function getTask(
@@ -292,59 +291,37 @@ export function formatArray(arr: any) {
   return outStr;
 }
 
-export function uploadJson(student: Student[]) {
-  let response: any;
-  // const data = await axios
-  //   .post("/api/json", { classroom: student })
-  //   .then((res) => res.data);
+export async function uploadJson(student: Student[]) {
+  const data = await axios
+    .post(
+      "https://api.jsonbin.io/v3/b",
+      { body: student },
+      {
+        headers: {
+          "X-Master-Key":
+            "$2b$10$wnfLIJ3QgmRaWVd8uqIWc.SxSIXMJdLAVTLdAKRcJIquIN82p.GcS",
+          "Contetnt-Type": "application/json",
+          "X-Bin-Name": "students",
+        },
+      }
+    )
+    .then((res) => res.data);
 
-  // console.log(data);
-  let request = new XMLHttpRequest();
-
-  let response_str: string | null = null;
-  request.onreadystatechange = () => {
-    if (request.readyState == XMLHttpRequest.DONE) {
-      //console.log(request.responseText);
-
-      response = JSON.parse(request.response);
-      response_str = response.metadata.id;
-      console.log(response_str);
-    }
-  };
-
-  request.open("POST", "https://api.jsonbin.io/v3/b", true);
-  request.setRequestHeader("Content-Type", "application/json");
-  request.setRequestHeader(
-    "X-Master-Key",
-    "$2b$10$wnfLIJ3QgmRaWVd8uqIWc.SxSIXMJdLAVTLdAKRcJIquIN82p.GcS"
-  );
-  request.setRequestHeader("X-Bin-Name", "students");
-  request.setRequestHeader("X-Bin-Private", "false");
-
-  return response_str;
+  return data.metadata.id;
 }
 
-export function fetchJson(id: string) {
-  let response: any;
-  let req = new XMLHttpRequest();
+export async function fetchJson(id: string) {
+  const data = await axios
+    .get(`https://api.jsonbin.io/v3/b/${id}`, {
+      headers: {
+        "X-Master-Key":
+          "$2b$10$wnfLIJ3QgmRaWVd8uqIWc.SxSIXMJdLAVTLdAKRcJIquIN82p.GcS",
+        "Contetnt-Type": "application/json",
+        "X-Access-Key":
+          "$2b$10$3jwfnPzq3VTkd8Gf3xAd0Od1FIFqq/scYeJ7AyZqFjdMfCjLurtGi",
+      },
+    })
+    .then((res) => res.data);
 
-  req.onreadystatechange = () => {
-    if (req.readyState == XMLHttpRequest.DONE) {
-      console.log(req.responseText);
-      response = JSON.parse(req.response);
-    }
-  };
-
-  req.open("GET", `https://api.jsonbin.io/v3/b/${id}`, true);
-  req.setRequestHeader(
-    "X-Master-Key",
-    "$2b$10$wnfLIJ3QgmRaWVd8uqIWc.SxSIXMJdLAVTLdAKRcJIquIN82p.GcS"
-  );
-  req.setRequestHeader(
-    "X-Access-Key",
-    "$2b$10$3jwfnPzq3VTkd8Gf3xAd0Od1FIFqq/scYeJ7AyZqFjdMfCjLurtGi"
-  );
-  req.send();
-
-  return response.record;
+  return data.record.body;
 }

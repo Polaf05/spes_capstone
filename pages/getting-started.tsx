@@ -89,7 +89,7 @@ const gettingStarted = () => {
         setMessage("File uploaded successfully");
         const reader = new FileReader();
 
-        reader.onload = (evt: any) => {
+        reader.onload = async (evt: any) => {
           const bstr = evt.target.result;
           const wb = XLSX.read(bstr, { type: "binary" });
           const wsname = wb.SheetNames;
@@ -321,13 +321,13 @@ const gettingStarted = () => {
               classroom.push(student_info);
             });
             let class_list = getRanking(classroom, task_length);
+
             console.log("Class List:", class_list);
-            let upload: string | null = uploadJson(class_list);
+            let upload = uploadJson(class_list);
             console.log("Class ID:", upload);
 
-            setJsonFile("62987f8c402a5b380219b752");
+            setJsonFile(upload);
 
-            //let upload = fetchJson("62987f8c402a5b380219b752");
             setStudents(class_list);
             setError(errors);
             console.log("Error:", error);
