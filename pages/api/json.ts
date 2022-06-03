@@ -3,23 +3,29 @@ import { XMLHttpRequest } from "xmlhttprequest";
 
 const postJsonhandler: NextApiHandler = async (req, res) => {
   const { body } = req;
-  let request = new XMLHttpRequest();
 
-  request.onreadystatechange = () => {
-    if (request.readyState == XMLHttpRequest.DONE) {
-      console.log(request.responseText);
+  console.log(body);
+
+  try {
+    const response = await fetch("https://api.jsonbin.io/v3/b", {
+      method: "POST",
+      headers: {
+        "X-Master-Key":
+          "$2b$10$wnfLIJ3QgmRaWVd8uqIWc.SxSIXMJdLAVTLdAKRcJIquIN82p.GcS",
+        "Contetnt-Type": "application/json",
+        "X-Bin-Name": "students",
+      },
+      body: JSON.stringify(body),
+    });
+    if (response.status >= 400) {
+      return res.status(400).json({
+        error: "there was an error",
+      });
     }
-  };
-
-  request.open("POST", "https://api.jsonbin.io/v3/b", true);
-  request.setRequestHeader("Content-Type", "application/json");
-  request.setRequestHeader(
-    "X-Master-Key",
-    "$2b$10$wnfLIJ3QgmRaWVd8uqIWc.SxSIXMJdLAVTLdAKRcJIquIN82p.GcS"
-  );
-
-  const response = request.send(JSON.stringify(body.classroom));
-  res.json(response);
+    return res.status(200).json(response);
+  } catch (e) {
+    return res.status(500).json({ error: "There was an error" });
+  }
 };
 
 export default postJsonhandler;

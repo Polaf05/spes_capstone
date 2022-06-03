@@ -87,7 +87,7 @@ const gettingStarted = () => {
         setMessage("File uploaded successfully");
         const reader = new FileReader();
 
-        reader.onload = (evt: any) => {
+        reader.onload = async (evt: any) => {
           const bstr = evt.target.result;
           const wb = XLSX.read(bstr, { type: "binary" });
           const wsname = wb.SheetNames;
@@ -320,7 +320,10 @@ const gettingStarted = () => {
             });
             let class_list = getRanking(classroom, task_length);
             console.log(class_list);
-            //let upload = fetchJson("62987f8c402a5b380219b752");
+            let upload = await uploadJson(class_list);
+            console.log(upload);
+            let download = await fetchJson(upload);
+            console.log(download);
             setStudents(class_list);
             setError(errors);
             console.log(error);
