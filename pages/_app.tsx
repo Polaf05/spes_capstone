@@ -3,7 +3,7 @@ import type { AppProps } from "next/app";
 import { SelectedStudentProvider } from "../context/SelectedStudent";
 import { SetClassroomProvider } from "../context/SetClassroom";
 import { SelectedQuarterProvider } from "../context/SelectedQuarter";
-import { SetJsonProvider } from "../context/SetJSON";
+import { SetJsonProvider } from "../context/SetJson";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

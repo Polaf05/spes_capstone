@@ -1,7 +1,7 @@
 import { useContext } from "react";
-import { SetJsonContext } from "../context/SetJSON";
+import { SetJsonContext } from "../context/SetJson";
 
 export const useJson = () => {
-  const { json, setJson } = useContext(SetJsonContext);
-  return { json, setJson };
+  const { jsonFile, setJsonFile } = useContext(SetJsonContext);
+  return { jsonFile, setJsonFile };
 };

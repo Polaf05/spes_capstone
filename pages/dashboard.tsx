@@ -80,7 +80,7 @@ Chart.register(
 
 const Dashboard = () => {
   const { students } = useClassroom();
-  const { json } = useJson();
+  const { jsonFile } = useJson();
   const { quarter, setQuarter } = useSelectedQuarter();
   const [quarters, setQuarters] = useState<number[]>([]);
   const router = useRouter();
@@ -247,7 +247,9 @@ const Dashboard = () => {
             <div>
               <h1 className="text-2xl font-bold">
                 Classroom Evaluation:{" "}
-                <span className="font-bold underline decoration-2">{json}</span>
+                <span className="font-bold underline decoration-2">
+                  {jsonFile}
+                </span>
               </h1>
             </div>
             <div className="flex gap-4">

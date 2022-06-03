@@ -5,6 +5,8 @@ import {
   SurveyResult,
 } from "../../types/Students";
 
+import { XMLHttpRequest } from "xmlhttprequest";
+
 //function that dynamically formats highest possible score, written task and performance task
 export function getTask(
   item: [],

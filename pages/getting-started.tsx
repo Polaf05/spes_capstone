@@ -45,7 +45,7 @@ let errors: number[] = [0, 0, 0, 0, -1, -1, -1];
 
 const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
-  const { json, setJson } = useJson();
+  const { setJsonFile } = useJson();
   const [fileName, setFileName] = useState(null);
   const [forms, setForms] = useState<SurveyResult[] | null>(null);
   const [text_value, setText_value] = useState("");
@@ -325,7 +325,7 @@ const gettingStarted = () => {
             let upload: string | null = uploadJson(class_list);
             console.log("Class ID:", upload);
 
-            setJson("62987f8c402a5b380219b752");
+            setJsonFile("62987f8c402a5b380219b752");
 
             //let upload = fetchJson("62987f8c402a5b380219b752");
             setStudents(class_list);

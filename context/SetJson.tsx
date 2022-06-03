@@ -1,34 +1,30 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { JsonState } from "../types/Contexts";
 
-interface Json {
-  json: string | null;
-  setJson: React.Dispatch<React.SetStateAction<string | null>>;
-}
-
-export const SetJsonContext = createContext<Json>({} as Json);
+export const SetJsonContext = createContext<JsonState>({} as JsonState);
 
 export const SetJsonProvider: React.FC = ({ children }) => {
-  const [json, setJson] = useState<string | null>(null);
+  const [jsonFile, setJsonFile] = useState<string>("");
 
   // on load get json
   useEffect(() => {
-    const localJson = localStorage.getItem("json");
+    const localJson = localStorage.getItem("json_file");
     if (localJson) {
-      setJson(JSON.parse(localJson));
+      setJsonFile(JSON.parse(localJson));
       console.log("GET JSON: ", localJson);
     }
   }, []);
 
   // on set student
   useEffect(() => {
-    if (json) {
-      localStorage.setItem("json", JSON.stringify(json));
-      console.log("SET JSON: ", json);
+    if (jsonFile) {
+      localStorage.setItem("json_file", JSON.stringify(jsonFile));
+      console.log("SET JSON: ", jsonFile);
     }
-  }, [json]);
+  }, [jsonFile]);
 
   return (
-    <SetJsonContext.Provider value={{ json, setJson }}>
+    <SetJsonContext.Provider value={{ jsonFile, setJsonFile }}>
       {children}
     </SetJsonContext.Provider>
   );

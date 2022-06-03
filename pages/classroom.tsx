@@ -34,11 +34,12 @@ const getRemarks = (grade: number) => {
 };
 
 export const getStaticProps = async () => {
-  const { json } = useJson();
+  //const { jsonFile } = useJson();
+  const static_json = "62987f8c402a5b380219b752";
   let students_json: Student[] = [];
-  if (json) {
-    students_json = fetchJson(json);
-  }
+  //if (jsonFile) {
+  students_json = fetchJson(static_json);
+  //}
 
   console.log("here: ", students_json);
   return {
