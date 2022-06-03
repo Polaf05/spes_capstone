@@ -33,21 +33,28 @@ const getRemarks = (grade: number) => {
     : "Very Good";
 };
 
-export const getStaticProps = async () => {
-  //const { jsonFile } = useJson();
-  const students_json = await fetchJson("6299bf87402a5b38021aeaec");
-  //}
+// export const getStaticProps = async () => {
+//   //const { jsonFile } = useJson();
+//   const static_json = "62987f8c402a5b380219b752";
+//   let students_json: any = [];
+//   //if (jsonFile) {
+//   students_json = await fetchJson(static_json);
+//   //}
 
-  console.log("here: ", students_json);
-  return {
-    props: {
-      classroom: students_json,
-    },
-  };
-};
+//   console.log("here: ", students_json);
+//   return {
+//     props: {
+//       classroom: students_json,
+//     },
+//   };
+// };
+
+//export default function ClassroomInfo({ classroom }: any) {
+
 
 export default function ClassroomInfo({ classroom }: any) {
-  const students: Student[] = classroom;
+  //const localStudents: Student[] = classroom;
+  const { students } = useClassroom();
   const { quarter } = useSelectedQuarter();
   const [open, setIsOpen] = useState<boolean>(false);
   const [task, setTask] = useState<number>(0);
@@ -72,6 +79,8 @@ export default function ClassroomInfo({ classroom }: any) {
       setWghPT(wgh_pt ? wgh_pt : 0);
     }
   }, []);
+
+  useEffect;
 
   let quarter_index = quarter;
 
