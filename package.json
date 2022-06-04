@@ -18,6 +18,7 @@
     "fuzzyis": "^1.0.2",
     "googleapis": "^100.0.0",
     "http2": "^3.3.7",
+    "jsonwebtoken": "^8.5.1",
     "next": "^12.1.6",
     "react": "^18.1.0",
     "react-chartjs-2": "^4.1.0",
@@ -30,6 +31,7 @@
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "17.0.21",
     "@types/react": "17.0.41",
     "@types/react-router-hash-link": "^2.4.5",
