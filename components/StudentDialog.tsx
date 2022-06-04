@@ -133,11 +133,11 @@ const StudentDialog = ({
   };
 
   const dataToRender: DataSet[] = [ww_dataToRender, pt_dataToRender];
-  console.log(dataToRender);
+
   const data_to_render =
     category === "Over All"
       ? dataToRender
-      : "Written Works"
+      : category === "Written Works"
       ? [ww_dataToRender]
       : [pt_dataToRender];
 
@@ -151,9 +151,10 @@ const StudentDialog = ({
       ? ww_labels.length > pt_labels.length
         ? ww_labels
         : pt_labels
-      : "Written Works"
+      : category === "Written Works"
       ? ww_labels
       : pt_labels;
+
   const dataChart: Chart = {
     labels:
       category === "Over All"
