@@ -35,6 +35,7 @@ export interface TaskInfo {
   perfect: Student[];
   failed: Student[];
   considerable: Student[];
+  zero: Student[];
 }
 
 export type Categories = {

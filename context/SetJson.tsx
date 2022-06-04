@@ -11,7 +11,7 @@ export const SetJsonProvider: React.FC = ({ children }) => {
     const localJson = localStorage.getItem("json_file");
     if (localJson) {
       setJsonFile(JSON.parse(localJson));
-      console.log("GET JSON: ", localJson);
+      //console.log("GET JSON: ", localJson);
     }
   }, []);
 
@@ -19,7 +19,7 @@ export const SetJsonProvider: React.FC = ({ children }) => {
   useEffect(() => {
     if (jsonFile) {
       localStorage.setItem("json_file", JSON.stringify(jsonFile));
-      console.log("SET JSON: ", jsonFile);
+      //console.log("SET JSON: ", jsonFile);
     }
   }, [jsonFile]);
 
