@@ -1,5 +1,6 @@
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import React from "react";
+import { formatName } from "../../lib/functions/concat";
 import { StruggledStudent, Student } from "../../types/Students";
 import StruggledStudentCard from "./StruggledStudentCard";
 
@@ -119,7 +120,9 @@ const StruggledSections = ({
         <div className="mt-4 h-fit px-4 py-2 border-2 border-green-300 rounded-xl">
           <div className="mt-4">
             {studentsExcelled.map((student) => (
-              <h4 className="text-lg font-bold">{student.name}</h4>
+              <h4 className="text-lg font-semibold">
+                {formatName(student.name)}
+              </h4>
             ))}
           </div>
         </div>
