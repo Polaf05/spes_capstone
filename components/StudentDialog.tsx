@@ -133,7 +133,7 @@ const StudentDialog = ({
   };
 
   const dataToRender: DataSet[] = [ww_dataToRender, pt_dataToRender];
-
+  console.log(dataToRender);
   const data_to_render =
     category === "Over All"
       ? dataToRender

@@ -317,27 +317,27 @@ const gettingStarted = () => {
                   survey == undefined ? ([] as any) : inferenceData(survey),
                 ranking: null,
               };
-              //console.log(student_info);
+              //// console.log(student_info);
               classroom.push(student_info);
             });
             let class_list = getRanking(classroom, task_length);
 
-            console.log("Class List:", class_list);
-            let upload = await uploadJson(class_list);
-            console.log("Class ID:", upload);
+            // // console.log("Class List:", class_list);
+            // let upload = await uploadJson(class_list);
+            // // console.log("Class ID:", upload);
 
-            setJsonFile(upload);
+            // setJsonFile(upload);
 
-            let download = await fetchJson(upload);
-            console.log(download);
+            // let download = await fetchJson(upload);
+            // // console.log(download);
 
             setStudents(class_list);
             setError(errors);
-            console.log("Error:", error);
+            // console.log("Error:", error);
           } else {
-            console.log(
-              "excel file did not match the template, please upload another file"
-            );
+            // console.log(
+            //   "excel file did not match the template, please upload another file"
+            // );
 
             setMessage("File is incompatible, file did not match the template");
 
@@ -352,7 +352,7 @@ const gettingStarted = () => {
         };
         reader.readAsBinaryString(file);
 
-        console.log("file permitted");
+        // console.log("file permitted");
       } else {
         setFileName(null);
         if (students) {
@@ -365,7 +365,7 @@ const gettingStarted = () => {
         );
         errors[2] = 1;
         errors[3] = 1;
-        console.log("file denied");
+        // console.log("file denied");
       }
     }
   };

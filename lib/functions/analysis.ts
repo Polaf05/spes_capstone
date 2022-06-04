@@ -68,7 +68,7 @@ export function fluctuation(task: TaskData[], possible: TaskData[]) {
 
   let lines = findLineByLeastSquares(x, percent);
 
-  console.log(lines);
+  // console.log(lines);
 
   trends = lines as string;
 
@@ -413,7 +413,7 @@ function findLineByLeastSquares(values_x: number[], values_y: number[]) {
     result_values_y.push(y);
   }
 
-  console.log(result_values_x, result_values_y);
+  // console.log(result_values_x, result_values_y);
 
   if (result_values_y[values_length - 1] == result_values_y[0]) {
     return "consistent linear";

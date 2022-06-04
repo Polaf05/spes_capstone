@@ -10,14 +10,16 @@ import PeopleChart from "../components/PeopleChart";
 import { useRouter } from "next/router";
 import ProgressComponent from "../components/ProgressComponent";
 import StruggledSections from "../components/sections/StruggledSections";
-import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
-import { getGrade } from "../lib/functions/grade_computation";
+import {
+  QuestionMarkCircleIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/outline";
+import { getGrade, transmuteGrade } from "../lib/functions/grade_computation";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { classNames } from "../lib/functions/concat";
 import { TaskInfo } from "../types/Task";
-import { students_json } from "../public/json/grades.js";
-import { fetchJson } from "../lib/functions/formatting";
-import { useJson } from "../hooks/useSetJson";
+
+import Link from "next/link";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -33,21 +35,27 @@ const getRemarks = (grade: number) => {
     : "Very Good";
 };
 
-export const getStaticProps = async () => {
-  //const { jsonFile } = useJson();
-  const students_json = await fetchJson("6299bf87402a5b38021aeaec");
-  //}
+// export const getStaticProps = async () => {
+//   //const { jsonFile } = useJson();
+//   const static_json = "62987f8c402a5b380219b752";
+//   let students_json: any = [];
+//   //if (jsonFile) {
+//   students_json = await fetchJson(static_json);
+//   //}
 
-  console.log("here: ", students_json);
-  return {
-    props: {
-      classroom: students_json,
-    },
-  };
-};
+//   console.log("here: ", students_json);
+//   return {
+//     props: {
+//       classroom: students_json,
+//     },
+//   };
+// };
+
+//export default function ClassroomInfo({ classroom }: any) {
 
 export default function ClassroomInfo({ classroom }: any) {
-  const students: Student[] = classroom;
+  //const localStudents: Student[] = classroom;
+  const { students } = useClassroom();
   const { quarter } = useSelectedQuarter();
   const [open, setIsOpen] = useState<boolean>(false);
   const [task, setTask] = useState<number>(0);
@@ -72,6 +80,8 @@ export default function ClassroomInfo({ classroom }: any) {
       setWghPT(wgh_pt ? wgh_pt : 0);
     }
   }, []);
+
+  useEffect;
 
   let quarter_index = quarter;
 
@@ -118,6 +128,7 @@ export default function ClassroomInfo({ classroom }: any) {
         perfect: [],
         failed: [],
         considerable: [],
+        zero: [],
       };
       let score_sum = 0;
       students?.map((student, no) => {
@@ -142,7 +153,10 @@ export default function ClassroomInfo({ classroom }: any) {
       });
       //total score
       task_info.total = task.highest_possible_score;
-      task_info.ave_score = Number((score_sum / students?.length!).toFixed(1));
+      //console.log(score_sum);
+      task_info.ave_score = Number(
+        (score_sum / task_info.participated).toFixed(1)
+      );
       task_info.ave_score_pct = Number(
         ((task_info.ave_score / task_info.total) * 100).toFixed(1)
       );
@@ -175,6 +189,7 @@ export default function ClassroomInfo({ classroom }: any) {
           perfect: [],
           failed: [],
           considerable: [],
+          zero: [],
         };
         let score_sum = 0;
         students?.map((student, no) => {
@@ -200,7 +215,7 @@ export default function ClassroomInfo({ classroom }: any) {
         //total score
         task_info.total = task.highest_possible_score;
         task_info.ave_score = Number(
-          (score_sum / students?.length!).toFixed(1)
+          (score_sum / task_info.participated!).toFixed(1)
         );
         task_info.ave_score_pct = Number(
           ((task_info.ave_score / task_info.total) * 100).toFixed(1)
@@ -292,14 +307,20 @@ export default function ClassroomInfo({ classroom }: any) {
     ww_remarks.push({
       student: student,
       remarks: getRemarks(
-        getGrade(student.quarter![quarter_index].written_percentage?.score!)
+        transmuteGrade(
+          getGrade(student.quarter![quarter_index].written_percentage?.score!)
+        )
       ),
     });
 
     pt_remarks.push({
       student: student,
       remarks: getRemarks(
-        getGrade(student.quarter![quarter_index].performance_percentage?.score!)
+        transmuteGrade(
+          getGrade(
+            student.quarter![quarter_index].performance_percentage?.score!
+          )
+        )
       ),
     });
   });
@@ -346,16 +367,28 @@ export default function ClassroomInfo({ classroom }: any) {
           <div className="">
             <Tab.Group>
               <div className="grid grid-cols-3 justify-between mx-10 mt-4 h-20">
-                <div className="w-20 h-20 p-1">
-                  <Image
-                    src="/logo.png"
-                    alt="logo picture"
-                    width={100}
-                    height={100}
-                  />
+                <div className="col-span-1 flex items-center gap-4 ">
+                  <div className="font-bold">
+                    <Link href="/dashboard" passHref>
+                      <ArrowLeftIcon className="w-10 h-10 cursor-pointer"></ArrowLeftIcon>
+                    </Link>
+                  </div>
+                  <div className="w-20 h-20 p-1">
+                    <Link href="/dashboard" passHref>
+                      <div className="w-fit h-fit cursor-pointer">
+                        <Image
+                          src="/logo.png"
+                          alt="logo picture"
+                          width={100}
+                          height={100}
+                        />
+                      </div>
+                    </Link>
+                  </div>
                 </div>
+
                 <Tab.List className="col-span-2 flex justify-end">
-                  {categories.map((category) => (
+                  {categories.map((category, idx) => (
                     <Tab
                       key={category.title}
                       className={({ selected }: { selected: any }) =>
