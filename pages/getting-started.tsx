@@ -37,13 +37,15 @@ import {
 } from "@heroicons/react/outline";
 import Intro from "../components/sections/Intro";
 import { useJson } from "../hooks/useSetJson";
+import cookie from "cookie";
+import { useRouter } from "next/router";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
 
 let errors: number[] = [0, 0, 0, 0, -1, -1, -1];
 
-const gettingStarted = () => {
+const gettingStarted = (user: any) => {
   const { students, setStudents } = useClassroom();
   const { setJsonFile } = useJson();
   const [fileName, setFileName] = useState(null);
@@ -52,6 +54,14 @@ const gettingStarted = () => {
   const [message, setMessage] = useState<string | null>(INITIAL_MESSAGE);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    console.log(user);
+    if (!user.user) {
+      router.push("/login");
+    }
+  }, [user]);
 
   let handleForms = async (text: string) => {
     setLoading(true);
@@ -285,10 +295,86 @@ const gettingStarted = () => {
 
               let quarter_analysis = quarterAnalysis(quarter_grade);
 
+              let initial: SurveyResult = {
+                email: "",
+                mobile: "",
+                name: "",
+                gender: "",
+                grade: "",
+                school: "",
+                learning_type: "",
+                learning_difficulty: "",
+                effectivity_implementation: {
+                  value: 0,
+                  linguistic: "",
+                },
+                learning_performance_similarities: {
+                  value: 0,
+                  linguistic: "",
+                },
+                environment_factors: {
+                  unwanted_noise: "",
+                  limited_space: "",
+                  household_chorse: "",
+                  comfortability: "",
+                  support: "",
+                  internet: "",
+                  device: "",
+                  faculty_readiness: "",
+                  value: [],
+                },
+                wifi: {
+                  value: 0,
+                  linguistic: "",
+                },
+                data: {
+                  value: 0,
+                  linguistic: "",
+                },
+                device: {
+                  value: 0,
+                  linguistic: "",
+                },
+                tech_difficulty: 0,
+                platform: "",
+                accessible_usage: 0,
+              };
+
               let survey = getSurveyResults(forms!, item.name);
 
+              let initial_infer: DataInference = {
+                experience: {
+                  value: 0,
+                  linguistic: "",
+                },
+                internet: {
+                  value: 0,
+                  linguistic: "",
+                },
+                resource: {
+                  value: 0,
+                  linguistic: "",
+                },
+                accessibility: {
+                  value: 0,
+                  linguistic: "",
+                },
+                technological: {
+                  value: 0,
+                  linguistic: "",
+                },
+                environment: {
+                  value: 0,
+                  linguistic: "",
+                },
+                external_elements: {
+                  value: 0,
+                  linguistic: "",
+                },
+              };
+
               let infer: DataInference =
-                survey == undefined ? ([] as any) : inferenceData(survey);
+                survey == undefined ? initial_infer : inferenceData(survey);
 
               let grade_after =
                 survey == undefined
@@ -311,10 +397,8 @@ const gettingStarted = () => {
                 final_grade_after: grade_after,
                 final_remarks: finals[index].remarks,
                 remarks: getRemarks(finals[index].final_grade) as string,
-                survey_result: survey == undefined ? ([] as any) : survey,
-                //inference_result: inference_data,
-                inference_result:
-                  survey == undefined ? ([] as any) : inferenceData(survey),
+                survey_result: survey == undefined ? initial : survey,
+                inference_result: infer,
                 ranking: null,
               };
               //// console.log(student_info);
@@ -563,6 +647,22 @@ const gettingStarted = () => {
 };
 
 export default gettingStarted;
+
+export async function getServerSideProps(context: any) {
+  let headerCookie = context.req.headers.cookie;
+  if (typeof headerCookie !== "string") {
+    headerCookie = "";
+  }
+  const cookies: any = cookie.parse(headerCookie);
+
+  const jwt = cookies.OursiteJWT;
+
+  if (!jwt) {
+    return { props: { user: null } };
+  }
+
+  return { props: { user: jwt } };
+}
 
 //legends lang nakakaalam
 

@@ -1,71 +1,45 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import * as XLSX from "xlsx";
-import { useClassroom } from "../hooks/useSetClassroom";
-import {
-  Student,
-  TaskData,
-  ScoreTotal,
-  Quarter,
-  SurveyResult,
-  DataInference,
-} from "../types/Students";
-import {
-  fetchJson,
-  getGradeAfter,
-  getRemarks,
-  getSurveyResults,
-  getTask,
-  getWeighted,
-  uploadJson,
-} from "../lib/functions/formatting";
-import {
-  fluctuation,
-  getRanking,
-  quarterAnalysis,
-} from "../lib/functions/analysis";
-import { afterGradeInference, inferenceData } from "../lib/functions/fuzzyis";
-import { getSurveyList } from "../lib/functions/sheets";
-import LoadingSpinner from "../components/Loader";
-import { classNames } from "../lib/functions/concat";
-import {
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-  QuestionMarkCircleIcon,
-  XCircleIcon,
-} from "@heroicons/react/outline";
 import Intro from "../components/sections/Intro";
-import { useJson } from "../hooks/useSetJson";
-import Loginform from "../components/loginform";
-import axios from "axios";
-import jwt from "jsonwebtoken";
+import axios, { AxiosResponseHeaders } from "axios";
+import { useRouter } from "next/router";
+import cookie from "cookie";
 
-const INITIAL_MESSAGE =
-  "An error message will appear here if there is problem with your file";
-
-let errors: number[] = [0, 0, 0, 0, -1, -1, -1];
-
-const gettingStarted = () => {
+const login = (user: any) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [users, setUser] = useState<any>(user.user);
+  const router = useRouter();
 
-  const [message, setMessage] = useState("Please log in");
-
-  async function submitForm() {
-    const data = await axios
-      .post("/api/login", { username: username, password: password })
-      .then((res) => res.data);
-
-    const token = data.token;
-
-    if (token) {
-      const json = jwt.decode(token);
-      setMessage("Welcome bitch");
-    } else {
-      setMessage("SINO KA?");
+  useEffect(() => {
+    if (users != null) {
+      router.push("/getting-started");
     }
-  }
+    console.log(user);
+  }, [users]);
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    const credentials = { username, password };
+
+    const user = await axios.post("/api/auth/login", credentials);
+
+    setUser(user);
+    console.log(user);
+  };
+
+  const handleGetUser = async () => {
+    const user = await axios.get("/api/user");
+
+    console.log(user);
+  };
+
+  const handleLogOut = async () => {
+    const user = await axios.get("/api/auth/logout");
+
+    console.log(user);
+  };
 
   const [page, setPage] = useState<number>(3);
 
@@ -82,36 +56,43 @@ const gettingStarted = () => {
                   width={100}
                   height={100}
                 />
-                <h1>{message}</h1>
               </div>
-              <div className="mb-10">
-                <h3 className="font-semibold text-lg">Username:</h3>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                  id="username"
-                  type="text"
-                  placeholder="Username"
-                  onChange={(value) => setUsername(value.target.value)}
-                />
-              </div>
-              <div className="mb-6">
-                <h3 className="font-semibold text-lg">Password:</h3>
-                <input
-                  className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
-                  id="password"
-                  type="password"
-                  placeholder="Password"
-                  onChange={(value) => setPassword(value.target.value)}
-                />
-              </div>
-              <div className="flex justify-center">
-                <button
-                  className="rounded-full w-fit px-4 py-2 bg-ocean-300 text-white text-lg font-bold"
-                  onClick={submitForm}
-                >
-                  Sign In
-                </button>
-              </div>
+              <form onSubmit={(e) => handleSubmit(e)}>
+                <div className="mb-10">
+                  <h3 className="font-semibold text-lg">Username:</h3>
+                  <input
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                    id="username"
+                    type="text"
+                    placeholder="Username"
+                    onChange={(value) => setUsername(value.target.value)}
+                  />
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-lg">Password:</h3>
+                  <input
+                    className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3"
+                    id="password"
+                    type="password"
+                    placeholder="Password"
+                    onChange={(value) => setPassword(value.target.value)}
+                  />
+                </div>
+                <div className="flex justify-center">
+                  <button
+                    className="rounded-full w-fit px-4 py-2 bg-ocean-300 text-white text-lg font-bold"
+                    type="submit"
+                  >
+                    Sign In
+                  </button>
+                </div>
+              </form>
+              <button
+                className="rounded-full w-fit px-4 py-2 bg-ocean-300 text-white text-lg font-bold"
+                onClick={handleGetUser}
+              >
+                check user
+              </button>
             </div>
           </div>
         ) : (
@@ -122,23 +103,20 @@ const gettingStarted = () => {
   );
 };
 
-export default gettingStarted;
+export default login;
 
-//legends lang nakakaalam
+export async function getServerSideProps(context: any) {
+  let headerCookie = context.req.headers.cookie;
+  if (typeof headerCookie !== "string") {
+    headerCookie = "";
+  }
+  const cookies: any = cookie.parse(headerCookie);
 
-//TOTAL SCORES index [9]
+  const jwt = cookies.OursiteJWT;
 
-//index 15 -> total scores written
+  if (!jwt) {
+    return { props: { user: null } };
+  }
 
-//index index
-
-//written task 5 -> 14
-
-//writter percentage ->16
-// written weighted score -> 17
-
-// performace task -> 18 -> 27
-
-//performance total -> 28
-
-//performace percentage -> 29
+  return { props: { user: jwt } };
+}
