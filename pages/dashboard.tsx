@@ -98,7 +98,6 @@ const Dashboard = () => {
   const [message_remarks, setMsgRemarks] = useState<string[]>([]);
 
   const grade = 36;
-  console.log(`Transmuted Grade ${grade}: ${transmuteGrade(grade)}`);
 
   useEffect(() => {
     if (!students) {
@@ -121,7 +120,6 @@ const Dashboard = () => {
 
       // ave grade for available quarters
       setWWAveGrade(getAverageGrade([ww_ave_grades])[0]);
-      console.log(ww_ave_grades);
 
       // grade list
       const pt_grades: number[][] = getGradeArray("ptasks", students, qSum);
@@ -139,7 +137,6 @@ const Dashboard = () => {
 
       //get average of quarter grades
       const ave_quarter_grades: number[] = getAverageGrade(quarter_grades);
-      console.log("Ave Quarter Grade: " + ave_quarter_grades);
 
       //ave quarter grades list
       const q_ave_grade = getAverageGrade([ave_quarter_grades])[0];
@@ -405,6 +402,7 @@ const Dashboard = () => {
                 <div className="mt-4">
                   <p className="font-light">
                     {getClassPerformanceAssessment(
+                      quarters.length,
                       dataset!,
                       ave_remarks!,
                       q_ave_grade!,

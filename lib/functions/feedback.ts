@@ -1,5 +1,7 @@
+import { FinalRemarks } from "../../types/Remarks";
 import { Student } from "../../types/Students";
 import { Dataset } from "../../types/Task";
+import { getRemarks, transmuteGrade } from "./grade_computation";
 
 type Pronoun = {
   male: {
@@ -49,6 +51,35 @@ export const getRemarksAnalysis = (student: Student, remarks: string) => {
   else if (remarks === "Average") return REMARKS_MESSAGE[2];
   else if (remarks === "Poor") return REMARKS_MESSAGE[3];
   else return REMARKS_MESSAGE[4];
+};
+
+export const getMarginResults = (dataset: Dataset, option: string) => {
+  let quarter_remarks: any[] = [];
+
+  if (option === "margin") {
+  } else {
+    if (dataset?.set_a && dataset.set_b) {
+      let set_a: number[] = dataset.set_a;
+      let set_b: number[] = dataset.set_b;
+
+      for (let i = 0; i < dataset.set_a.length; i++) {
+        let margin = set_a[i] - set_b[i];
+        if (margin > 40) {
+          quarter_remarks.push("Very Good");
+        } else if (margin >= 20) {
+          quarter_remarks.push(["Good", margin]);
+        } else if (margin >= 0) {
+          quarter_remarks.push("Average");
+        } else if (margin >= -20) {
+          quarter_remarks.push("Poor");
+        } else {
+          quarter_remarks.push("Very Poor");
+        }
+      }
+    }
+  }
+
+  return quarter_remarks;
 };
 
 export const getPassingRemarks = (passing_pct: number, quarter: number) => {
@@ -123,6 +154,7 @@ export const getPassingRemarks = (passing_pct: number, quarter: number) => {
 };
 
 export const getClassPerformanceAssessment = (
+  quarters: number,
   dataset: Dataset | null,
   ave_remarks: string,
   q_ave_grade: number,
@@ -133,40 +165,304 @@ export const getClassPerformanceAssessment = (
 ) => {
   let message: string[] = [];
 
-  const set: string | null =
-    dataset?.set_a && dataset.set_b
-      ? ave_remarks.match(/Poor/g)
-        ? "a"
-        : "b"
-      : null;
+  let ave_grade_margin =
+    transmuteGrade(ww_ave_grade) - transmuteGrade(pt_ave_grade);
 
-  const remarks_arr: number[] =
-    dataset?.set_a && dataset.set_b
-      ? set === "a"
-        ? dataset?.set_b
-        : dataset?.set_a
-      : [];
+  const ww_ave_grade_remarks = getRemarks(transmuteGrade(ww_ave_grade));
+  const pt_ave_grade_remarks = getRemarks(transmuteGrade(pt_ave_grade));
 
-  const total =
-    dataset?.set_a && dataset.set_b ? dataset?.set_a[0] + dataset?.set_b[0] : 0;
-  const max_index = remarks_arr.indexOf(Math.max(...remarks_arr));
-  let significant_quarters: number[] = [max_index];
+  if (ave_grade_margin > 10) {
+    //class is better at written works
 
-  remarks_arr.forEach((element, idx) => {
-    if (idx !== max_index && remarks_arr[max_index] - element <= 5)
-      significant_quarters.push(idx);
-  });
+    if (ww_ave_grade_remarks === "Very Poor") {
+      // not better at anything
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Uh-oh, class performed very poorly for the school year, please check on your students especially those who lack your attention.
+      } else {
+        // has remaining quarters
+        // class needs to focus on both ww and pt for the remaining ${4-quarters} quarters
+      }
+    } else if (ww_ave_grade_remarks === "Poor") {
+      // class needs guidance on both ww and pt
+      if (quarters >= 4) {
+        // second sem has ended
+        // Uh-oh, class performed poorly for the school year, please check on your students especially those who lack your attention.
+      } else {
+        // has remaining quarters
+        // class needs guidance on both ww and pt for the remaining ${4-quarters} quarters
+      }
+    } else if (ww_ave_grade_remarks === "Average") {
+      // class needs guidance on performance tasks and has a lot to improve on written works
+      if (quarters >= 4) {
+        // second sem has ended
+        // Class performed quite good on written works for the school year. however, please check on your students who are struggling with their performance tasks.
+      } else {
+        // has remaining quarters
+        // Although class performs quite good on written works, class still needs to focus on improving their performance tasks for the remaining ${4-quarters} quarters.
+      }
+    } else if (ww_ave_grade_remarks === "Good") {
+      // class is good at written works. however, class needs guidance on performance tasks
+      if (quarters >= 4) {
+        // second sem has ended
+        // Class performed good on written works for the school year. however, please check on your students who are struggling with their performance tasks.
+      } else {
+        // has remaining quarters
+        // Although class performs good on written works, class still needs to focus on improving their performance tasks for the remaining ${4-quarters} quarters.
+      }
+    } else {
+      // class is outstanding on written works. however, class needs guidance on performance tasks
+      if (quarters >= 4) {
+        // second sem has ended
+        // Outstanding class performance on written works for the school year. however, please check on your students who are struggling with their performance tasks.
+      } else {
+        // has remaining quarters
+        // Although class performs outstandingly on written works, class still needs to focus on improving their performance tasks for the remaining ${4-quarters} quarters.
+      }
+    }
+  } else if (ave_grade_margin > 0) {
+    //class is slightly better at written works
+
+    if (ww_ave_grade_remarks === "Very Poor") {
+      // not better at anything
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Uh-oh, class performed very poorly for the school year, please check on your students especially those who lack your attention.
+      } else {
+        // has remaining quarters
+        // class needs to focus on both ww and pt for the remaining ${4-quarters} quarters
+      }
+    } else if (ww_ave_grade_remarks === "Poor") {
+      // class needs guidance on both ww and pt
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Uh-oh, class performed poorly for the school year, please check on your students especially those who lack your attention.
+      } else {
+        // has remaining quarters
+        // Class needs to focus on both ww and pt for the remaining ${4-quarters} quarters
+      }
+    } else if (ww_ave_grade_remarks === "Average") {
+      // class is slightly better at written works. however, focusing on performance tasks is also needed.
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Not bad, class performed quite good for the school year, please check on your students especially those struggle on performance tasks.
+      } else {
+        // has remaining quarters
+        // Class performed slightly better at written works, however, they need to focus on performance tasks for the remaining ${4-quarters} quarters
+      }
+    } else if (ww_ave_grade_remarks === "Good") {
+      // class is good at written works. on the other hand, performance tasks still has a lot of room to improve.
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Wow!, class is good at written works for the school year. however, please check on your students especially those struggle on performance tasks.
+      } else {
+        // has remaining quarters
+        // Wow! class is good at written works. however, performance tasks still has a lot of room to improve for the remaining ${4-quarters} quarters
+      }
+    } else {
+      // class is outstanding on written works. on the other hand, performance tasks still has a lot of room to improve.
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Hooray! class performed outstandingly at written works for the school year. however, please check on your students especially those struggle on performance tasks.
+      } else {
+        // has remaining quarters
+        // Hooray! class performed outstandingly at written works. on the other hand, performance tasks still has a lot of room to improve for the remaining ${4-quarters} quarters
+      }
+    }
+  } else if (ave_grade_margin === 0) {
+    // class is better at both ww and pt
+
+    if (ww_ave_grade_remarks === "Very Poor") {
+      // not better at anything
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Uh-oh, class performed very poorly for the school year, please check on your students especially those who lack your attention.
+      } else {
+        // has remaining quarters
+        // class needs to focus on both ww and pt for the remaining ${4-quarters} quarters
+      }
+    } else if (ww_ave_grade_remarks === "Poor") {
+      // class needs guidance on both ww and pt
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Uh-oh, class performed very poorly for the school year, please check on your students especially those who lack your attention.
+      } else {
+        // has remaining quarters
+        // class needs to focus on both ww and pt for the remaining ${4-quarters} quarters
+      }
+    } else if (ww_ave_grade_remarks === "Average") {
+      // class is quite good at both ww and pt. maintain focus on improving both of these aspects as it still has a lot of room for it.
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Not bad, class performed quite good for the school year, please check on your students especially those who lack your attention.
+      } else {
+        // has remaining quarters
+        // Not bad, class performed quite good on written works and performance tasks. maintain focus on improving both of these aspects for the remaining ${4-quarters} quarters as it still has a lot of room for it.
+      }
+    } else if (ww_ave_grade_remarks === "Good") {
+      // wow! class is good at both ww and pt.
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Wow! class performed good for the school year, congratulate your students for doing a great job!
+      } else {
+        // has remaining quarters
+        // Wow! class performed good on both written works and performance tasks. Maintain focus on improving both of these aspects for the remaining ${4-quarters} quarters as it still has a lot of room for it.
+      }
+    } else {
+      // hooray! class performance is outstanding on both written works and performance tasks.
+      if (quarters >= 4) {
+        // second sem has ended
+        // Hooray! class performed outstandingly for the school year, congratulate your students for doing an excellent job!
+      } else {
+        // has remaining quarters
+        // Hooray! class performed outstandingly both on written works and performance tasks. Maintain focus on improving both of these aspects for the remaining ${4-quarters} quarters as it still has a lot of room for it.
+      }
+    }
+  } else if (ave_grade_margin > -10) {
+    // class is slightly better at performance tasks
+
+    if (pt_ave_grade_remarks === "Very Poor") {
+      // not better at anything
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Uh-oh, class performed very poorly for the school year, please check on your students especially those who lack your attention.
+      } else {
+        // has remaining quarters
+        // class needs to focus on both ww and pt for the remaining ${4-quarters} quarters
+      }
+    } else if (pt_ave_grade_remarks === "Poor") {
+      // class needs guidance on both ww and pt
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Uh-oh, class performed poorly for the school year, please check on your students especially those who lack your attention.
+      } else {
+        // has remaining quarters
+        // Class needs to focus on both ww and pt for the remaining ${4-quarters} quarters
+      }
+    } else if (pt_ave_grade_remarks === "Average") {
+      // class is slightly better at performance tasks. however, focusing on written works is also needed.
+      if (quarters >= 4) {
+        // second sem has ended
+        // Not bad, class performed quite good for the school year, please check on your students especially those struggle on written works.
+      } else {
+        // has remaining quarters
+        // Class performed slightly better at performance tasks, however, they need to focus on written works for the remaining ${4-quarters} quarters
+      }
+    } else if (pt_ave_grade_remarks === "Good") {
+      // class is good at performance tasks. on the other hand, written works still has a lot of room to improve.
+      if (quarters >= 4) {
+        // second sem has ended
+        // Wow!, class is good at performance tasks for the school year. however, please check on your students especially those struggle on written works.
+      } else {
+        // has remaining quarters
+        // Wow! class is good at performance tasks. however, written works still has a lot of room to improve for the remaining ${4-quarters} quarters
+      }
+    } else {
+      // class is outstanding on performance tasks. on the other hand, written works still has a lot of room to improve.
+      if (quarters >= 4) {
+        // second sem has ended
+        // Hooray! class performed outstandingly at performance tasks for the school year. however, please check on your students especially those struggle on performance tasks.
+      } else {
+        // has remaining quarters
+        // Hooray! class performed outstandingly at performance tasks. on the other hand, written works still has a lot of room to improve for the remaining ${4-quarters} quarters
+      }
+    }
+  } else {
+    // class is better at performance tasks
+
+    if (pt_ave_grade_remarks === "Very Poor") {
+      // not better at anything
+
+      if (quarters >= 4) {
+        // second sem has ended
+        // Uh-oh, class performed very poorly for the school year, please check on your students especially those who lack your attention.
+      } else {
+        // has remaining quarters
+        // class needs to focus on both ww and pt for the remaining ${4-quarters} quarters
+      }
+    } else if (pt_ave_grade_remarks === "Poor") {
+      // class needs guidance on both ww and pt
+      if (quarters >= 4) {
+        // second sem has ended
+        // Uh-oh, class performed poorly for the school year, please check on your students especially those who lack your attention.
+      } else {
+        // has remaining quarters
+        // class needs guidance on both ww and pt for the remaining ${4-quarters} quarters
+      }
+    } else if (pt_ave_grade_remarks === "Average") {
+      // class needs guidance on performance tasks and has a lot to improve on written works
+      if (quarters >= 4) {
+        // second sem has ended
+        // Class performed quite good on performance tasks for the school year. however, please check on your students who are struggling with their written works.
+      } else {
+        // has remaining quarters
+        // Although class performs quite good on performance tasks, class still needs to focus on improving their written works for the remaining ${4-quarters} quarters.
+      }
+    } else if (pt_ave_grade_remarks === "Good") {
+      // class good at performance tasks. however, class needs guidance on written works
+      if (quarters >= 4) {
+        // second sem has ended
+        // Class performed good on performance tasks for the school year. however, please check on your students who are struggling with their written works.
+      } else {
+        // has remaining quarters
+        // Although class performs good on performance tasks, class still needs to focus on improving their written works for the remaining ${4-quarters} quarters.
+      }
+    } else {
+      // class is outstanding on performance tasks. however, class needs guidance on written works
+      if (quarters >= 4) {
+        // second sem has ended
+        // Outstanding class performance on performance tasks for the school year. however, please check on your students who are struggling with their performance tasks and written works.
+      } else {
+        // has remaining quarters
+        // Although class performs outstandingly on performance tasks, class still needs to focus on improving their written works for the remaining ${4-quarters} quarters.
+      }
+    }
+  }
+
+  const final_remarks: FinalRemarks[] = [
+    {
+      very_good: {
+        message: [],
+        margin: null,
+      },
+      good: {
+        message: [],
+        margin: null,
+      },
+      average: {
+        message: [],
+        margin: null,
+      },
+      poor: {
+        message: [],
+        margin: null,
+      },
+      very_poor: { message: [], margin: null },
+    },
+  ];
 
   if (ave_remarks === "Very Good") {
-    message.push(`Very good class performance! ${significant_quarters}`);
+    message.push(`Very good student performance`);
   } else if (ave_remarks === "Good") {
-    message.push(`Good class performance! ${significant_quarters}`);
+    message.push(`Good student performance`);
   } else if (ave_remarks === "Average") {
-    message.push(`Average class performance! ${significant_quarters}`);
+    message.push(`Average student performance`);
   } else if (ave_remarks === "Poor") {
-    message.push(`Poor class performance! ${significant_quarters}`);
-  } else if (ave_remarks === "Very Poor") {
-    message.push(`Very poor class performance! ${significant_quarters}`);
+    message.push(`Poor student performance`);
+  } else {
+    message.push(`Very poor student performance`);
   }
 
   return message;
