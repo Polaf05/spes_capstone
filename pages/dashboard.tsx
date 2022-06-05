@@ -236,17 +236,18 @@ const Dashboard = (user: any) => {
         setFailedStudents(
           getScorePCT(remarks.very_poor.length, students.length)
         );
-        const message = generateFeedback(100 - failedStudents);
 
-      setFailedStudents(getScorePCT(remarks.very_poor.length, students.length));
+        setFailedStudents(
+          getScorePCT(remarks.very_poor.length, students.length)
+        );
 
-      var buttons: number[] = [];
-      for (var i = 1; i <= qSum; i++) {
-        buttons.push(i);
+        var buttons: number[] = [];
+        for (var i = 1; i <= qSum; i++) {
+          buttons.push(i);
+        }
+        setQuarters(buttons);
+        setMsgRemarks(getPassingRemarks(100 - failedStudents, quarters.length));
       }
-      setQuarters(buttons);
-      setMsgRemarks(getPassingRemarks(100 - failedStudents, quarters.length));
-
     }
   }, [user]);
 
