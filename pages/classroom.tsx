@@ -18,6 +18,7 @@ import { getGrade, transmuteGrade } from "../lib/functions/grade_computation";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { classNames } from "../lib/functions/concat";
 import { TaskInfo } from "../types/Task";
+import cookie from "cookie";
 
 import Link from "next/link";
 
@@ -35,25 +36,23 @@ const getRemarks = (grade: number) => {
     : "Very Good";
 };
 
-// export const getStaticProps = async () => {
-//   //const { jsonFile } = useJson();
-//   const static_json = "62987f8c402a5b380219b752";
-//   let students_json: any = [];
-//   //if (jsonFile) {
-//   students_json = await fetchJson(static_json);
-//   //}
+export async function getServerSideProps(context: any) {
+  let headerCookie = context.req.headers.cookie;
+  if (typeof headerCookie !== "string") {
+    headerCookie = "";
+  }
+  const cookies: any = cookie.parse(headerCookie);
 
-//   console.log("here: ", students_json);
-//   return {
-//     props: {
-//       classroom: students_json,
-//     },
-//   };
-// };
+  const jwt = cookies.OursiteJWT;
 
-//export default function ClassroomInfo({ classroom }: any) {
+  if (!jwt) {
+    return { props: { user: null } };
+  }
 
-export default function ClassroomInfo({ classroom }: any) {
+  return { props: { user: jwt } };
+}
+
+export default function ClassroomInfo(user: any) {
   //const localStudents: Student[] = classroom;
   const { students } = useClassroom();
   const { quarter } = useSelectedQuarter();
@@ -67,19 +66,23 @@ export default function ClassroomInfo({ classroom }: any) {
   const [wgh_pt, setWghPT] = useState<number>(0);
 
   useEffect(() => {
-    if (!students) {
-      router.back();
+    if (!user.user) {
+      router.push("/login");
     } else {
-      console.log(students);
-      const myStudent = students![0].quarter![quarter];
-      // get weighted omsim of a written works and performance task
-      const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
-      const wgh_pt =
-        myStudent.performance_weighted_score?.highest_possible_score;
-      setWghWW(wgh_ww ? wgh_ww : 0);
-      setWghPT(wgh_pt ? wgh_pt : 0);
+      if (!students) {
+        router.back();
+      } else {
+        console.log(students);
+        const myStudent = students![0].quarter![quarter];
+        // get weighted omsim of a written works and performance task
+        const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
+        const wgh_pt =
+          myStudent.performance_weighted_score?.highest_possible_score;
+        setWghWW(wgh_ww ? wgh_ww : 0);
+        setWghPT(wgh_pt ? wgh_pt : 0);
+      }
     }
-  }, []);
+  }, [user]);
 
   useEffect;
 
