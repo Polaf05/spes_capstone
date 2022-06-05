@@ -8,18 +8,17 @@ const Home: NextPage = () => {
     <div className="bg-[url('/bg-index.jpg')] bg-cover min-h-screen">
       <div className="flex flex-row justify-around pt-16 px-14 gap-12 xl:pt-20">
         <div className="space-y-10 w-9/12 xl:w-1/2">
-          <div className="font-poppins text-4xl font-bold break-words leading-tight xl:text-6xl ">
+          <div className="font-poppins text-4xl font-bold break-words leading-tight xl:text-5xl ">
             <h1>Student Performance</h1> <h1>Evaluation System</h1>
           </div>
           <p className="text-justify inline-block text-base xl:text-lg">
-            Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
-            adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet
-            dolore magna. Lorem ipsum dolor sit amet, consectetuer adipiscing
-            elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore
-            magna.
+            A data analytics web-based platform that automates evaluation on
+            students from online/hybrid learning set-up amidst pandemic based on
+            their semester-long performance. It includes additional factors in
+            the evaluation, such as "Environmental" and "Technological" factors.
           </p>
           <Link href={"/getting-started"} passHref>
-            <button className="rounded-full w-64 h-14 bg-ocean-300 text-white text-lg font-bold">
+            <button className="rounded-full w-64 h-14 border-2 border-ocean-300 text-ocean-300 hover:bg-ocean-300 hover:text-white text-lg font-bold">
               Continue
             </button>
           </Link>
