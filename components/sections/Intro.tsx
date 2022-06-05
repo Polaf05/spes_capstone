@@ -2,7 +2,12 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { classNames } from "../../lib/functions/concat";
 
-const msg = ["Paste Omskrt", "Upload Omskrt", "Generate Evaluation"];
+const msg = [
+  "Survey Requirement",
+  "Paste Google Spreadsheet",
+  "Upload Grading Sheet File",
+  "Generate Evaluation",
+];
 
 const Intro = ({
   page,
@@ -19,7 +24,7 @@ const Intro = ({
             <div className="col-span-10">
               <h1 className="text-2xl font-bold">Getting Started</h1>
               <p className="text-light">
-                Student Performance Evaluation System
+                Students' Performance Evaluation System
               </p>
             </div>
             <div className="col-span-2 flex justify-end">
@@ -31,16 +36,15 @@ const Intro = ({
               />
             </div>
           </div>
-          <div className="px-12">
+          <div className="xl:px-12">
             <h3 className="text-xl font-bold">
               Step {page + 1}: {msg[page]}
             </h3>
-            <div className="border-2 border-black h-80 rounded-lg flex justify-center items-center">
+            <div className="border-2 border-black h-[40vh] xl:h-[60vh] rounded-lg flex justify-center items-center relative">
               <Image
-                src={`/orange-${page + 1}.jpg`}
-                alt="just a bunch of oranges"
-                width={250}
-                height={230}
+                src={`/step-${page + 1}.jpg`}
+                alt={`step ${page + 1} image not available`}
+                layout="fill"
               />
             </div>
             <p className="text-justify mt-5">
@@ -50,7 +54,7 @@ const Intro = ({
               adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
               laoreet dolore magna.
             </p>
-            <div className="flex justify-between">
+            <div className="grid grid-cols-3 mt-4">
               <div className="text-lg">
                 <button
                   onClick={() => {
@@ -60,7 +64,7 @@ const Intro = ({
                   <span className="underline decoration-2">Prev</span>
                 </button>
               </div>
-              <div className="flex justify-evenly gap-2">
+              <div className="flex justify-center gap-2">
                 <span
                   className={classNames(
                     "rounded-full w-3 h-3",
@@ -79,6 +83,12 @@ const Intro = ({
                     page === 2 ? "bg-black" : "border border-black"
                   )}
                 ></span>
+                <span
+                  className={classNames(
+                    "rounded-full w-3 h-3",
+                    page === 3 ? "bg-black" : "border border-black"
+                  )}
+                ></span>
               </div>
               <div className="text-lg flex flex-col justify-end items-end">
                 <button
@@ -91,7 +101,7 @@ const Intro = ({
                 </button>
                 <button
                   onClick={() => {
-                    setPage(3);
+                    setPage(4);
                   }}
                   className="text-lg underline decoration-2"
                 >

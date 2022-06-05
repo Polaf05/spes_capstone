@@ -2,6 +2,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
+import cookie from "cookie";
 import {
   Chart,
   ArcElement,
@@ -31,7 +32,11 @@ import {
 import { GetServerSideProps } from "next";
 import { Bar, Line, Radar } from "react-chartjs-2";
 import { StarIcon } from "@heroicons/react/solid";
-import { CheckIcon, XIcon } from "@heroicons/react/outline";
+import {
+  CheckIcon,
+  ExclamationCircleIcon,
+  XIcon,
+} from "@heroicons/react/outline";
 import BarChart from "../components/BarChart";
 import { DataSet, Quarter, Student, TaskData } from "../types/Students";
 import CardInfo from "../components/CardInfo";
@@ -44,12 +49,18 @@ import {
 } from "react-circular-progressbar";
 import { tasks } from "googleapis/build/src/apis/tasks";
 import { Router, useRouter } from "next/router";
-import { type } from "os";
 import { formatArray, getRemarks } from "../lib/functions/formatting";
 import { fluctuation } from "../lib/functions/analysis";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { TaskDataScores } from "../types/Task";
-import cookie from "cookie";
+import Link from "next/link";
+import {
+  getInitialGrade,
+  studentFailed,
+  transmuteGrade,
+} from "../lib/functions/grade_computation";
+import { capitalize, classNames, formatName } from "../lib/functions/concat";
+import { getRemarksAnalysis } from "../lib/functions/feedback";
 
 Chart.register(
   ArcElement,
@@ -77,12 +88,7 @@ Chart.register(
   Tooltip
 );
 
-const classNames = (...classes: string[]) => {
-  return classes.filter(Boolean).join(" ");
-};
 // methods
-const capitalize = (string: string) =>
-  string ? string.charAt(0).toUpperCase() + string.slice(1) : "";
 
 const getIndexOfMaxNumber = (arr: any[]) => arr.indexOf(Math.max(...arr));
 const getIndexOfMinNumber = (arr: any[]) => arr.indexOf(Math.min(...arr));
@@ -113,6 +119,14 @@ const getTask = (option: any, arr: number[]) => {
   }
 };
 
+const REMARKS_MESSAGE = [
+  "Outstanding Performance, SPES has nothing to say!",
+  "Wow, this student has a lot of potential!",
+  "Good performance, however there is still a lot of room for improvement.",
+  "The student needs attention, help him where he lacks",
+  "Student performed very poorly, he needs a lot of attention.",
+];
+
 const StudentInfo = (user: any) => {
   const { students } = useClassroom();
   const { student } = useSelectedStudent();
@@ -134,7 +148,6 @@ const StudentInfo = (user: any) => {
       if (!students || !student) router.back();
       else {
         setMyStudent(student?.quarter![quarter]!);
-        console.log(student.name);
         let ww_available_scores: number[] = [];
         let pt_available_scores: number[] = [];
 
@@ -436,14 +449,14 @@ const StudentInfo = (user: any) => {
     better_score = ave_pt_pct;
     lower_score = ave_ww_pct;
     flag = "pt";
-    margin = ave_pt_pct - ave_ww_pct;
+    margin = transmuteGrade(ave_pt_pct) - transmuteGrade(ave_ww_pct);
   } else {
     better_at = "better in Written Works";
     better = "Written Works";
     better_score = ave_ww_pct;
     lower_score = ave_pt_pct;
     flag = "ww";
-    margin = ave_ww_pct - ave_pt_pct;
+    margin = transmuteGrade(ave_ww_pct) - transmuteGrade(ave_pt_pct);
   }
 
   margin = Number(margin.toFixed(1));
@@ -811,696 +824,807 @@ const StudentInfo = (user: any) => {
   const percentage: number = 0;
 
   return (
-    <>
-      {/* Header */}
-      <div className="mx-12 py-2 h-[10vh]">
-        <div className="w-20 h-20 p-1">
-          <Image src="/logo.png" alt="logo picture" width={100} height={100} />
+    student && (
+      <>
+        {/* Header */}
+        <div className="mx-12 py-2 h-[10vh]">
+          <div className="flex justify-between items-center">
+            <Link href="/dashboard" passHref>
+              <div className="w-20 h-20 p-1 cursor-pointer">
+                <Image
+                  src="/logo.png"
+                  alt="logo picture"
+                  width={120}
+                  height={120}
+                />
+              </div>
+            </Link>
+
+            <Link href="/classroom" passHref>
+              <div className="cursor-pointer rounded-full w-12 h-12 flex items-center justify-center hover:bg-ocean-300 hover:text-white">
+                <XIcon className="w-10 h-10" />
+              </div>
+            </Link>
+          </div>
         </div>
-      </div>
-      <div className="mx-12 mt-10 mb-4 grid grid-cols-3">
-        <div className="col-span-2">
-          <h1 className=" text-xl">Student Evaluation</h1>
-          <h1 className="font-bold font-poppins text-4xl">{student?.name}</h1>
-          <h6>{student?.gender}</h6>
+        <div className="mx-12 mt-10 mb-4 grid grid-cols-3">
+          <div className="col-span-2">
+            <h1 className=" text-xl">Student Evaluation</h1>
+            <h1 className="font-bold font-poppins text-4xl">
+              {formatName(student?.name)}
+            </h1>
+            <h6>{student?.gender}</h6>
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center justify-end gap-4">
+              <h1
+                className={classNames(
+                  "font-bold  text-4xl",
+                  studentFailed(student.remarks)
+                    ? "text-red-400"
+                    : "text-tallano_gold-300"
+                )}
+              >
+                {student?.remarks}
+              </h1>
+              {student.remarks.match(/Poor/g) && (
+                <ExclamationCircleIcon className="w-10 h-10 xl:w-12 xl:h-12 text-red-400" />
+              )}
+            </div>
+            <h2 className="flex justify-end text-[0.8rem] text-neutral-500">
+              {getRemarksAnalysis(student, student?.remarks)}
+            </h2>
+          </div>
         </div>
-        <div className="flex justify-end place-content-center">
-          <h1 className="font-bold text-tallano_gold-300 text-3xl">
-            {student?.remarks}
-          </h1>
-        </div>
-      </div>
-      {/* General Section */}
-      <div className="bg-ocean-100 h-[110vh] flex flex-col justify-between">
-        <div className="mx-12 py-8">
-          <h3 className="text-justify mb-4">{getOverallFeedback()}</h3>
-          <h2 className="font-bold text-2xl">
-            Final Grade: {student?.final_grade_after}
-          </h2>
-          {/* Bar Chart */}
-          <div className="grid grid-cols-9 h-fit gap-4">
-            <div className="col-span-5 bg-neutral-50 p-4 rounded-xl">
-              <BarChart
-                display={true}
-                indexAxis="x"
-                labels={myquar}
-                datasets={quarter_dataset}
-              />
-              <div className="border-t mt-3 text-sm text-neutral-500">
-                <div className="flex gap-2">
-                  <p>
-                    Fluctuation:{" "}
-                    {student?.quarter_analysis.fluctuation.toFixed(1)}
-                  </p>
-                  {student?.quarter_analysis.plunge_task.length! > 0 && (
+        {/* General Section */}
+        <div className="bg-ocean-100 h-[110vh] flex flex-col justify-between">
+          <div className="mx-12 py-8">
+            <h3 className="text-justify mb-4">{getOverallFeedback()}</h3>
+            <h2 className="font-semibold text-xl">
+              {myquar.length !== 4
+                ? `Initial Grade for ${
+                    myquar.length
+                  } quarters: ${getInitialGrade(student, myquar.length)}`
+                : `Final Grade: ${student?.final_grade_after}`}{" "}
+            </h2>
+            {/* Bar Chart */}
+            <div className="grid grid-cols-9 h-fit gap-4">
+              <div className="col-span-5 bg-neutral-50 p-4 rounded-xl">
+                <BarChart
+                  display={true}
+                  indexAxis="x"
+                  labels={myquar}
+                  datasets={quarter_dataset}
+                />
+                <div className="border-t mt-3 text-sm text-neutral-500">
+                  <div className="flex gap-2">
                     <p>
-                      Plunged:{" "}
-                      {student?.quarter_analysis.plunge_task.join(", ")}
+                      Fluctuation:{" "}
+                      {student?.quarter_analysis.fluctuation.toFixed(1)}
                     </p>
-                  )}
-                  {student?.quarter_analysis.surge_task.length! > 0 && (
-                    <p>
-                      Surged: {student?.quarter_analysis.surge_task.join(", ")}
-                    </p>
-                  )}
+                    {student?.quarter_analysis.plunge_task.length! > 0 && (
+                      <p>
+                        Plunged:{" "}
+                        {student?.quarter_analysis.plunge_task.join(", ")}
+                      </p>
+                    )}
+                    {student?.quarter_analysis.surge_task.length! > 0 && (
+                      <p>
+                        Surged:{" "}
+                        {student?.quarter_analysis.surge_task.join(", ")}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-            {/* Overall Performance Assessment */}
-            <div className="col-span-4 h-[65vh] overflow-x-auto px-3">
-              <h2 className="text-xl font-bold">Overall Performance:</h2>
-              <div className="grid grid-cols-10 mb-4">
-                <CardInfo
-                  className={classNames(
-                    "w-full h-fit px-4 py-2 bg-tallano_gold-100 rounded-l-xl",
-                    flag === "both"
-                      ? "col-span-5"
-                      : flag === "ww"
-                      ? "col-span-6"
-                      : "col-span-4"
-                  )}
-                  title={"Written Works"}
-                  value={ave_ww_pct}
-                >
-                  <div className="font-light text-[0.8rem]">
-                    <h5 className="flex justify-between">
-                      Quarter with highest grade:
-                      <span className="font-semibold">{ww_best_quarter}</span>
-                    </h5>
-                    <h5 className="flex justify-between">
-                      Quarter with lowest grade:
-                      <span className="font-semibold">
-                        {ww_underperformed_quarter}
-                      </span>
-                    </h5>
-                  </div>
-                </CardInfo>
-                <CardInfo
-                  className={classNames(
-                    "w-full h-fit px-4 py-2 bg-white rounded-r-xl",
-                    flag === "both"
-                      ? "col-span-5"
-                      : flag === "pt"
-                      ? "col-span-6"
-                      : "col-span-4"
-                  )}
-                  title={"Performance Tasks"}
-                  value={ave_pt_pct}
-                >
-                  <div className="text-[0.8rem]">
-                    <h5 className="font-semibold">{pt_best_quarter}</h5>
-                    <h5 className="font-semibold">
-                      {pt_underperformed_quarter}
-                    </h5>
-                  </div>
-                </CardInfo>
-              </div>
-              <div className="flex justify-center gap-4 h-40 mb-4">
-                {student?.quarter?.map(
-                  (quarter, idx) =>
-                    idx < myquar.length && (
-                      <div
-                        className={classNames(
-                          "w-28 h-full rounded-2xl border-4",
-                          quarter.grade_before >= 75
-                            ? "bg-green-100 border-green-300"
-                            : "bg-red-100 border-red-300"
-                        )}
-                      >
-                        <p className="font-bold text-[0.7rem] pt-1 px-2 italic">
-                          Quarter {idx + 1}
-                        </p>
-                        <div className="w-full grid place-items-center">
-                          <h2 className="font-bold text-2xl">
-                            {quarter.grade_before}
-                          </h2>
-                          <h2 className="border-t-2 border-black font-semibold text-base">
-                            Class Rank:
-                          </h2>
-                          <h2 className="font-bold text-xl">
-                            {quarter.ranking}
-                          </h2>
+              {/* Overall Performance Assessment */}
+              <div className="col-span-4 h-[65vh] overflow-x-auto px-3">
+                <h2 className="text-xl font-bold">Overall Performance:</h2>
+                <div className="grid grid-cols-10 mb-4">
+                  <CardInfo
+                    className={classNames(
+                      "w-full h-fit px-4 py-2 bg-tallano_gold-100 rounded-l-xl",
+                      flag === "both"
+                        ? "col-span-5"
+                        : flag === "ww"
+                        ? "col-span-6"
+                        : "col-span-4"
+                    )}
+                    title={"Written Works"}
+                    value={transmuteGrade(ave_ww_pct)}
+                  >
+                    <div className="font-light text-[0.8rem]">
+                      <h5 className="flex justify-between">
+                        Quarter with highest grade:
+                        <span className="font-semibold">{ww_best_quarter}</span>
+                      </h5>
+                      <h5 className="flex justify-between">
+                        Quarter with lowest grade:
+                        <span className="font-semibold">
+                          {ww_underperformed_quarter}
+                        </span>
+                      </h5>
+                    </div>
+                  </CardInfo>
+                  <CardInfo
+                    className={classNames(
+                      "w-full h-fit px-4 py-2 bg-white rounded-r-xl",
+                      flag === "both"
+                        ? "col-span-5"
+                        : flag === "pt"
+                        ? "col-span-6"
+                        : "col-span-4"
+                    )}
+                    title={"Performance Tasks"}
+                    value={transmuteGrade(ave_pt_pct)}
+                  >
+                    <div className="text-[0.8rem]">
+                      <h5 className="font-semibold">{pt_best_quarter}</h5>
+                      <h5 className="font-semibold">
+                        {pt_underperformed_quarter}
+                      </h5>
+                    </div>
+                  </CardInfo>
+                </div>
+                <div className="flex justify-center gap-4 h-40 mb-4">
+                  {student?.quarter?.map(
+                    (quarter, idx) =>
+                      idx < myquar.length && (
+                        <div
+                          className={classNames(
+                            "w-28 h-full rounded-2xl border-4",
+                            quarter.grade_before >= 75
+                              ? "bg-green-100 border-green-300"
+                              : "bg-red-100 border-red-300"
+                          )}
+                        >
+                          <p className="font-bold text-[0.7rem] pt-1 px-2 italic">
+                            Quarter {idx + 1}
+                          </p>
+                          <div className="w-full grid place-items-center">
+                            <h2 className="font-bold text-2xl">
+                              {quarter.grade_before}
+                            </h2>
+                            <h2 className="border-t-2 border-black font-semibold text-base">
+                              Class Rank:
+                            </h2>
+                            <h2 className="font-bold text-xl">
+                              {quarter.ranking}
+                            </h2>
+                          </div>
                         </div>
-                      </div>
-                    )
-                )}
-              </div>
+                      )
+                  )}
+                </div>
 
-              <div className="text-sm flex justify-between border-t border-neutral-300">
-                <h6>
-                  Performs {better_at} with a margin of (+{margin})
-                </h6>
+                <div className="text-sm flex justify-between border-t border-neutral-300">
+                  <h6>
+                    Performs {better_at} with a margin of (+{margin})
+                  </h6>
 
-                <h6>
-                  Average Rank: <span className="font-bold">{ave_rank}</span>
-                </h6>
+                  <h6>
+                    Average Rank: <span className="font-bold">{ave_rank}</span>
+                  </h6>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        {/* Toggle Quarter */}
-        <div className="flex justify-end">
-          {myquar.map((q, idx) => (
-            <div
-              key={idx}
-              className={classNames(
-                "px-12 pt-4 pb-1 text-xl rounded-t-xl",
-                quarter === idx ? "bg-white" : ""
-              )}
-            >
-              <button
-                onClick={() => {
-                  setQuarter(idx);
-                  setMyStudent(student?.quarter![idx]!);
-                  console.log(student?.quarter[idx]);
-                }}
-              >
-                {myquar[idx]}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-      {/* Quarter Section */}
-      <div className="min-h-[90vh]">
-        <div className="mx-12 my-10">
-          <div className="h-full">
-            <div className="grid grid-cols-2">
-              <div>
-                <h1 className="font-bold text-2xl">Performance Analysis</h1>
-                <h3 className="italic">{myquar[quarter]} Evaluation</h3>
-              </div>
-              {/* Grade Component */}
-              <div className="col-span-1 flex justify-end gap-4">
-                <div className="flex flex-col place-content-center">
-                  <h1 className="text-lg font-semibold">Quarter Grade:</h1>
-                  <h3 className="text-base">
-                    Suggested Grade:{" "}
-                    <span className="font-bold">{myStudent?.grade_after}</span>
-                  </h3>
-                  <div className="flex gap-3">
-                    <h3>
-                      Class Ranking:{" "}
-                      <span className="font-bold">{myStudent?.ranking}</span>
-                    </h3>
-                    {myStudent?.ranking! <= 4 && (
-                      <StarIcon className="h-5 text-tallano_gold-300" />
-                    )}
-                  </div>
-                </div>
-                <div className="grid place-content-center">
-                  <div className="grid place-content-center w-28 h-28 rounded-full bg-tallano_gold-200">
-                    <h1 className="font-bold text-3xl">
-                      {myStudent?.grade_before}
-                    </h1>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 mx-4 py-6 h-fit">
-              {/* Line Chart */}
-              <div>
-                <Line
-                  data={{
-                    labels:
-                      ww_labels.length >= pt_labels.length
-                        ? ww_labels
-                        : pt_labels,
-                    datasets: dataToRender,
-                  }}
-                  options={{
-                    scales: {
-                      y: { max: 100, min: 0, ticks: { stepSize: 20 } },
-                    },
-                    plugins: {
-                      legend: {
-                        display: true,
-                      },
-                    },
-                  }}
-                />
-                <div className="border-t mt-3 text-sm text-neutral-500">
-                  <div className="flex justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <div className="bg-yellow-200 w-5 h-1"></div>
-
-                      <p>
-                        Fluctuation:{" "}
-                        {myStudent?.written_tasks_analysis?.fluctuation.toFixed(
-                          1
-                        )}
-                      </p>
-
-                      {myStudent?.written_tasks_analysis?.plunge_task.length! >
-                        0 && (
-                        <p>
-                          Plunged:{" "}
-                          {myStudent?.written_tasks_analysis?.plunge_task.join(
-                            ", "
-                          )}
-                        </p>
-                      )}
-                      {myStudent?.written_tasks_analysis?.surge_task.length! >
-                        0 && (
-                        <p>
-                          Surged:{" "}
-                          {myStudent?.written_tasks_analysis?.surge_task.join(
-                            ", "
-                          )}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <div className="bg-ocean-200 w-5 h-1"></div>
-                      <p>
-                        Fluctuation:{" "}
-                        {
-                          69
-                          /* {myStudent?.performace_tasks_analysis?.fluctuation.toFixed(
-                          1
-                        )} */
-                        }
-                      </p>
-
-                      {myStudent?.performace_tasks_analysis?.plunge_task
-                        .length! > 0 && (
-                        <p>
-                          Plunged:{" "}
-                          {myStudent?.performace_tasks_analysis?.plunge_task.join(
-                            ", "
-                          )}
-                        </p>
-                      )}
-                      {myStudent?.performace_tasks_analysis?.surge_task
-                        .length! > 0 && (
-                        <p>
-                          Surged:{" "}
-                          {myStudent?.performace_tasks_analysis?.surge_task.join(
-                            ", "
-                          )}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Line Chart Assessment */}
-              <div className="h-[45vh] overflow-x-auto px-3">
-                <h5 className="text-justify">
-                  Assessment: {performanceAnalysis(quarter)}
-                </h5>
-              </div>
-            </div>
-            <div className="grid grid-cols-9 gap-4 mx-4 py-6 h-fit">
-              <div className="col-span-4">
-                {/* Top Performance Section */}
-                <div className="">
-                  <h3 className="text-xl font-bold">
-                    {tdata.ww.raw_scores.score[ww_best_task!] != -1 &&
-                    tdata.pt.raw_scores.score[pt_best_task!] != -1
-                      ? "Top Performance"
-                      : "No data available for student  "}
-                  </h3>
-                  <div className="grid grid-cols-2 gap-2 mt-4">
-                    {tdata.ww.raw_scores.score[ww_best_task!] > 0 && (
-                      <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between">
-                        <h6 className="px-4 ">
-                          Written Work {ww_best_task! + 1}:
-                        </h6>
-                        <div className="flex justify-end">
-                          <h1 className="font-bold text-xl px-6">
-                            {tdata.ww.raw_scores.score[ww_best_task!]} /{" "}
-                            {tdata.ww.raw_scores.hp[ww_best_task!]}
-                          </h1>
-                        </div>
-                      </div>
-                    )}
-                    {tdata.pt.raw_scores.score[pt_best_task!] > 0 && (
-                      <div className=" h-24 bg-ocean-100 py-2 rounded-3xl flex flex-col justify-between">
-                        <h6 className="px-4">
-                          Performance Task {pt_best_task! + 1} :
-                        </h6>
-                        <div className="flex justify-end px-6">
-                          <h1 className="font-bold text-xl">
-                            {tdata.pt.raw_scores.score[pt_best_task!]} /{" "}
-                            {tdata.pt.raw_scores.hp[pt_best_task!]}
-                          </h1>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                {/* Tasks Streak */}
-                <div className="mt-4">
-                  <div className="border-b-2 pb-3">
-                    <div className="flex justify-between">
-                      <h6>Written Works: </h6>
-                      <h6>
-                        <span className="font-bold">{tdata.ww.passed}</span> of{" "}
-                        <span className="font-bold">{tdata.ww.total}</span>{" "}
-                        task/s passed.
-                      </h6>
-                    </div>
-                    <div className="flex gap-2">
-                      {wworks.map((task, idx) =>
-                        task === "Perfect" ? (
-                          <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
-                            <StarIcon className="text-tallano_gold-300" />
-                          </div>
-                        ) : task === "??" ? (
-                          <div className="flex justify-center items-center w-14 h-14 bg-neutral-50 border-4 rounded-full">
-                            <h1 className="text-sm font-bold text-neutral-500">
-                              No data
-                            </h1>
-                          </div>
-                        ) : task === "Passed" ? (
-                          <div className="w-14 h-14 border-4 rounded-full border-green-300">
-                            <CheckIcon className="text-green-300" />
-                          </div>
-                        ) : task === "Failed" ? (
-                          <div className="w-14 h-14 border-4 border-red-300 rounded-full">
-                            <XIcon className="text-red-300" />
-                          </div>
-                        ) : task === "Considerable" ? (
-                          <div className="flex justify-center items-center w-14 h-14 border-4 border-orange-300 rounded-full">
-                            <h1 className="text-3xl font-bold text-orange-300">
-                              C
-                            </h1>
-                          </div>
-                        ) : task === "Zero" ? (
-                          <div className="w-14 h-14 border-4 border-red-300 rounded-full">
-                            <h1 className="text-3xl font-bold text-red-300">
-                              0
-                            </h1>
-                          </div>
-                        ) : (
-                          <div
-                            data-tip
-                            data-for={idx.toString()}
-                            className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"
-                          ></div>
-                        )
-                      )}
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <div className="flex justify-between">
-                      <h6>Performance Tasks: </h6>
-                      <h6>
-                        <span className="font-bold">{tdata.pt.passed}</span> of{" "}
-                        <span className="font-bold">{tdata.pt.total}</span>{" "}
-                        task/s passed.
-                      </h6>
-                    </div>
-                    <div className="flex gap-2">
-                      {ptasks.map((task) =>
-                        task === "Perfect" ? (
-                          <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
-                            <StarIcon className="text-tallano_gold-300" />
-                          </div>
-                        ) : task === "??" ? (
-                          <div className="flex justify-center items-center w-14 h-14 bg-neutral-50 border-4 rounded-full">
-                            <h1 className="text-sm font-bold text-neutral-500">
-                              No data
-                            </h1>
-                          </div>
-                        ) : task === "Passed" ? (
-                          <div className="w-14 h-14 border-4 rounded-full border-green-300">
-                            <CheckIcon className="text-green-300" />
-                          </div>
-                        ) : task === "Failed" ? (
-                          <div className="w-14 h-14 border-4 border-red-300 rounded-full">
-                            <XIcon className="text-red-300" />
-                          </div>
-                        ) : task === "Considerable" ? (
-                          <div className="flex justify-center items-center w-14 h-14 border-4 border-orange-300 rounded-full">
-                            <h1 className="text-3xl font-bold text-orange-300">
-                              C
-                            </h1>
-                          </div>
-                        ) : task === "Zero" ? (
-                          <div className="w-14 h-14 border-4 border-red-300 rounded-full">
-                            <h1 className="text-3xl font-bold text-red-300">
-                              0
-                            </h1>
-                          </div>
-                        ) : (
-                          <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
-                        )
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <h2 className="text-xl font-bold">
-                    {tdata.ww.raw_scores.score[ww_best_task!] == -1 &&
-                    tdata.pt.raw_scores.score[pt_best_task!] == -1
-                      ? ""
-                      : tdata.underperformed_tasks.length > 0
-                      ? `${capitalize("student")} had a hard time with:`
-                      : `Wow! ${capitalize(
-                          "student"
-                        )} didn't fail a single task!`}
-                  </h2>
-                  {/* Failed Tasks */}
-                  <div className="w-full h-fit grid grid-cols-2 grid-flow-row gap-2 mt-4">
-                    {tdata.underperformed_tasks.map((task, idx) => (
-                      <div
-                        key={idx}
-                        className={classNames(
-                          "h-24 py-2 rounded-3xl border-2 flex flex-col justify-between",
-                          task[3] === "Considerable"
-                            ? "border-orange-300"
-                            : "border-red-300"
-                        )}
-                      >
-                        <h6 className="px-4 ">{task[2]}:</h6>
-                        <div className="flex justify-end">
-                          <h1 className="font-bold text-xl px-6">
-                            {task[0]} / {task[1]}
-                          </h1>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+          {/* Toggle Quarter */}
+          <div className="flex justify-end">
+            {myquar.map((q, idx) => (
               <div
-                className={classNames("col-span-5 grid grid-cols-10 gap-3 p-4")}
+                key={idx}
+                className={classNames(
+                  "px-12 pt-4 pb-1 text-xl rounded-t-xl",
+                  quarter === idx ? "bg-white" : ""
+                )}
               >
-                {/* WW Data */}
+                <button
+                  onClick={() => {
+                    setQuarter(idx);
+                    setMyStudent(student?.quarter![idx]!);
+                    console.log(student?.quarter[idx]);
+                  }}
+                >
+                  {myquar[idx]}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Quarter Section */}
+        <div className="min-h-[90vh]">
+          <div className="mx-12 my-10">
+            <div className="h-full">
+              <div className="grid grid-cols-2">
+                <div>
+                  <h1 className="font-bold text-2xl">Performance Analysis</h1>
+                  <h3 className="italic">{myquar[quarter]} Evaluation</h3>
+                </div>
+                {/* Grade Component */}
+                <div className="col-span-1 flex justify-end gap-4">
+                  <div className="flex flex-col place-content-center">
+                    <h1 className="text-lg font-semibold">Quarter Grade:</h1>
+                    <h3 className="text-base">
+                      Suggested Grade:{" "}
+                      <span className="font-bold">
+                        {myStudent?.grade_after}
+                      </span>
+                    </h3>
+                    <div className="flex gap-3">
+                      <h3>
+                        Class Ranking:{" "}
+                        <span className="font-bold">{myStudent?.ranking}</span>
+                      </h3>
+                      {myStudent?.ranking! <= 4 && (
+                        <StarIcon className="h-5 text-tallano_gold-300" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="grid place-content-center">
+                    <div className="grid place-content-center w-28 h-28 rounded-full bg-tallano_gold-200">
+                      <h1 className="font-bold text-3xl">
+                        {myStudent?.grade_before}
+                      </h1>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mx-4 py-6 h-fit">
+                {/* Line Chart */}
+                <div>
+                  <Line
+                    data={{
+                      labels:
+                        ww_labels.length >= pt_labels.length
+                          ? ww_labels
+                          : pt_labels,
+                      datasets: dataToRender,
+                    }}
+                    options={{
+                      scales: {
+                        y: { max: 100, min: 0, ticks: { stepSize: 20 } },
+                      },
+                      plugins: {
+                        legend: {
+                          display: true,
+                        },
+                      },
+                    }}
+                  />
+                  <div className="border-t mt-3 text-sm text-neutral-500">
+                    <div className="flex justify-between">
+                      <div className="flex justify-center items-center gap-2">
+                        <div className="bg-yellow-200 w-5 h-1"></div>
+
+                        <p>
+                          Fluctuation:{" "}
+                          {myStudent?.written_tasks_analysis?.fluctuation.toFixed(
+                            1
+                          )}
+                        </p>
+
+                        {myStudent?.written_tasks_analysis?.plunge_task
+                          .length! > 0 && (
+                          <p>
+                            Plunged:{" "}
+                            {myStudent?.written_tasks_analysis?.plunge_task.join(
+                              ", "
+                            )}
+                          </p>
+                        )}
+                        {myStudent?.written_tasks_analysis?.surge_task.length! >
+                          0 && (
+                          <p>
+                            Surged:{" "}
+                            {myStudent?.written_tasks_analysis?.surge_task.join(
+                              ", "
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex justify-between">
+                      <div className="flex justify-center items-center gap-2">
+                        <div className="bg-ocean-200 w-5 h-1"></div>
+                        {myStudent?.performace_tasks_analysis?.fluctuation && (
+                          <p>
+                            Fluctuation:{" "}
+                            {myStudent?.performace_tasks_analysis?.fluctuation.toFixed(
+                              1
+                            )}
+                          </p>
+                        )}
+                        {myStudent?.performace_tasks_analysis?.plunge_task
+                          .length! > 0 && (
+                          <p>
+                            Plunged:{" "}
+                            {myStudent?.performace_tasks_analysis?.plunge_task.join(
+                              ", "
+                            )}
+                          </p>
+                        )}
+                        {myStudent?.performace_tasks_analysis?.surge_task
+                          .length! > 0 && (
+                          <p>
+                            Surged:{" "}
+                            {myStudent?.performace_tasks_analysis?.surge_task.join(
+                              ", "
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Line Chart Assessment */}
+                <div className="h-[45vh] overflow-x-auto px-3">
+                  <h5 className="text-justify">
+                    Assessment: {performanceAnalysis(quarter)}
+                  </h5>
+                </div>
+              </div>
+              <div className="grid grid-cols-9 gap-4 mx-4 py-6 h-fit">
+                <div className="col-span-4">
+                  {/* Top Performance Section */}
+                  <div className="">
+                    <h3 className="text-xl font-bold">
+                      {tdata.ww.raw_scores.score[ww_best_task!] != -1 &&
+                      tdata.pt.raw_scores.score[pt_best_task!] != -1
+                        ? "Top Performance"
+                        : "No data available for student  "}
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2 mt-4">
+                      {tdata.ww.raw_scores.score[ww_best_task!] > 0 && (
+                        <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between">
+                          <h6 className="px-4 ">
+                            Written Work {ww_best_task! + 1}:
+                          </h6>
+                          <div className="flex justify-end">
+                            <h1 className="font-bold text-xl px-6">
+                              {tdata.ww.raw_scores.score[ww_best_task!]} /{" "}
+                              {tdata.ww.raw_scores.hp[ww_best_task!]}
+                            </h1>
+                          </div>
+                        </div>
+                      )}
+                      {tdata.pt.raw_scores.score[pt_best_task!] > 0 && (
+                        <div className=" h-24 bg-ocean-100 py-2 rounded-3xl flex flex-col justify-between">
+                          <h6 className="px-4">
+                            Performance Task {pt_best_task! + 1} :
+                          </h6>
+                          <div className="flex justify-end px-6">
+                            <h1 className="font-bold text-xl">
+                              {tdata.pt.raw_scores.score[pt_best_task!]} /{" "}
+                              {tdata.pt.raw_scores.hp[pt_best_task!]}
+                            </h1>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {/* Tasks Streak */}
+                  <div className="mt-4">
+                    <div className="border-b-2 pb-3">
+                      <div className="flex justify-between">
+                        <h6>Written Works: </h6>
+                        <h6>
+                          <span className="font-bold">{tdata.ww.passed}</span>{" "}
+                          of <span className="font-bold">{tdata.ww.total}</span>{" "}
+                          task/s passed.
+                        </h6>
+                      </div>
+                      <div className="flex gap-2">
+                        {wworks.map((task, idx) =>
+                          task === "Perfect" ? (
+                            <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
+                              <StarIcon className="text-tallano_gold-300" />
+                            </div>
+                          ) : task === "??" ? (
+                            <div className="flex justify-center items-center w-14 h-14 bg-neutral-50 border-4 rounded-full">
+                              <h1 className="text-sm font-bold text-neutral-500">
+                                No data
+                              </h1>
+                            </div>
+                          ) : task === "Passed" ? (
+                            <div className="w-14 h-14 border-4 rounded-full border-green-300">
+                              <CheckIcon className="text-green-300" />
+                            </div>
+                          ) : task === "Failed" ? (
+                            <div className="w-14 h-14 border-4 border-red-300 rounded-full">
+                              <XIcon className="text-red-300" />
+                            </div>
+                          ) : task === "Considerable" ? (
+                            <div className="flex justify-center items-center w-14 h-14 border-4 border-orange-300 rounded-full">
+                              <h1 className="text-3xl font-bold text-orange-300">
+                                C
+                              </h1>
+                            </div>
+                          ) : task === "Zero" ? (
+                            <div className="w-14 h-14 border-4 border-red-300 rounded-full">
+                              <h1 className="text-3xl font-bold text-red-300">
+                                0
+                              </h1>
+                            </div>
+                          ) : (
+                            <div
+                              data-tip
+                              data-for={idx.toString()}
+                              className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"
+                            ></div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <div className="flex justify-between">
+                        <h6>Performance Tasks: </h6>
+                        <h6>
+                          <span className="font-bold">{tdata.pt.passed}</span>{" "}
+                          of <span className="font-bold">{tdata.pt.total}</span>{" "}
+                          task/s passed.
+                        </h6>
+                      </div>
+                      <div className="flex gap-2">
+                        {ptasks.map((task) =>
+                          task === "Perfect" ? (
+                            <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
+                              <StarIcon className="text-tallano_gold-300" />
+                            </div>
+                          ) : task === "??" ? (
+                            <div className="flex justify-center items-center w-14 h-14 bg-neutral-50 border-4 rounded-full">
+                              <h1 className="text-sm font-bold text-neutral-500">
+                                No data
+                              </h1>
+                            </div>
+                          ) : task === "Passed" ? (
+                            <div className="w-14 h-14 border-4 rounded-full border-green-300">
+                              <CheckIcon className="text-green-300" />
+                            </div>
+                          ) : task === "Failed" ? (
+                            <div className="w-14 h-14 border-4 border-red-300 rounded-full">
+                              <XIcon className="text-red-300" />
+                            </div>
+                          ) : task === "Considerable" ? (
+                            <div className="flex justify-center items-center w-14 h-14 border-4 border-orange-300 rounded-full">
+                              <h1 className="text-3xl font-bold text-orange-300">
+                                C
+                              </h1>
+                            </div>
+                          ) : task === "Zero" ? (
+                            <div className="w-14 h-14 border-4 border-red-300 rounded-full">
+                              <h1 className="text-3xl font-bold text-red-300">
+                                0
+                              </h1>
+                            </div>
+                          ) : (
+                            <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <h2 className="text-xl font-bold">
+                      {tdata.ww.raw_scores.score[ww_best_task!] == -1 &&
+                      tdata.pt.raw_scores.score[pt_best_task!] == -1
+                        ? ""
+                        : tdata.underperformed_tasks.length > 0
+                        ? `${capitalize("student")} had a hard time with:`
+                        : `Wow! ${capitalize(
+                            "student"
+                          )} didn't fail a single task!`}
+                    </h2>
+                    {/* Failed Tasks */}
+                    <div className="w-full h-fit grid grid-cols-2 grid-flow-row gap-2 mt-4">
+                      {tdata.underperformed_tasks.map((task, idx) => (
+                        <div
+                          key={idx}
+                          className={classNames(
+                            "h-24 py-2 rounded-3xl border-2 flex flex-col justify-between",
+                            task[3] === "Considerable"
+                              ? "border-orange-300"
+                              : "border-red-300"
+                          )}
+                        >
+                          <h6 className="px-4 ">{task[2]}:</h6>
+                          <div className="flex justify-end">
+                            <h1 className="font-bold text-xl px-6">
+                              {task[0]} / {task[1]}
+                            </h1>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
                 <div
                   className={classNames(
-                    wgh_ww! > wgh_pt!
-                      ? "col-span-6"
-                      : wgh_pt! > wgh_ww!
-                      ? "col-span-4"
-                      : "col-span-5"
+                    "col-span-5 grid grid-cols-10 gap-3 p-4"
                   )}
                 >
-                  {/* Written Works Circular Progress */}
-                  <div className="relative">
-                    <div className="z-40 absolute inset-0 flex justify-center items-center">
-                      <div className="flex flex-col justify-center items-center">
-                        <h2 className="font-bold text-3xl">
-                          {tdata.ww.percentage}%
-                        </h2>
-                        <h3 className="text-lg font-semibold">Written Works</h3>
-                        <p className="text-base">
-                          Scored {tdata.ww.score_sum} out of{" "}
-                          {tdata.ww.total_item}
-                        </p>
+                  {/* WW Data */}
+                  <div
+                    className={classNames(
+                      wgh_ww! > wgh_pt!
+                        ? "col-span-6"
+                        : wgh_pt! > wgh_ww!
+                        ? "col-span-4"
+                        : "col-span-5"
+                    )}
+                  >
+                    {/* Written Works Circular Progress */}
+                    <div className="relative">
+                      <div className="z-40 absolute inset-0 flex justify-center items-center">
+                        <div className="flex flex-col justify-center items-center">
+                          <h2 className="font-bold text-3xl">
+                            {tdata.ww.percentage}%
+                          </h2>
+                          <h3 className="text-lg font-semibold">
+                            Written Works
+                          </h3>
+                          <p className="text-base">
+                            Scored {tdata.ww.score_sum} out of{" "}
+                            {tdata.ww.total_item}
+                          </p>
+                        </div>
+                      </div>
+                      <CircularProgress
+                        value={tdata.ww.percentage}
+                        pathColor="#FFF598"
+                        strokeWidth={8}
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <div className={"w-6/12"}>
+                        <div className="relative">
+                          <div className="z-40 absolute inset-0 flex justify-center items-center">
+                            <div className="flex flex-col justify-center items-center">
+                              <h2 className="font-bold text-xl">{ww_pct}%</h2>
+                              <h3 className="text-[0.8rem] font-semibold">
+                                Surpassed
+                              </h3>
+                              <p
+                                className={
+                                  wgh_ww! > wgh_pt!
+                                    ? "text-[0.6rem]"
+                                    : "text-[0.4rem]"
+                                }
+                              >
+                                {ww_surp_sum} out of {students?.length!}{" "}
+                                students
+                              </p>
+                            </div>
+                          </div>
+                          <CircularProgress
+                            value={ww_pct}
+                            pathColor="#FFF598"
+                            strokeWidth={10}
+                          />
+                        </div>
                       </div>
                     </div>
-                    <CircularProgress
-                      value={tdata.ww.percentage}
-                      pathColor="#FFF598"
-                      strokeWidth={8}
-                    />
                   </div>
-                  <div className="flex justify-end">
+                  {/* PT Data */}
+                  <div
+                    className={classNames(
+                      wgh_ww! > wgh_pt!
+                        ? "col-span-4"
+                        : wgh_pt! > wgh_ww!
+                        ? "col-span-6"
+                        : "col-span-5"
+                    )}
+                  >
+                    {/* Performance Tasks Circular Progress */}
                     <div className={"w-6/12"}>
                       <div className="relative">
                         <div className="z-40 absolute inset-0 flex justify-center items-center">
                           <div className="flex flex-col justify-center items-center">
-                            <h2 className="font-bold text-xl">{ww_pct}%</h2>
+                            <h2 className="font-bold text-xl">{pt_pct}%</h2>
                             <h3 className="text-[0.8rem] font-semibold">
                               Surpassed
                             </h3>
                             <p
                               className={
-                                wgh_ww! > wgh_pt!
+                                wgh_ww! < wgh_pt!
                                   ? "text-[0.6rem]"
-                                  : "text-[0.4rem]"
+                                  : "text-[0.5rem]"
                               }
                             >
-                              {ww_surp_sum} out of {students?.length!} students
+                              {pt_surp_sum} out of {students?.length} students
                             </p>
                           </div>
                         </div>
                         <CircularProgress
-                          value={ww_pct}
-                          pathColor="#FFF598"
+                          value={pt_pct}
+                          pathColor="#63C7FF"
                           strokeWidth={10}
                         />
                       </div>
                     </div>
-                  </div>
-                </div>
-                {/* PT Data */}
-                <div
-                  className={classNames(
-                    wgh_ww! > wgh_pt!
-                      ? "col-span-4"
-                      : wgh_pt! > wgh_ww!
-                      ? "col-span-6"
-                      : "col-span-5"
-                  )}
-                >
-                  {/* Performance Tasks Circular Progress */}
-                  <div className={"w-6/12"}>
                     <div className="relative">
                       <div className="z-40 absolute inset-0 flex justify-center items-center">
                         <div className="flex flex-col justify-center items-center">
-                          <h2 className="font-bold text-xl">{pt_pct}%</h2>
-                          <h3 className="text-[0.8rem] font-semibold">
-                            Surpassed
+                          <h2 className="font-bold text-3xl">
+                            {tdata.pt.percentage}%
+                          </h2>
+                          <h3 className="text-lg font-semibold">
+                            Performance Tasks
                           </h3>
-                          <p
-                            className={
-                              wgh_ww! < wgh_pt!
-                                ? "text-[0.6rem]"
-                                : "text-[0.5rem]"
-                            }
-                          >
-                            {pt_surp_sum} out of {students?.length} students
+                          <p className="text-base">
+                            Scored {tdata.pt.score_sum} out of{" "}
+                            {tdata.pt.total_item}
                           </p>
                         </div>
                       </div>
                       <CircularProgress
-                        value={pt_pct}
+                        value={tdata.pt.percentage}
                         pathColor="#63C7FF"
-                        strokeWidth={10}
+                        strokeWidth={8}
                       />
                     </div>
-                  </div>
-                  <div className="relative">
-                    <div className="z-40 absolute inset-0 flex justify-center items-center">
-                      <div className="flex flex-col justify-center items-center">
-                        <h2 className="font-bold text-3xl">
-                          {tdata.pt.percentage}%
-                        </h2>
-                        <h3 className="text-lg font-semibold">
-                          Performance Tasks
-                        </h3>
-                        <p className="text-base">
-                          Scored {tdata.pt.score_sum} out of{" "}
-                          {tdata.pt.total_item}
-                        </p>
-                      </div>
-                    </div>
-                    <CircularProgress
-                      value={tdata.pt.percentage}
-                      pathColor="#63C7FF"
-                      strokeWidth={8}
-                    />
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      {/* External Elements Section */}
-      <div className="min-h-fit bg-ocean-100">
-        <div className="mx-12 my-10">
-          <div className="pt-10">
-            <h2 className="text-2xl font-bold">
-              What affected my performance?
-            </h2>
-            <h3 className="italic">External Elements/Factors</h3>
-          </div>
-          <div className="pb-10">
-            <div className="flex gap-3 mt-6">
-              <h2 className="font-bold text-lg">Environmental Factors: </h2>
-              <h2 className="font-bold text-lg">
-                {capitalize(student?.inference_result?.environment.linguistic!)}
+        {/* External Elements Section */}
+        <div className="min-h-fit bg-ocean-100">
+          <div className="mx-12 my-10">
+            <div className="pt-10">
+              <h2 className="text-2xl font-bold">
+                What affected my performance?
               </h2>
+              <h3 className="italic">External Elements/Factors</h3>
             </div>
-            <div className="grid grid-cols-11 py-4">
-              <div className="col-span-5">
-                {/* Radar Chart */}
-                <div className="bg-white p-5 rounded-xl">
-                  <h3 className="font-semibold">
-                    Average Degree of Truth: {ave_env_fuzzy}
-                  </h3>
-                  <div>
-                    <Radar
-                      data={{
-                        labels: [
-                          "Unwanted Noise",
-                          "Limited Space",
-                          "House Chores",
-                          "Comfortability",
-                          "Support",
-                          "Internet",
-                          "Device",
-                          "Faculty Readiness",
-                        ],
-                        datasets: radarData,
-                      }}
-                      options={{
-                        responsive: true,
-                        scales: {
-                          r: {
-                            angleLines: {
+            <div className="pb-10">
+              <div className="flex gap-3 mt-6">
+                <h2 className="font-bold text-lg">Environmental Factors: </h2>
+                <h2 className="font-bold text-lg">
+                  {capitalize(
+                    student?.inference_result?.environment.linguistic!
+                  )}
+                </h2>
+              </div>
+              <div className="grid grid-cols-11 py-4">
+                <div className="col-span-5">
+                  {/* Radar Chart */}
+                  <div className="bg-white p-5 rounded-xl">
+                    <h3 className="font-semibold">
+                      Average Degree of Truth: {ave_env_fuzzy}
+                    </h3>
+                    <div>
+                      <Radar
+                        data={{
+                          labels: [
+                            "Unwanted Noise",
+                            "Limited Space",
+                            "House Chores",
+                            "Comfortability",
+                            "Support",
+                            "Internet",
+                            "Device",
+                            "Faculty Readiness",
+                          ],
+                          datasets: radarData,
+                        }}
+                        options={{
+                          responsive: true,
+                          scales: {
+                            r: {
+                              angleLines: {
+                                display: false,
+                              },
+                              suggestedMin: 0,
+                              suggestedMax: 1,
+                              ticks: {
+                                stepSize: 0.2,
+                              },
+                            },
+                          },
+                          plugins: {
+                            legend: {
                               display: false,
                             },
-                            suggestedMin: 0,
-                            suggestedMax: 1,
-                            ticks: {
-                              stepSize: 0.2,
+
+                            title: {
+                              display: true,
                             },
                           },
-                        },
-                        plugins: {
-                          legend: {
-                            display: false,
-                          },
-
-                          title: {
-                            display: true,
-                          },
-                        },
-                      }}
-                    />
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-span-6 ml-6 flex flex-col justify-between">
+                  <div className="w-1/2 p-4 rounded-lg bg-yellow-50 font-bold">
+                    <h4>Legend in Fuzzy Range</h4>
+                    <div className="font-normal border-t border-neutral-400 mt-2 pt-2">
+                      <div className="flex justify-between">
+                        <p>Unaffecting at all</p> <p>0.0</p>
+                      </div>
+                      <div className="flex justify-between">
+                        <p>Quite Affecting </p> <p>0.25</p>
+                      </div>
+                      <div className="flex justify-between">
+                        <p>Affecting </p> <p>0.50</p>
+                      </div>
+                      <div className="flex justify-between">
+                        <p>Greatly Affecting </p> <p>0.75</p>
+                      </div>
+                      <div className="flex justify-between">
+                        <p>Extremely Affecting </p> <p>1.00</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="h-96 overflow-x-auto text-justify pr-4">
+                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                    sed diam nonummy nibh euismod tincidunt ut laoreet dolore
+                    magna. Lorem ipsum dolor sit amet, consectetuer adipiscing
+                    elit, sed diam nonummy nibh euismod tincidunt ut laoreet
+                    dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                    adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                    laoreet dolore magna. Lorem ipsum dolor sit amet,
+                    consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                    tincidunt ut laoreet dolore magna.Lorem ipsum dolor sit
+                    amet, consectetuer adipiscing elit, sed diam nonummy nibh
+                    euismod tincidunt ut laoreet dolore magna. Lorem ipsum dolor
+                    sit amet, consectetuer adipiscing elit, sed diam nonummy
+                    nibh euismod tincidunt ut laoreet dolore magna. Lorem ipsum
+                    dolor sit amet, consectetuer adipiscing elit, sed diam
+                    nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                    sed diam nonummy nibh euismod tincidunt ut laoreet dolore
+                    magna.Lorem ipsum dolor sit amet, consectetuer adipiscing
+                    elit, sed diam nonummy nibh euismod tincidunt ut laoreet
+                    dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                    adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                    laoreet dolore magna. Lorem ipsum dolor sit amet,
+                    consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                    tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit
+                    amet, consectetuer adipiscing elit, sed diam nonummy nibh
+                    euismod tincidunt ut laoreet dolore magna.Lorem ipsum dolor
+                    sit amet, consectetuer adipiscing elit, sed diam nonummy
+                    nibh euismod tincidunt ut laoreet dolore magna. Lorem ipsum
+                    dolor sit amet, consectetuer adipiscing elit, sed diam
+                    nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                    sed diam nonummy nibh euismod tincidunt ut laoreet dolore
+                    magna. Lorem ipsum dolor sit amet, consectetuer adipiscing
+                    elit, sed diam nonummy nibh euismod tincidunt ut laoreet
+                    dolore magna.Lorem ipsum dolor sit amet, consectetuer
+                    adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                    laoreet dolore magna. Lorem ipsum dolor sit amet,
+                    consectetuer adipiscing elit, sed diam nonummy nibh euismod
+                    tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit
+                    amet, consectetuer adipiscing elit, sed diam nonummy nibh
+                    euismod tincidunt ut laoreet dolore magna. Lorem ipsum dolor
+                    sit amet, consectetuer adipiscing elit, sed diam nonummy
+                    nibh euismod tincidunt ut laoreet dolore magna.Lorem ipsum
+                    dolor sit amet, consectetuer adipiscing elit, sed diam
+                    nonummy nibh euismod tincidunt ut laoreet dolore magna.
+                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                    sed diam nonummy nibh euismod tincidunt ut laoreet dolore
+                    magna. Lorem ipsum dolor sit amet, consectetuer adipiscing
+                    elit, sed diam nonummy nibh euismod tincidunt ut laoreet
+                    dolore magna. Lorem ipsum dolor sit amet, consectetuer
+                    adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+                    laoreet dolore magna.
                   </div>
                 </div>
               </div>
-              <div className="col-span-6 ml-6 flex flex-col justify-between">
-                <div className="w-1/2 p-4 rounded-lg bg-yellow-50 font-bold">
-                  <h4>Legend in Fuzzy Range</h4>
-                  <div className="font-normal border-t border-neutral-400 mt-2 pt-2">
-                    <div className="flex justify-between">
-                      <p>Unaffecting at all</p> <p>0.0</p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p>Quite Affecting </p> <p>0.25</p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p>Affecting </p> <p>0.50</p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p>Greatly Affecting </p> <p>0.75</p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p>Extremely Affecting </p> <p>1.00</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="h-96 overflow-x-auto text-justify pr-4">
+
+              <div className="flex gap-3 py-6">
+                <h2 className="font-bold text-lg">Technological Factors: </h2>
+                <h2 className="font-bold text-lg">
+                  {capitalize(
+                    student?.inference_result?.technological.linguistic!
+                  )}
+                </h2>
+              </div>
+              <div className="grid grid-cols-11 gap-4 pb-10">
+                <div className="col-span-6 h-96 overflow-x-auto text-justify pr-4">
                   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
                   diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
                   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
@@ -1551,104 +1675,43 @@ const StudentInfo = (user: any) => {
                   adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
                   laoreet dolore magna.
                 </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3 py-6">
-              <h2 className="font-bold text-lg">Technological Factors: </h2>
-              <h2 className="font-bold text-lg">
-                {capitalize(
-                  student?.inference_result?.technological.linguistic!
-                )}
-              </h2>
-            </div>
-            <div className="grid grid-cols-11 gap-4 pb-10">
-              <div className="col-span-6 h-96 overflow-x-auto text-justify pr-4">
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore
-                magna.Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore
-                magna.Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore
-                magna.Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore
-                magna.Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore
-                magna.Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-              </div>
-              <div className="col-span-5">
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between font-light">
-                    <h6 className="px-4 ">Wi-Fi Connection</h6>
-                    <div className="flex justify-end">
-                      <h1 className="font-bold text-xl px-6">
-                        {student?.survey_result?.wifi.linguistic}
-                      </h1>
+                <div className="col-span-5">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between font-light">
+                      <h6 className="px-4 ">Wi-Fi Connection</h6>
+                      <div className="flex justify-end">
+                        <h1 className="font-bold text-xl px-6">
+                          {student?.survey_result?.wifi.linguistic}
+                        </h1>
+                      </div>
+                    </div>
+                    <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between font-light">
+                      <h6 className="px-4 ">Data Connection</h6>
+                      <div className="flex justify-end">
+                        <h1 className="font-bold text-xl px-6">
+                          {student?.survey_result?.data.linguistic}
+                        </h1>
+                      </div>
                     </div>
                   </div>
-                  <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between font-light">
-                    <h6 className="px-4 ">Data Connection</h6>
+                  <div className=" h-28 border border-black py-2 rounded-3xl flex flex-col justify-between">
+                    <h6 className="px-4 ">Device Availability</h6>
                     <div className="flex justify-end">
                       <h1 className="font-bold text-xl px-6">
-                        {student?.survey_result?.data.linguistic}
+                        {student?.survey_result?.device.linguistic}
                       </h1>
                     </div>
-                  </div>
-                </div>
-                <div className=" h-28 border border-black py-2 rounded-3xl flex flex-col justify-between">
-                  <h6 className="px-4 ">Device Availability</h6>
-                  <div className="flex justify-end">
-                    <h1 className="font-bold text-xl px-6">
-                      {student?.survey_result?.device.linguistic}
-                    </h1>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Footer */}
-      <div className="bg-white h-[10vh]"></div>
-    </>
+        {/* Footer */}
+        <div className="bg-white h-[10vh]"></div>
+      </>
+    )
   );
 };
 

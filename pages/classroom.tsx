@@ -462,21 +462,31 @@ export default function ClassroomInfo(user: any) {
                     </h2>
                     <div>
                       <h6 className="font-light">
-                        Average Score: {ww_task_array[task].ave_score}/
-                        {ww_task_array[task].total}
+                        Average Score:{" "}
+                        <span className="font-semibold">
+                          {ww_task_array[task].ave_score} /{" "}
+                          {ww_task_array[task].total}
+                        </span>
                       </h6>
                       <h6 className="font-light">
-                        Average Score PCT: {ww_task_array[task].ave_score_pct}
+                        Average Score PCT:{" "}
+                        <span className="font-semibold">
+                          {ww_task_array[task].ave_score_pct}
+                        </span>
                       </h6>
 
                       <h6 className="font-light">
                         No. of Students Participated:{" "}
-                        {ww_task_array[task].participated}
+                        <span className="font-semibold">
+                          {ww_task_array[task].participated}
+                        </span>
                       </h6>
                       <h6 className="font-light">
                         No. of Students Passed:{" "}
-                        {ww_task_array[task].passed.length +
-                          ww_task_array[task].perfect.length}
+                        <span className="font-semibold">
+                          {ww_task_array[task].passed.length +
+                            ww_task_array[task].perfect.length}
+                        </span>
                       </h6>
                       <div className="w-full">
                         <PeopleChart
@@ -540,22 +550,31 @@ export default function ClassroomInfo(user: any) {
 
                       <div>
                         <h6 className="font-light">
-                          Average Score: {pt_task_array[pt_task].ave_score}/
-                          {pt_task_array[pt_task].total}
+                          Average Score:{" "}
+                          <span className="font-semibold">
+                            {pt_task_array[pt_task].ave_score} /{" "}
+                            {pt_task_array[pt_task].total}
+                          </span>
                         </h6>
                         <h6 className="font-light">
                           Average Score PCT:{" "}
-                          {pt_task_array[pt_task].ave_score_pct}
+                          <span className="font-semibold">
+                            {pt_task_array[pt_task].ave_score_pct}
+                          </span>
                         </h6>
 
                         <h6 className="font-light">
                           No. of Students Participated:{" "}
-                          {pt_task_array[pt_task].participated}
+                          <span className="font-semibold">
+                            {pt_task_array[pt_task].participated}
+                          </span>
                         </h6>
                         <h6 className="font-light">
                           No. of Students Passed:{" "}
-                          {pt_task_array[pt_task].passed.length +
-                            pt_task_array[pt_task].perfect.length}
+                          <span className="font-semibold">
+                            {pt_task_array[pt_task].passed.length +
+                              pt_task_array[pt_task].perfect.length}
+                          </span>
                         </h6>
                         <div className="w-full">
                           <PeopleChart
