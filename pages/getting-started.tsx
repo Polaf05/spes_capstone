@@ -49,7 +49,7 @@ const gettingStarted = (user: any) => {
   const { students, setStudents } = useClassroom();
   const { setJsonFile } = useJson();
   const [fileName, setFileName] = useState(null);
-  const [forms, setForms] = useState<SurveyResult[] | null>(null);
+  const [forms, setForms] = useState<SurveyResult[]>([]);
   const [text_value, setText_value] = useState("");
   const [message, setMessage] = useState<string | null>(INITIAL_MESSAGE);
   const [isLoading, setLoading] = useState(false);
@@ -76,11 +76,16 @@ const gettingStarted = (user: any) => {
       } else {
         errors[1] = 1;
       }
+      setStudents(null);
+      setFileName(null);
+
+      errors[2] = 0;
+      errors[3] = 0;
     } else {
       setMessage("ERROR, INCORRECT TEMPLATE OR THE FORMS IS RESTRICTED");
       errors[0] = 1;
       errors[1] = 1;
-      setForms(null);
+      setForms([]);
       setStudents(null);
       setFileName(null);
     }
@@ -296,47 +301,47 @@ const gettingStarted = (user: any) => {
               let quarter_analysis = quarterAnalysis(quarter_grade);
 
               let initial: SurveyResult = {
-                email: "",
-                mobile: "",
-                name: "",
-                gender: "",
-                grade: "",
-                school: "",
-                learning_type: "",
-                learning_difficulty: "",
+                email: "No Data",
+                mobile: "No Data",
+                name: "No Data",
+                gender: "No Data",
+                grade: "No Data",
+                school: "No Data",
+                learning_type: "No Data",
+                learning_difficulty: "No Data",
                 effectivity_implementation: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
                 learning_performance_similarities: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
                 environment_factors: {
-                  unwanted_noise: "",
-                  limited_space: "",
-                  household_chorse: "",
-                  comfortability: "",
-                  support: "",
-                  internet: "",
-                  device: "",
-                  faculty_readiness: "",
+                  unwanted_noise: "No Data",
+                  limited_space: "No Data",
+                  household_chorse: "No Data",
+                  comfortability: "No Data",
+                  support: "No Data",
+                  internet: "No Data",
+                  device: "No Data",
+                  faculty_readiness: "No Data",
                   value: [],
                 },
                 wifi: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
                 data: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
                 device: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
                 tech_difficulty: 0,
-                platform: "",
+                platform: "No Data",
                 accessible_usage: 0,
               };
 
@@ -345,31 +350,31 @@ const gettingStarted = (user: any) => {
               let initial_infer: DataInference = {
                 experience: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
                 internet: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
                 resource: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
                 accessibility: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
                 technological: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
                 environment: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
                 external_elements: {
                   value: 0,
-                  linguistic: "",
+                  linguistic: "No Data",
                 },
               };
 
@@ -567,22 +572,16 @@ const gettingStarted = (user: any) => {
                       <form action="">
                         <div>
                           <div
-                            className={classNames(
-                              "mt-1 flex justify-center px-6 py-6 border-2 w-full border-gray-300 border-dashed rounded-md",
-                              forms !== null
-                                ? "border-ocean-400"
-                                : "border-gray-300"
-                            )}
+                            className={
+                              "mt-1 flex justify-center px-6 py-6 border-2 w-full border-ocean-400 border-dashed rounded-md"
+                            }
                           >
                             <div className="space-y-1 text-center">
                               <div className="flex text-lg text-gray-600">
                                 <label
-                                  className={classNames(
-                                    "font-bold",
-                                    forms !== null
-                                      ? "relative cursor-pointer text-ocean-400 hover:text-ocean-400"
-                                      : "text-misc-disable"
-                                  )}
+                                  className={
+                                    "font-bold relative cursor-pointer text-ocean-400 hover:text-ocean-400"
+                                  }
                                 >
                                   <span>Upload a file</span>
                                   <input
@@ -591,7 +590,6 @@ const gettingStarted = (user: any) => {
                                     type="file"
                                     className="sr-only"
                                     onChange={handleFile}
-                                    disabled={forms == null}
                                   />
                                 </label>
                               </div>

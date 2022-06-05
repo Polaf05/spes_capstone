@@ -94,17 +94,11 @@ const Dashboard = (user: any) => {
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [failedStudents, setFailedStudents] = useState<number>(0);
 
-  useEffect(() => {
-    if (!user.user) {
-      router.push("/login");
-    }
-  }, [user]);
-
   const grade = 36;
   console.log(`Transmuted Grade ${grade}: ${transmuteGrade(grade)}`);
 
   useEffect(() => {
-    if (user != null) {
+    if (!user.user) {
       router.push("/login");
     } else {
       if (!students) {
