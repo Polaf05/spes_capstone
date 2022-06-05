@@ -30,7 +30,11 @@ import {
   Tooltip,
 } from "chart.js";
 import Link from "next/link";
-import { classNames, studentInCategory } from "../lib/functions/concat";
+import {
+  classNames,
+  formatName,
+  studentInCategory,
+} from "../lib/functions/concat";
 import { getGrade } from "../lib/functions/grade_computation";
 import { getRemarks } from "../lib/functions/formatting";
 import { Student } from "../types/Students";
@@ -137,7 +141,7 @@ const StudentDialog = ({
   const data_to_render =
     category === "Over All"
       ? dataToRender
-      : "Written Works"
+      : category === "Written Works"
       ? [ww_dataToRender]
       : [pt_dataToRender];
 
@@ -151,9 +155,10 @@ const StudentDialog = ({
       ? ww_labels.length > pt_labels.length
         ? ww_labels
         : pt_labels
-      : "Written Works"
+      : category === "Written Works"
       ? ww_labels
       : pt_labels;
+
   const dataChart: Chart = {
     labels:
       category === "Over All"
@@ -246,7 +251,7 @@ const StudentDialog = ({
                           as="h1"
                           className="flex justify-end text-2xl font-semibold leading-6 text-gray-900 w-full mb-2"
                         >
-                          {student?.name}
+                          {formatName(student!.name)}
                         </Dialog.Title>
                         <div className="flex justify-end font-medium border-b">
                           {student?.gender}

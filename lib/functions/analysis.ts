@@ -68,7 +68,7 @@ export function fluctuation(task: TaskData[], possible: TaskData[]) {
 
   let lines = findLineByLeastSquares(x, percent);
 
-  console.log(lines);
+  // console.log(lines);
 
   trends = lines as string;
 
@@ -98,6 +98,9 @@ export function quarterAnalysis(quarter: Quarter[]) {
   let consistent: number[] = [];
   let temp_consistent: number[] = [];
 
+  let x: number[] = [];
+  let percent: number[] = [];
+
   let len = -1;
 
   for (let i = 0; i < quarter.length; i++) {
@@ -110,6 +113,8 @@ export function quarterAnalysis(quarter: Quarter[]) {
   }
 
   for (let i = 0; i <= len; i++) {
+    x.push(i);
+    percent.push(quarter[i].grade_before);
     //Getting the trend
     if (i < len) {
       let sum = quarter[i + 1].grade_before - quarter[i].grade_before;
@@ -148,41 +153,11 @@ export function quarterAnalysis(quarter: Quarter[]) {
 
   let trends = "";
 
-  let positive = 0;
-  let negative = 0;
-  let alternating = true;
-  let linear = true;
+  let lines = findLineByLeastSquares(x, percent);
 
-  for (let i = 0; i < trend.length; i++) {
-    if (i + 1 != trend.length) {
-      if (Math.sign(trend[i]) == Math.sign(trend[i + 1])) {
-        alternating = false;
-      }
-    }
+  // console.log(lines);
 
-    if (trend[i] != trend[0]) {
-      linear = false;
-    }
-    if (trend[i] < 0) {
-      negative++;
-    } else if (trend[i] > 0) {
-      positive++;
-    }
-  }
-
-  if (!linear) {
-    if (!alternating) {
-      if (positive > negative) {
-        trends = "upward";
-      } else {
-        trends = "downward";
-      }
-    } else {
-      trends = "fluctuating";
-    }
-  } else {
-    trends = "linear";
-  }
+  trends = lines as string;
 
   const quarterData: TaskAnalysis = {
     fluctuation: fluctuate,
@@ -413,11 +388,19 @@ function findLineByLeastSquares(values_x: number[], values_y: number[]) {
     result_values_y.push(y);
   }
 
-  console.log(result_values_x, result_values_y);
+  // console.log(result_values_x, result_values_y);
 
-  if (result_values_y[values_length - 1] == result_values_y[0]) {
+  let trend = parseFloat(
+    (result_values_y[values_length - 1] - result_values_y[0]).toFixed(1)
+  );
+
+  if (trend == 0) {
     return "consistent linear";
-  } else if (result_values_y[values_length - 1] > result_values_y[0]) {
+  } else if (trend > 0 && trend <= 3) {
+    return "slightly upward";
+  } else if (trend < 0 && trend >= -3) {
+    return "slightly downward";
+  } else if (trend > 3) {
     return "upward";
   } else {
     return "downward";

@@ -80,7 +80,6 @@ Chart.register(
 
 const Dashboard = () => {
   const { students } = useClassroom();
-  const { jsonFile } = useJson();
   const { quarter, setQuarter } = useSelectedQuarter();
   const [quarters, setQuarters] = useState<number[]>([]);
   const router = useRouter();
@@ -93,6 +92,9 @@ const Dashboard = () => {
   const [remarks, setRemarks] = useState<Remarks[]>([]);
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [failedStudents, setFailedStudents] = useState<number>(0);
+
+  const grade = 36;
+  console.log(`Transmuted Grade ${grade}: ${transmuteGrade(grade)}`);
 
   useEffect(() => {
     if (!students) {
@@ -235,21 +237,31 @@ const Dashboard = () => {
     <>
       {students && (
         <div className="m-4">
-          <div className="w-40 h-40 p-2">
-            <Image
-              src="/logo.png"
-              alt="logo picture"
-              width={100}
-              height={100}
-            />
+          <div className="w-full flex justify-between px-12">
+            <div className="flex justify-center items-center">
+              {" "}
+              <h2 className="text-xl xl:text-2xl font-bold">
+                Student Performance Evaluation System
+              </h2>
+            </div>
+            <div className="w-20 h-20 xl:w-40 xl:h-40 p-2">
+              <Link href={`/getting-started`} passHref>
+                <div className="w-fit h-fit cursor-pointer">
+                  <Image
+                    src="/logo.png"
+                    alt="logo picture"
+                    width={100}
+                    height={100}
+                  />
+                </div>
+              </Link>
+            </div>
           </div>
           <div className="grid place-content-center">
             <div>
-              <h1 className="text-2xl font-bold">
+              <h1 className="text-xl xl:text-2xl font-semibold">
                 Classroom Evaluation:{" "}
-                <span className="font-bold underline decoration-2">
-                  {jsonFile}
-                </span>
+                <span className="font-bold underline decoration-2"></span>
               </h1>
             </div>
             <div className="flex gap-4">
@@ -260,7 +272,7 @@ const Dashboard = () => {
                       onClick={() => {
                         setQuarter(idx);
                       }}
-                      className="rounded-3xl w-60 h-40 bg-ocean-100 grid place-items-center"
+                      className="rounded-3xl w-36 h-24 xl:w-60 xl:h-40 bg-ocean-100 grid place-items-center"
                     >
                       <h3 className="font-semibold text-lg">
                         Quarter {button}
@@ -272,23 +284,27 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="mt-16 mx-24 h-[80vh]">
-            <h2 className="text-2xl font-semibold">Quarter Summary</h2>
-            {quarters.length === 4 ? (
-              <div className="flex gap-1 items-center">
-                <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                <p className="font-light">Complete Quarter Summary</p>
-              </div>
-            ) : (
-              <div className="flex gap-1 items-center">
-                <ExclamationCircleIcon className="w-5 h-5 text-yellow-500" />
-                <p className="font-light">
-                  Grading Sheet is still incomplete. Displaying{" "}
-                  {quarters.length} of 4 quarters only
-                </p>
-              </div>
-            )}
+            <h2 className="text-lg xl:text-2xl font-semibold">
+              Quarter Summary
+            </h2>
+            <div className="flex gap-1 text-sm xl:text-lg items-center">
+              {quarters.length === 4 ? (
+                <>
+                  <CheckCircleIcon className="w-3 h-3 xl:w-5 xl:h-5 text-green-500" />
+                  <p className="font-light">Complete Quarter Summary</p>
+                </>
+              ) : (
+                <>
+                  <ExclamationCircleIcon className="w-3 h-3 xl:w-5 xl:h-5 text-yellow-500" />
+                  <p className="font-light">
+                    Grading Sheet is still incomplete. Displaying{" "}
+                    {quarters.length} of 4 quarters only
+                  </p>
+                </>
+              )}
+            </div>
             <div className="grid grid-cols-9 h-fit gap-8 mt-4">
-              <div className="col-span-5 bg-neutral-50 p-4 rounded-xl">
+              <div className="col-span-5  p-4 rounded-xl">
                 <BarChart
                   display={true}
                   indexAxis="x"

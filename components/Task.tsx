@@ -10,7 +10,7 @@ import {
   getGrade,
   getRemarks,
 } from "../lib/functions/grade_computation";
-import { classNames } from "../lib/functions/concat";
+import { classNames, formatName } from "../lib/functions/concat";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -199,7 +199,7 @@ export const Task = ({
                     key={idx}
                   >
                     <td className="pl-4 font-semibold text-left">
-                      {student.name}
+                      {formatName(student.name)}
                     </td>
                     <td>
                       {category === "Over All"
