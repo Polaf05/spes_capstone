@@ -372,7 +372,7 @@ const gettingStarted = () => {
   const checker_msg = [
     "Link is correct and not restricted",
     "Sheet template format is correct",
-    "Uploaded file format is korik (.xlsx)",
+    "Uploaded file format is correct (.xlsx)",
     "DepEd Grading Sheet Template is met",
     "Names of the students are correct",
     "Grading Sheet is in Alphabetical Order",
@@ -384,19 +384,25 @@ const gettingStarted = () => {
   return (
     <React.Fragment>
       <div className="bg-[url('/bg-form.jpg')] bg-cover min-h-screen">
-        {page > 2 ? (
+        {page > 3 ? (
           <div className="flex justify-center">
             <div className="space-y-4 bg-ocean-100 w-10/12 my-10 rounded-2xl p-10 xl:w-4/5">
               <div className="flex justify-between">
                 <div>
-                  <h1 className="text-2xl font-bold">Welcome to SPES!</h1>
+                  <h1 className="text-2xl font-bold">
+                    A great day for evalution! Let's get you set up...
+                  </h1>
                   <div className="my-4 w-5/6">
                     <p className="inline-block text-justify">
-                      Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
-                      adipiscing elit, sed diam nonummy nibh euismod tincidunt
-                      ut laoreet dolore magna. Lorem ipsum dolor sit amet,
-                      consectetuer adipiscing elit, sed diam nonummy nibh
-                      euismod tincidunt ut laoreet dolore magna. Click{" "}
+                      The{" "}
+                      <span className="font-semibold">
+                        Student Performance Evaluation System (SPES)
+                      </span>{" "}
+                      is a data analytics web-based platform that automates
+                      evaluation on students from online/hybrid learning set-up
+                      amidst pandemic based on their semester-long performance.
+                      It includes additional factors in the evaluation, such as
+                      "Environmental" and "Technological" factors. Click{" "}
                       <span
                         onClick={() => {
                           setPage(0);
@@ -405,18 +411,20 @@ const gettingStarted = () => {
                       >
                         here
                       </span>{" "}
-                      for a quick tutorial
+                      for a quick tutorial.
                     </p>
                   </div>
                 </div>
-                <div className="">
-                  <Image
-                    src="/logo.png"
-                    alt="logo picture"
-                    width={250}
-                    height={230}
-                  />
-                </div>
+                <Link href="/" passHref>
+                  <div className="w-fit h-fit cursor-pointer">
+                    <Image
+                      src="/logo.png"
+                      alt="logo picture"
+                      width={250}
+                      height={230}
+                    />
+                  </div>
+                </Link>
               </div>
               <div className="px-2 grid grid-cols-2">
                 <div>
@@ -426,7 +434,7 @@ const gettingStarted = () => {
                         <h3 className="font-bold text-white">1</h3>
                       </div>
                       <h3 className="font-semibold text-lg">
-                        Google Sheets Link:
+                        Google Spreadsheet Link:
                       </h3>
                     </div>
                     <div className="">
@@ -511,14 +519,14 @@ const gettingStarted = () => {
                   </div>
                 </div>
                 <div className="border-l-2 border-ocean-400 pl-6">
-                  <h3 className="text-lg font-semibold">Checking</h3>
+                  <h3 className="text-lg font-semibold">System Requirements</h3>
                   <div>
                     {checker_msg.map((msg, idx) => (
                       <div className="flex gap-4 items-center py-1">
                         {errors[idx] === 2 ? (
                           <CheckCircleIcon className="w-5 h-5 text-green-500" />
                         ) : errors[idx] === 0 ? (
-                          <ExclamationCircleIcon className="w-5 h-5 text-orange-500" />
+                          <ExclamationCircleIcon className="w-5 h-5 text-yellow-500" />
                         ) : errors[idx] === -1 ? (
                           <div className="w-4 h-4 bg-neutral-300 rounded-full"></div>
                         ) : (
