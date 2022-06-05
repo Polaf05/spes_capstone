@@ -468,7 +468,7 @@ const gettingStarted = (user: any) => {
     "Complete data",
   ];
 
-  const [page, setPage] = useState<number>(3);
+  const [page, setPage] = useState<number>(4);
 
   return (
     <React.Fragment>
