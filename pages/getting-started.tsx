@@ -37,31 +37,21 @@ import {
 } from "@heroicons/react/outline";
 import Intro from "../components/sections/Intro";
 import { useJson } from "../hooks/useSetJson";
-import cookie from "cookie";
-import { useRouter } from "next/router";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
 
 let errors: number[] = [0, 0, 0, 0, -1, -1, -1];
 
-const gettingStarted = (user: any) => {
+const gettingStarted = () => {
   const { students, setStudents } = useClassroom();
   const { setJsonFile } = useJson();
   const [fileName, setFileName] = useState(null);
-  const [forms, setForms] = useState<SurveyResult[]>([]);
+  const [forms, setForms] = useState<SurveyResult[] | null>(null);
   const [text_value, setText_value] = useState("");
   const [message, setMessage] = useState<string | null>(INITIAL_MESSAGE);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<any>(null);
-  const router = useRouter();
-
-  // useEffect(() => {
-  //   console.log(user);
-  //   if (!user.user) {
-  //     router.push("/login");
-  //   }
-  // }, [user]);
 
   let handleForms = async (text: string) => {
     setLoading(true);
@@ -76,16 +66,11 @@ const gettingStarted = (user: any) => {
       } else {
         errors[1] = 1;
       }
-      setStudents(null);
-      setFileName(null);
-
-      errors[2] = 0;
-      errors[3] = 0;
     } else {
       setMessage("ERROR, INCORRECT TEMPLATE OR THE FORMS IS RESTRICTED");
       errors[0] = 1;
       errors[1] = 1;
-      setForms([]);
+      setForms(null);
       setStudents(null);
       setFileName(null);
     }
@@ -300,86 +285,10 @@ const gettingStarted = (user: any) => {
 
               let quarter_analysis = quarterAnalysis(quarter_grade);
 
-              let initial: SurveyResult = {
-                email: "No Data",
-                mobile: "No Data",
-                name: "No Data",
-                gender: "No Data",
-                grade: "No Data",
-                school: "No Data",
-                learning_type: "No Data",
-                learning_difficulty: "No Data",
-                effectivity_implementation: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-                learning_performance_similarities: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-                environment_factors: {
-                  unwanted_noise: "No Data",
-                  limited_space: "No Data",
-                  household_chorse: "No Data",
-                  comfortability: "No Data",
-                  support: "No Data",
-                  internet: "No Data",
-                  device: "No Data",
-                  faculty_readiness: "No Data",
-                  value: [],
-                },
-                wifi: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-                data: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-                device: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-                tech_difficulty: 0,
-                platform: "No Data",
-                accessible_usage: 0,
-              };
-
               let survey = getSurveyResults(forms!, item.name);
 
-              let initial_infer: DataInference = {
-                experience: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-                internet: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-                resource: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-                accessibility: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-                technological: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-                environment: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-                external_elements: {
-                  value: 0,
-                  linguistic: "No Data",
-                },
-              };
-
               let infer: DataInference =
-                survey == undefined ? initial_infer : inferenceData(survey);
+                survey == undefined ? ([] as any) : inferenceData(survey);
 
               let grade_after =
                 survey == undefined
@@ -402,31 +311,33 @@ const gettingStarted = (user: any) => {
                 final_grade_after: grade_after,
                 final_remarks: finals[index].remarks,
                 remarks: getRemarks(finals[index].final_grade) as string,
-                survey_result: survey == undefined ? initial : survey,
-                inference_result: infer,
+                survey_result: survey == undefined ? ([] as any) : survey,
+                //inference_result: inference_data,
+                inference_result:
+                  survey == undefined ? ([] as any) : inferenceData(survey),
                 ranking: null,
               };
-              //// console.log(student_info);
+              //console.log(student_info);
               classroom.push(student_info);
             });
             let class_list = getRanking(classroom, task_length);
 
-            // // console.log("Class List:", class_list);
+            // console.log("Class List:", class_list);
             // let upload = await uploadJson(class_list);
-            // // console.log("Class ID:", upload);
+            // console.log("Class ID:", upload);
 
             // setJsonFile(upload);
 
             // let download = await fetchJson(upload);
-            // // console.log(download);
+            // console.log(download);
 
             setStudents(class_list);
             setError(errors);
-            // console.log("Error:", error);
+            console.log("Error:", error);
           } else {
-            // console.log(
-            //   "excel file did not match the template, please upload another file"
-            // );
+            console.log(
+              "excel file did not match the template, please upload another file"
+            );
 
             setMessage("File is incompatible, file did not match the template");
 
@@ -441,7 +352,7 @@ const gettingStarted = (user: any) => {
         };
         reader.readAsBinaryString(file);
 
-        // console.log("file permitted");
+        console.log("file permitted");
       } else {
         setFileName(null);
         if (students) {
@@ -454,44 +365,38 @@ const gettingStarted = (user: any) => {
         );
         errors[2] = 1;
         errors[3] = 1;
-        // console.log("file denied");
+        console.log("file denied");
       }
     }
   };
   const checker_msg = [
     "Link is correct and not restricted",
     "Sheet template format is correct",
-    "Uploaded file format is correct (.xlsx)",
+    "Uploaded file format is korik (.xlsx)",
     "DepEd Grading Sheet Template is met",
     "Names of the students are correct",
     "Grading Sheet is in Alphabetical Order",
     "Complete data",
   ];
 
-  const [page, setPage] = useState<number>(4);
+  const [page, setPage] = useState<number>(3);
 
   return (
     <React.Fragment>
       <div className="bg-[url('/bg-form.jpg')] bg-cover min-h-screen">
-        {page > 3 ? (
+        {page > 2 ? (
           <div className="flex justify-center">
             <div className="space-y-4 bg-ocean-100 w-10/12 my-10 rounded-2xl p-10 xl:w-4/5">
               <div className="flex justify-between">
                 <div>
-                  <h1 className="text-2xl font-bold">
-                    A great day for evalution! Let's get you set up...
-                  </h1>
+                  <h1 className="text-2xl font-bold">Welcome to SPES!</h1>
                   <div className="my-4 w-5/6">
                     <p className="inline-block text-justify">
-                      The{" "}
-                      <span className="font-semibold">
-                        Student Performance Evaluation System (SPES)
-                      </span>{" "}
-                      is a data analytics web-based platform that automates
-                      evaluation on students from online/hybrid learning set-up
-                      amidst pandemic based on their semester-long performance.
-                      It includes additional factors in the evaluation, such as
-                      "Environmental" and "Technological" factors. Click{" "}
+                      Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
+                      adipiscing elit, sed diam nonummy nibh euismod tincidunt
+                      ut laoreet dolore magna. Lorem ipsum dolor sit amet,
+                      consectetuer adipiscing elit, sed diam nonummy nibh
+                      euismod tincidunt ut laoreet dolore magna. Click{" "}
                       <span
                         onClick={() => {
                           setPage(0);
@@ -500,20 +405,18 @@ const gettingStarted = (user: any) => {
                       >
                         here
                       </span>{" "}
-                      for a quick tutorial.
+                      for a quick tutorial
                     </p>
                   </div>
                 </div>
-                <Link href="/" passHref>
-                  <div className="w-fit h-fit cursor-pointer">
-                    <Image
-                      src="/logo.png"
-                      alt="logo picture"
-                      width={250}
-                      height={230}
-                    />
-                  </div>
-                </Link>
+                <div className="">
+                  <Image
+                    src="/logo.png"
+                    alt="logo picture"
+                    width={250}
+                    height={230}
+                  />
+                </div>
               </div>
               <div className="px-2 grid grid-cols-2">
                 <div>
@@ -523,7 +426,7 @@ const gettingStarted = (user: any) => {
                         <h3 className="font-bold text-white">1</h3>
                       </div>
                       <h3 className="font-semibold text-lg">
-                        Google Spreadsheet Link:
+                        Google Sheets Link:
                       </h3>
                     </div>
                     <div className="">
@@ -572,16 +475,22 @@ const gettingStarted = (user: any) => {
                       <form action="">
                         <div>
                           <div
-                            className={
-                              "mt-1 flex justify-center px-6 py-6 border-2 w-full border-ocean-400 border-dashed rounded-md"
-                            }
+                            className={classNames(
+                              "mt-1 flex justify-center px-6 py-6 border-2 w-full border-gray-300 border-dashed rounded-md",
+                              forms !== null
+                                ? "border-ocean-400"
+                                : "border-gray-300"
+                            )}
                           >
                             <div className="space-y-1 text-center">
                               <div className="flex text-lg text-gray-600">
                                 <label
-                                  className={
-                                    "font-bold relative cursor-pointer text-ocean-400 hover:text-ocean-400"
-                                  }
+                                  className={classNames(
+                                    "font-bold",
+                                    forms !== null
+                                      ? "relative cursor-pointer text-ocean-400 hover:text-ocean-400"
+                                      : "text-misc-disable"
+                                  )}
                                 >
                                   <span>Upload a file</span>
                                   <input
@@ -590,6 +499,7 @@ const gettingStarted = (user: any) => {
                                     type="file"
                                     className="sr-only"
                                     onChange={handleFile}
+                                    disabled={forms == null}
                                   />
                                 </label>
                               </div>
@@ -601,14 +511,14 @@ const gettingStarted = (user: any) => {
                   </div>
                 </div>
                 <div className="border-l-2 border-ocean-400 pl-6">
-                  <h3 className="text-lg font-semibold">System Requirements</h3>
+                  <h3 className="text-lg font-semibold">Checking</h3>
                   <div>
                     {checker_msg.map((msg, idx) => (
                       <div className="flex gap-4 items-center py-1">
                         {errors[idx] === 2 ? (
                           <CheckCircleIcon className="w-5 h-5 text-green-500" />
                         ) : errors[idx] === 0 ? (
-                          <ExclamationCircleIcon className="w-5 h-5 text-yellow-500" />
+                          <ExclamationCircleIcon className="w-5 h-5 text-orange-500" />
                         ) : errors[idx] === -1 ? (
                           <div className="w-4 h-4 bg-neutral-300 rounded-full"></div>
                         ) : (
@@ -653,38 +563,3 @@ const gettingStarted = (user: any) => {
 };
 
 export default gettingStarted;
-
-// export async function getServerSideProps(context: any) {
-//   let headerCookie = context.req.headers.cookie;
-//   if (typeof headerCookie !== "string") {
-//     headerCookie = "";
-//   }
-//   const cookies: any = cookie.parse(headerCookie);
-
-//   const jwt = cookies.OursiteJWT;
-
-//   if (!jwt) {
-//     return { props: { user: null } };
-//   }
-
-//   return { props: { user: jwt } };
-// }
-
-//legends lang nakakaalam
-
-//TOTAL SCORES index [9]
-
-//index 15 -> total scores written
-
-//index index
-
-//written task 5 -> 14
-
-//writter percentage ->16
-// written weighted score -> 17
-
-// performace task -> 18 -> 27
-
-//performance total -> 28
-
-//performace percentage -> 29
