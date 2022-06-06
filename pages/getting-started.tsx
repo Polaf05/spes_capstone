@@ -56,12 +56,12 @@ const gettingStarted = (user: any) => {
   const [error, setError] = useState<any>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    console.log(user);
-    if (!user.user) {
-      router.push("/login");
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   console.log(user);
+  //   if (!user.user) {
+  //     router.push("/login");
+  //   }
+  // }, [user]);
 
   let handleForms = async (text: string) => {
     setLoading(true);
@@ -654,21 +654,21 @@ const gettingStarted = (user: any) => {
 
 export default gettingStarted;
 
-export async function getServerSideProps(context: any) {
-  let headerCookie = context.req.headers.cookie;
-  if (typeof headerCookie !== "string") {
-    headerCookie = "";
-  }
-  const cookies: any = cookie.parse(headerCookie);
+// export async function getServerSideProps(context: any) {
+//   let headerCookie = context.req.headers.cookie;
+//   if (typeof headerCookie !== "string") {
+//     headerCookie = "";
+//   }
+//   const cookies: any = cookie.parse(headerCookie);
 
-  const jwt = cookies.OursiteJWT;
+//   const jwt = cookies.OursiteJWT;
 
-  if (!jwt) {
-    return { props: { user: null } };
-  }
+//   if (!jwt) {
+//     return { props: { user: null } };
+//   }
 
-  return { props: { user: jwt } };
-}
+//   return { props: { user: jwt } };
+// }
 
 //legends lang nakakaalam
 
