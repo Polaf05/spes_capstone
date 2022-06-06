@@ -18,7 +18,7 @@ const Home: NextPage = () => {
             the evaluation, such as "Environmental" and "Technological" factors.
           </p>
           <Link href={"/getting-started"} passHref>
-            <button className="rounded-full w-64 h-14 border-2 border-ocean-300 text-ocean-300 hover:bg-ocean-300 hover:text-white text-lg font-bold">
+            <button className="rounded-full w-64 h-14 border-2 border-ocean-300 bg-white text-ocean-300 hover:bg-ocean-300 hover:text-white text-lg font-bold">
               Continue
             </button>
           </Link>
@@ -31,6 +31,9 @@ const Home: NextPage = () => {
             objectFit="contain"
           />
         </div>
+      </div>
+      <div className="float-right pr-4">
+        <p className="text-sm text-neutral-400">ver 0.1.0</p>
       </div>
     </div>
   );

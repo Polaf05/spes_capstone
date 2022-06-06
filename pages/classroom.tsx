@@ -84,8 +84,6 @@ export default function ClassroomInfo() {
     // }
   }, []);
 
-  useEffect;
-
   let quarter_index = quarter;
 
   var count = [0, 0, 0, 0, 0];
