@@ -142,40 +142,40 @@ const StudentInfo = (user: any) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!user.user) {
-      router.push("/login");
-    } else {
-      if (!students || !student) router.back();
-      else {
-        setMyStudent(student?.quarter![quarter]!);
-        let ww_available_scores: number[] = [];
-        let pt_available_scores: number[] = [];
+    // if (!user.user) {
+    //   router.push("/login");
+    // } else {
+    if (!students || !student) router.back();
+    else {
+      setMyStudent(student?.quarter![quarter]!);
+      let ww_available_scores: number[] = [];
+      let pt_available_scores: number[] = [];
 
-        let qSum: number = 0;
-        students[0]?.quarter?.map((q) => {
-          qSum +=
-            q.written_works?.length! > 0 || q.performance_tasks?.length! > 0
-              ? 1
-              : 0;
-        });
+      let qSum: number = 0;
+      students[0]?.quarter?.map((q) => {
+        qSum +=
+          q.written_works?.length! > 0 || q.performance_tasks?.length! > 0
+            ? 1
+            : 0;
+      });
 
-        let buttons: string[] = [];
-        for (var i = 0; i < qSum; i++) {
-          buttons.push(`Quarter ${i + 1}`);
-          const ww_grade = student?.quarter![i].written_percentage?.score;
-          const pt_grade = student?.quarter![i].performance_percentage?.score;
+      let buttons: string[] = [];
+      for (var i = 0; i < qSum; i++) {
+        buttons.push(`Quarter ${i + 1}`);
+        const ww_grade = student?.quarter![i].written_percentage?.score;
+        const pt_grade = student?.quarter![i].performance_percentage?.score;
 
-          ww_available_scores.push(typeof ww_grade === "string" ? 0 : ww_grade);
-          pt_available_scores.push(typeof pt_grade === "string" ? 0 : pt_grade);
-        }
-        setQSum(qSum);
-        set_ww_available_scores(ww_available_scores);
-        set_pt_available_scores(pt_available_scores);
-        setButtons(buttons);
-        setMyquar(buttons);
+        ww_available_scores.push(typeof ww_grade === "string" ? 0 : ww_grade);
+        pt_available_scores.push(typeof pt_grade === "string" ? 0 : pt_grade);
       }
+      setQSum(qSum);
+      set_ww_available_scores(ww_available_scores);
+      set_pt_available_scores(pt_available_scores);
+      setButtons(buttons);
+      setMyquar(buttons);
     }
-  }, [user]);
+    //}
+  }, []);
 
   //set quarter data
   const quarter_grades = {
@@ -1717,18 +1717,18 @@ const StudentInfo = (user: any) => {
 
 export default StudentInfo;
 
-export async function getServerSideProps(context: any) {
-  let headerCookie = context.req.headers.cookie;
-  if (typeof headerCookie !== "string") {
-    headerCookie = "";
-  }
-  const cookies: any = cookie.parse(headerCookie);
+// export async function getServerSideProps(context: any) {
+//   let headerCookie = context.req.headers.cookie;
+//   if (typeof headerCookie !== "string") {
+//     headerCookie = "";
+//   }
+//   const cookies: any = cookie.parse(headerCookie);
 
-  const jwt = cookies.OursiteJWT;
+//   const jwt = cookies.OursiteJWT;
 
-  if (!jwt) {
-    return { props: { user: null } };
-  }
+//   if (!jwt) {
+//     return { props: { user: null } };
+//   }
 
-  return { props: { user: jwt } };
-}
+//   return { props: { user: jwt } };
+// }

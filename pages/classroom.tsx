@@ -36,23 +36,23 @@ const getRemarks = (grade: number) => {
     : "Very Good";
 };
 
-export async function getServerSideProps(context: any) {
-  let headerCookie = context.req.headers.cookie;
-  if (typeof headerCookie !== "string") {
-    headerCookie = "";
-  }
-  const cookies: any = cookie.parse(headerCookie);
+// export async function getServerSideProps(context: any) {
+//   let headerCookie = context.req.headers.cookie;
+//   if (typeof headerCookie !== "string") {
+//     headerCookie = "";
+//   }
+//   const cookies: any = cookie.parse(headerCookie);
 
-  const jwt = cookies.OursiteJWT;
+//   const jwt = cookies.OursiteJWT;
 
-  if (!jwt) {
-    return { props: { user: null } };
-  }
+//   if (!jwt) {
+//     return { props: { user: null } };
+//   }
 
-  return { props: { user: jwt } };
-}
+//   return { props: { user: jwt } };
+// }
 
-export default function ClassroomInfo(user: any) {
+export default function ClassroomInfo() {
   //const localStudents: Student[] = classroom;
   const { students } = useClassroom();
   const { quarter } = useSelectedQuarter();
@@ -66,23 +66,23 @@ export default function ClassroomInfo(user: any) {
   const [wgh_pt, setWghPT] = useState<number>(0);
 
   useEffect(() => {
-    if (!user.user) {
-      router.push("/login");
+    // if (!user.user) {
+    //   router.push("/login");
+    // } else {
+    if (!students) {
+      router.back();
     } else {
-      if (!students) {
-        router.back();
-      } else {
-        console.log(students);
-        const myStudent = students![0].quarter![quarter];
-        // get weighted omsim of a written works and performance task
-        const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
-        const wgh_pt =
-          myStudent.performance_weighted_score?.highest_possible_score;
-        setWghWW(wgh_ww ? wgh_ww : 0);
-        setWghPT(wgh_pt ? wgh_pt : 0);
-      }
+      console.log(students);
+      const myStudent = students![0].quarter![quarter];
+      // get weighted omsim of a written works and performance task
+      const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
+      const wgh_pt =
+        myStudent.performance_weighted_score?.highest_possible_score;
+      setWghWW(wgh_ww ? wgh_ww : 0);
+      setWghPT(wgh_pt ? wgh_pt : 0);
     }
-  }, [user]);
+    // }
+  }, []);
 
   useEffect;
 
