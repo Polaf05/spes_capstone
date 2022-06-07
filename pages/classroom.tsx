@@ -18,7 +18,6 @@ import { getGrade, transmuteGrade } from "../lib/functions/grade_computation";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { classNames } from "../lib/functions/concat";
 import { TaskInfo } from "../types/Task";
-import cookie from "cookie";
 
 import Link from "next/link";
 

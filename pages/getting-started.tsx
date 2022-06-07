@@ -37,7 +37,6 @@ import {
 } from "@heroicons/react/outline";
 import Intro from "../components/sections/Intro";
 import { useJson } from "../hooks/useSetJson";
-import cookie from "cookie";
 import { useRouter } from "next/router";
 
 const INITIAL_MESSAGE =
@@ -640,7 +639,10 @@ const gettingStarted = (user: any) => {
                         <button
                           className={classNames(
                             "rounded-full w-fit px-4 py-2 bg-ocean-300 opacity-50 text-white text-lg font-bold",
-                            (errors[0] === 2 && errors[1] === 2) ||
+                            (errors[0] === 2 &&
+                              errors[1] === 2 &&
+                              errors[2] === 2 &&
+                              errors[3] === 2) ||
                               (errors[2] === 2 && errors[3] === 2)
                               ? "opacity-100 cursor-pointer"
                               : "cursor-not-allowed"
