@@ -417,7 +417,7 @@ const gettingStarted = (user: any) => {
             // setJsonFile(upload);
 
             // let download = await fetchJson(upload);
-            // // console.log(download);
+            console.log(class_list);
 
             setStudents(class_list);
             setError(errors);

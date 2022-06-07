@@ -262,7 +262,7 @@ export function getRemarks(grade_before: number) {
     return "Average";
   } else if (grade_before >= 89 && grade_before <= 96) {
     return "Good";
-  } else if (grade_before > 96) {
+  } else {
     return "Very Good";
   }
 }
