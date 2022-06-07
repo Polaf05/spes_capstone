@@ -5,7 +5,7 @@ import { useClassroom } from "../hooks/useSetClassroom";
 import { Tab } from "@headlessui/react";
 import { Task } from "../components/Task";
 import BarChart from "../components/BarChart";
-import { DataSet, Student } from "../types/Students";
+import { DataSet, StruggledStudent, Student } from "../types/Students";
 import PeopleChart from "../components/PeopleChart";
 import { useRouter } from "next/router";
 import ProgressComponent from "../components/ProgressComponent";
@@ -20,6 +20,7 @@ import { classNames } from "../lib/functions/concat";
 import { TaskInfo } from "../types/Task";
 
 import Link from "next/link";
+import StudentDialog from "../components/dialogs/StudentDialog";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -359,7 +360,9 @@ export default function ClassroomInfo() {
   );
 
   const tasks_buttons = [ww_render_labels, pt_render_labels];
-
+  const [dialog, setDialog] = useState<string>("");
+  const [strgStudent, setStrgStudent] = useState<StruggledStudent | null>(null);
+  const [categoryTitle, setCategoryTitle] = useState<string>("");
   return (
     <>
       {students && (
@@ -367,7 +370,7 @@ export default function ClassroomInfo() {
           <div className="">
             <Tab.Group>
               <div className="grid grid-cols-3 justify-between mx-10 mt-4 h-20">
-                <div className="col-span-1 flex items-center gap-4 ">
+                <div className="col-span-1 flex items-center gap-4">
                   <div className="font-bold">
                     <Link href="/dashboard" passHref>
                       <ArrowLeftIcon className="w-10 h-10 cursor-pointer"></ArrowLeftIcon>
@@ -400,6 +403,9 @@ export default function ClassroomInfo() {
                         )
                       }
                     >
+                      {() => {
+                        setCategoryTitle(category.title);
+                      }}
                       {category.title}
                     </Tab>
                   ))}
@@ -411,17 +417,21 @@ export default function ClassroomInfo() {
                   <Tab.Panel key={idx} className="h-[90vh] bg-ocean-100 pt-10">
                     {/* Content Section */}
                     <Task
+                      dialog={dialog}
+                      setDialog={setDialog}
                       students={students}
                       open={open}
                       setIsOpen={setIsOpen}
                       category={category.title}
                       assessment={category.value}
                       quarter={quarter_index}
+                      strgStudent={strgStudent}
                     />
                   </Tab.Panel>
                 ))}
               </Tab.Panels>
             </Tab.Group>
+
             <div className="bg-white h-fit px-12 py-10">
               {/* Omsim Chart */}
               {/* Student Cards */}
@@ -429,6 +439,10 @@ export default function ClassroomInfo() {
                 <StruggledSections
                   students={students}
                   quarter={quarter_index}
+                  open={open}
+                  setIsOpen={setIsOpen}
+                  setDialog={setDialog}
+                  setStrgStudent={setStrgStudent}
                 />
               </div>
               {/* Bar Chart */}

@@ -2,6 +2,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
+import { performanceAnalysis } from "../lib/functions/studentFeedback";
 import cookie from "cookie";
 import {
   Chart,
@@ -632,124 +633,6 @@ const StudentInfo = (user: any) => {
     return overall_feedback.join(" ");
   };
 
-  const performanceAnalysis = (i: number) => {
-    let quarter: string[] = [];
-
-    if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation == 0 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation == 0
-    ) {
-      quarter.push(
-        `The students written works and performance task is consistent in this quarter.`
-      );
-    } else if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation == 0 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 3
-    ) {
-      quarter.push(
-        `The student’s written works is consistent while ${
-          student?.gender == "MALE" ? "his" : "her"
-        } performance task is inconsistent in this quarter.`
-      );
-    } else if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation! > 3 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! == 0
-    ) {
-      quarter.push(
-        `The student’s written works is inconsistent while ${
-          student?.gender == "MALE" ? "his" : "her"
-        } performance task is consistent in this quarter.`
-      );
-    } else if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation! > 3 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! == 0
-    ) {
-      quarter.push(
-        `The student’s written works is inconsistent while ${
-          student?.gender == "MALE" ? "his" : "her"
-        } performance task is consistent in this quarter.`
-      );
-    } else if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].written_tasks_analysis?.fluctuation! <= 3 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! == 0
-    ) {
-      quarter.push(
-        `The student’s written work is slightly consistent while ${
-          student?.gender == "MALE" ? "his" : "her"
-        } performance task is consistent in this quarter.`
-      );
-    } else if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].written_tasks_analysis?.fluctuation! <= 3 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! <= 3
-    ) {
-      quarter.push(
-        `The students written work and performance task are both slightly consistent in this quarter.`
-      );
-    } else if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation! == 0 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! <= 3
-    ) {
-      quarter.push(
-        `The student’s written work is consistent while ${
-          student?.gender == "MALE" ? "his" : "her"
-        } performance task is slightly consistent in this quarter.`
-      );
-    } else if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].written_tasks_analysis?.fluctuation! <= 3 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! <= 3
-    ) {
-      quarter.push(
-        `The student’s written work is consistent while ${
-          student?.gender == "MALE" ? "his" : "her"
-        } performance task is slightly consistent in this quarter.`
-      );
-    } else if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].written_tasks_analysis?.fluctuation! <= 3 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! <= 3
-    ) {
-      quarter.push(
-        `The students written work and performance task are both slightly consistent in this quarter.`
-      );
-    } else if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! <= 3
-    ) {
-      quarter.push(
-        `The student’s written work is not consistent while ${
-          student?.gender == "MALE" ? "his" : "her"
-        } performance task is slightly consistent in this quarter.`
-      );
-    } else if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].written_tasks_analysis?.fluctuation! <= 3 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! == 0
-    ) {
-      quarter.push(
-        `The student’s written work is slightly consistent while ${
-          student?.gender == "MALE" ? "his" : "her"
-        } performance task is not consistent in this quarter.`
-      );
-    } else if (
-      student?.quarter![i].written_tasks_analysis?.fluctuation! > 0 &&
-      student?.quarter![i].performace_tasks_analysis?.fluctuation! > 0
-    ) {
-      quarter.push(
-        `The students written works and performance task is not consistent in this quarter.`
-      );
-    }
-
-    return quarter.join(" ");
-  };
-
   const quarter_dataset: DataSet[] = [
     {
       label: "Grade",
@@ -1160,7 +1043,8 @@ const StudentInfo = (user: any) => {
                 {/* Line Chart Assessment */}
                 <div className="h-[45vh] overflow-x-auto px-3">
                   <h5 className="text-justify">
-                    Assessment: {performanceAnalysis(quarter)}
+                    Assessment:{" "}
+                    {performanceAnalysis(student!, quarter, myquar.length)}
                   </h5>
                 </div>
               </div>
@@ -1559,58 +1443,7 @@ const StudentInfo = (user: any) => {
                     </div>
                   </div>
                   <div className="h-96 overflow-x-auto text-justify pr-4">
-                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                    sed diam nonummy nibh euismod tincidunt ut laoreet dolore
-                    magna. Lorem ipsum dolor sit amet, consectetuer adipiscing
-                    elit, sed diam nonummy nibh euismod tincidunt ut laoreet
-                    dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                    adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                    laoreet dolore magna. Lorem ipsum dolor sit amet,
-                    consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                    tincidunt ut laoreet dolore magna.Lorem ipsum dolor sit
-                    amet, consectetuer adipiscing elit, sed diam nonummy nibh
-                    euismod tincidunt ut laoreet dolore magna. Lorem ipsum dolor
-                    sit amet, consectetuer adipiscing elit, sed diam nonummy
-                    nibh euismod tincidunt ut laoreet dolore magna. Lorem ipsum
-                    dolor sit amet, consectetuer adipiscing elit, sed diam
-                    nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                    sed diam nonummy nibh euismod tincidunt ut laoreet dolore
-                    magna.Lorem ipsum dolor sit amet, consectetuer adipiscing
-                    elit, sed diam nonummy nibh euismod tincidunt ut laoreet
-                    dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                    adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                    laoreet dolore magna. Lorem ipsum dolor sit amet,
-                    consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                    tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit
-                    amet, consectetuer adipiscing elit, sed diam nonummy nibh
-                    euismod tincidunt ut laoreet dolore magna.Lorem ipsum dolor
-                    sit amet, consectetuer adipiscing elit, sed diam nonummy
-                    nibh euismod tincidunt ut laoreet dolore magna. Lorem ipsum
-                    dolor sit amet, consectetuer adipiscing elit, sed diam
-                    nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                    sed diam nonummy nibh euismod tincidunt ut laoreet dolore
-                    magna. Lorem ipsum dolor sit amet, consectetuer adipiscing
-                    elit, sed diam nonummy nibh euismod tincidunt ut laoreet
-                    dolore magna.Lorem ipsum dolor sit amet, consectetuer
-                    adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                    laoreet dolore magna. Lorem ipsum dolor sit amet,
-                    consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                    tincidunt ut laoreet dolore magna. Lorem ipsum dolor sit
-                    amet, consectetuer adipiscing elit, sed diam nonummy nibh
-                    euismod tincidunt ut laoreet dolore magna. Lorem ipsum dolor
-                    sit amet, consectetuer adipiscing elit, sed diam nonummy
-                    nibh euismod tincidunt ut laoreet dolore magna.Lorem ipsum
-                    dolor sit amet, consectetuer adipiscing elit, sed diam
-                    nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                    sed diam nonummy nibh euismod tincidunt ut laoreet dolore
-                    magna. Lorem ipsum dolor sit amet, consectetuer adipiscing
-                    elit, sed diam nonummy nibh euismod tincidunt ut laoreet
-                    dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                    adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                    laoreet dolore magna.
+                    Assessment - Environmental factors
                   </div>
                 </div>
               </div>
@@ -1625,55 +1458,7 @@ const StudentInfo = (user: any) => {
               </div>
               <div className="grid grid-cols-11 gap-4 pb-10">
                 <div className="col-span-6 h-96 overflow-x-auto text-justify pr-4">
-                  Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                  diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                  Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                  diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                  Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                  diam nonummy nibh euismod tincidunt ut laoreet dolore magna.
-                  Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-                  diam nonummy nibh euismod tincidunt ut laoreet dolore
-                  magna.Lorem ipsum dolor sit amet, consectetuer adipiscing
-                  elit, sed diam nonummy nibh euismod tincidunt ut laoreet
-                  dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna.Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna.Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna.Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna.Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-                  laoreet dolore magna.
+                  Assessment Technological Factors
                 </div>
                 <div className="col-span-5">
                   <div className="grid grid-cols-2 gap-4 mb-4">

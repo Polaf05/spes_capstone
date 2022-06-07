@@ -7,9 +7,17 @@ import StruggledStudentCard from "./StruggledStudentCard";
 const StruggledSections = ({
   students,
   quarter,
+  open,
+  setIsOpen,
+  setDialog,
+  setStrgStudent,
 }: {
   students: Student[];
   quarter: number;
+  open: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setDialog: React.Dispatch<React.SetStateAction<string>>;
+  setStrgStudent: React.Dispatch<React.SetStateAction<StruggledStudent | null>>;
 }) => {
   const struggledStudents: StruggledStudent[] = [];
 
@@ -88,22 +96,30 @@ const StruggledSections = ({
       <div className="col-span-7">
         <h2 className="text-xl font-bold">Students Struggled</h2>
         <div className="flex gap-1 items-center">
-          <QuestionMarkCircleIcon className="w-4 h-4 text-neutral-500" />
-          <p className="text-neutral-600 text-sm">
+          {/* <QuestionMarkCircleIcon className="w-4 h-4 text-neutral-500" /> */}
+          <p className="text-neutral-600 text-[0.7rem]">
             Students who failed half of the given tasks
           </p>
         </div>
         <div className="mt-4 gap-4">
           <div className="">
             <StruggledStudentCard
+              open={open}
+              setIsOpen={setIsOpen}
               title="Written Works"
               struggledStudents={struggledStudents}
               struggledStudents_length={struggledStudents_length[0]}
+              setDialog={setDialog}
+              setStrgStudent={setStrgStudent}
             />
             <StruggledStudentCard
+              open={open}
+              setIsOpen={setIsOpen}
               title="Performance Tasks"
               struggledStudents={struggledStudents}
               struggledStudents_length={struggledStudents_length[1]}
+              setDialog={setDialog}
+              setStrgStudent={setStrgStudent}
             />
           </div>
         </div>
@@ -111,8 +127,8 @@ const StruggledSections = ({
       <div className="col-span-3">
         <h2 className="text-xl font-bold">Students Excelled</h2>
         <div className="flex gap-1 items-center">
-          <QuestionMarkCircleIcon className="w-4 h-4 text-neutral-500" />
-          <p className="text-neutral-600 text-sm">
+          {/* <QuestionMarkCircleIcon className="w-4 h-4 text-neutral-500" /> */}
+          <p className="text-neutral-600 text-[0.7rem]">
             Students with no failing task and with at least 1 perfect score
           </p>
         </div>
