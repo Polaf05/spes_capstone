@@ -1,4 +1,6 @@
+import { LinearScale } from "chart.js";
 import { Quarter, Student, TaskAnalysis, TaskData } from "../../types/Students";
+import { getRemarks } from "./formatting";
 
 export function fluctuation(task: TaskData[], possible: TaskData[]) {
   let trend = [];
@@ -66,12 +68,17 @@ export function fluctuation(task: TaskData[], possible: TaskData[]) {
 
   let trends = "";
 
-  let lines = findLineByLeastSquares(x, percent);
+  let lines: any = findLineByLeastSquares(x, percent);
 
-  // console.log(lines);
+  if (x.length > 1) {
+    lines = findLineByLeastSquares(x, percent);
 
-  trends = lines as string;
+    // console.log(lines);
 
+    trends = lines.linguistic;
+  } else {
+    trends = getRemarks(x[x.length - 1]);
+  }
   const taskData: TaskAnalysis = {
     fluctuation: fluctuate,
     trend: trend,
@@ -153,11 +160,11 @@ export function quarterAnalysis(quarter: Quarter[]) {
 
   let trends = "";
 
-  let lines = findLineByLeastSquares(x, percent);
+  let lines: any = findLineByLeastSquares(x, percent);
 
   // console.log(lines);
 
-  trends = lines as string;
+  trends = lines.linguistic;
 
   const quarterData: TaskAnalysis = {
     fluctuation: fluctuate,
@@ -394,15 +401,17 @@ function findLineByLeastSquares(values_x: number[], values_y: number[]) {
     (result_values_y[values_length - 1] - result_values_y[0]).toFixed(1)
   );
 
+  console.log(trend);
+
   if (trend == 0) {
-    return "consistent linear";
-  } else if (trend > 0 && trend <= 3) {
-    return "slightly upward";
-  } else if (trend < 0 && trend >= -3) {
-    return "slightly downward";
-  } else if (trend > 3) {
-    return "upward";
+    return { trend: trend, linguistic: "consistent linear" };
+  } else if (trend > 0 && trend <= 1) {
+    return { trend: trend, linguistic: "slightly upward" };
+  } else if (trend < 0 && trend >= -1) {
+    return { trend: trend, linguistic: "slightly downward" };
+  } else if (trend > 1) {
+    return { trend: trend, linguistic: "upward" };
   } else {
-    return "downward";
+    return { trend: trend, linguistic: "downward" };
   }
 }
