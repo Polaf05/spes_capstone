@@ -37,7 +37,6 @@ import {
 } from "@heroicons/react/outline";
 import Intro from "../components/sections/Intro";
 import { useJson } from "../hooks/useSetJson";
-import cookie from "cookie";
 import { useRouter } from "next/router";
 
 const INITIAL_MESSAGE =
@@ -516,7 +515,7 @@ const gettingStarted = (user: any) => {
                 </Link>
               </div>
               <div className="px-2 grid grid-cols-2">
-                <div>
+                <div className="space-y-4">
                   <div className="space-y-4 pr-6">
                     <div className="flex items-center gap-2">
                       <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
@@ -543,18 +542,19 @@ const gettingStarted = (user: any) => {
                     </div>
                     <div className="flex justify-end">
                       <button
-                        className="flex justify-center rounded-xl w-fit py-1 px-10 bg-ocean-400"
+                        className={classNames(
+                          "flex justify-center rounded-xl w-36 py-1 px-10 bg-ocean-300",
+                          isLoading ? "bg-ocean-100" : ""
+                        )}
                         onClick={() => handleForms(text_value)}
                         disabled={isLoading}
                       >
                         {isLoading ? (
                           <LoadingSpinner />
                         ) : (
-                          <div className="flex gap-2 justify-center items-center">
-                            <p className="text-white font-semibold text-lg">
-                              Submit
-                            </p>
-                          </div>
+                          <p className="text-white font-semibold text-lg">
+                            Submit
+                          </p>
                         )}
                       </button>
                     </div>
@@ -565,7 +565,8 @@ const gettingStarted = (user: any) => {
                         <h3 className="font-bold text-white">2</h3>
                       </div>
                       <h3 className="font-semibold text-lg">
-                        Upload Grading Sheet:
+                        Upload Grading Sheet:{" "}
+                        <span className="underline font-light">{fileName}</span>
                       </h3>
                     </div>
                     <div>
@@ -626,13 +627,25 @@ const gettingStarted = (user: any) => {
                   </div>
                   <div className="flex justify-end mt-8">
                     {
-                      <Link href={fileName ? "/dashboard" : "#"} passHref>
+                      <Link
+                        href={
+                          (errors[0] === 2 && errors[1] === 2) ||
+                          (errors[2] === 2 && errors[3] === 2)
+                            ? "/dashboard"
+                            : "#"
+                        }
+                        passHref
+                      >
                         <button
                           className={classNames(
-                            "rounded-full w-fit px-4 py-2 bg-ocean-300 text-white text-lg font-bold",
-                            errors.includes(0) || errors.includes(1)
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
+                            "rounded-full w-fit px-4 py-2 bg-ocean-300 opacity-50 text-white text-lg font-bold",
+                            (errors[0] === 2 &&
+                              errors[1] === 2 &&
+                              errors[2] === 2 &&
+                              errors[3] === 2) ||
+                              (errors[2] === 2 && errors[3] === 2)
+                              ? "opacity-100 cursor-pointer"
+                              : "cursor-not-allowed"
                           )}
                         >
                           Generate Evaluation

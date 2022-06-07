@@ -35,7 +35,6 @@ import {
   Tooltip,
 } from "chart.js";
 import PeopleChart from "../components/PeopleChart";
-import { Student } from "../types/Students";
 import {
   getAverageGrade,
   getGrade,
@@ -45,16 +44,16 @@ import {
   transmuteGrade,
 } from "../lib/functions/grade_computation";
 import { getRemarks, getTask } from "../lib/functions/formatting";
-import { Dataset, Remarks, Score, TaskScores } from "../types/Task";
+import { Dataset, Remarks, Score, TaskInfo, TaskScores } from "../types/Task";
 import { classNames } from "../lib/functions/concat";
-import { setDatasets } from "react-chartjs-2/dist/utils";
 import { getLabels } from "../lib/functions/chart";
 import {
   getClassPerformanceAssessment,
+  getMarginResults,
   getPassingRemarks,
 } from "../lib/functions/feedback";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
-import { useJson } from "../hooks/useSetJson";
+import Footer from "../components/sections/Footer";
 Chart.register(
   ArcElement,
   LineElement,
@@ -80,7 +79,7 @@ Chart.register(
   Title,
   Tooltip
 );
-import cookie from "cookie";
+import { getTasksInfo } from "../lib/functions/tasks";
 
 const Dashboard = () => {
   const { students } = useClassroom();
@@ -97,8 +96,14 @@ const Dashboard = () => {
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [failedStudents, setFailedStudents] = useState<number>(0);
   const [message_remarks, setMsgRemarks] = useState<string[]>([]);
-
-  const grade = 36;
+  const [ww_ave_class_participation, setWWAveCPar] = useState<number | null>(
+    null
+  );
+  const [pt_ave_class_participation, setPTAveCPar] = useState<number | null>(
+    null
+  );
+  const [ww_ave_participants_arr, setWWAveParArr] = useState<number[]>([]);
+  const [pt_ave_participants_arr, setPTAveParArr] = useState<number[]>([]);
 
   useEffect(() => {
     // if (!user.user) {
@@ -239,191 +244,263 @@ const Dashboard = () => {
       }
       setQuarters(buttons);
       setMsgRemarks(getPassingRemarks(100 - failedStudents, quarters.length));
+
+      const ww_task_array: TaskInfo[][] = [];
+      const pt_task_array: TaskInfo[][] = [];
+
+      for (let i = 0; i < qSum; i++) {
+        ww_task_array.push(getTasksInfo(students, i, "written works"));
+        pt_task_array.push(getTasksInfo(students, i, "performance tasks"));
+      }
+
+      let ww_ave_participants_arr: number[] = [];
+      let pt_ave_participants_arr: number[] = [];
+
+      ww_task_array.forEach((quarter) => {
+        quarter.forEach((task) => {
+          ww_ave_participants_arr.push(
+            getScorePCT(task.participated, students.length)
+          );
+        });
+      });
+      pt_task_array.forEach((quarter) => {
+        quarter.forEach((task) => {
+          pt_ave_participants_arr.push(
+            getScorePCT(task.participated, students.length)
+          );
+        });
+      });
+
+      setWWAveParArr(ww_ave_participants_arr);
+      setPTAveParArr(pt_ave_participants_arr);
+
+      const ww_ave_participant = getAverageGrade([ww_ave_participants_arr])[0];
+      const pt_ave_participant = getAverageGrade([pt_ave_participants_arr])[0];
+      setWWAveCPar(ww_ave_participant);
+      setPTAveCPar(pt_ave_participant);
     }
     //}
   }, []);
 
+  const barchart_remarks: string[] = getMarginResults(dataset!, "");
+
   return (
     <>
       {students && (
-        <div className="m-4">
-          <div className="w-full flex justify-between px-12">
-            <div className="flex justify-center items-center">
-              {" "}
-              <h2 className="text-xl xl:text-2xl font-bold">
-                Student Performance Evaluation System
-              </h2>
-            </div>
-            <div className="w-20 h-20 xl:w-40 xl:h-40 p-2">
-              <Link href={`/getting-started`} passHref>
-                <div className="w-fit h-fit cursor-pointer">
-                  <Image
-                    src="/logo.png"
-                    alt="logo picture"
-                    width={100}
-                    height={100}
-                  />
-                </div>
-              </Link>
-            </div>
-          </div>
-          <div className="grid place-content-center">
-            <div>
-              <h1 className="text-xl xl:text-2xl font-semibold">
-                Classroom Evaluation:{" "}
-                <span className="font-bold underline decoration-2"></span>
-              </h1>
-            </div>
-            <div className="flex gap-4">
-              {quarters.map((button, idx) => (
-                <div key={idx}>
-                  <Link href={`/classroom`} passHref>
-                    <button
-                      onClick={() => {
-                        setQuarter(idx);
-                      }}
-                      className="rounded-3xl w-36 h-24 xl:w-60 xl:h-40 bg-ocean-100 grid place-items-center"
-                    >
-                      <h3 className="font-semibold text-lg">
-                        Quarter {button}
-                      </h3>
-                    </button>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="mt-16 mx-24 h-[80vh]">
-            <h2 className="text-lg xl:text-2xl font-semibold">
-              Quarter Summary
-            </h2>
-            <div className="flex gap-1 text-sm xl:text-lg items-center">
-              {quarters.length === 4 ? (
-                <>
-                  <CheckCircleIcon className="w-3 h-3 xl:w-5 xl:h-5 text-green-500" />
-                  <p className="font-light">Complete Quarter Summary</p>
-                </>
-              ) : (
-                <>
-                  <ExclamationCircleIcon className="w-3 h-3 xl:w-5 xl:h-5 text-yellow-500" />
-                  <p className="font-light">
-                    Grading Sheet is still incomplete. Displaying{" "}
-                    {quarters.length} of 4 quarters only
-                  </p>
-                </>
-              )}
-            </div>
-            <div className="grid grid-cols-9 h-fit gap-8 mt-4">
-              <div className="col-span-5  p-4 rounded-xl">
-                <BarChart
-                  display={true}
-                  indexAxis="x"
-                  labels={getLabels("Quarter ", dataset?.set_a.length!)}
-                  datasets={[
-                    {
-                      label: "Very Good, Good, & Average",
-                      data: dataset?.set_a!,
-                      fill: true,
-                      backgroundColor: "#FFF598",
-                      borderColor: "#FFF598",
-                    },
-                    {
-                      label: "Poor & Very Poor",
-                      data: dataset?.set_b!,
-                      fill: true,
-                      backgroundColor: "#63C7FF",
-                      borderColor: "#63C7FF",
-                    },
-                  ]}
-                />
+        <>
+          <div className="m-4">
+            <div className="w-full flex justify-between px-12">
+              <div className="flex justify-center items-center">
+                {" "}
+                <h2 className="text-xl xl:text-2xl font-bold">
+                  Students' Performance Evaluation System
+                </h2>
               </div>
-              <div className="col-span-4">
-                <div className="pb-4">
-                  <h4 className="font-semibold text-lg">Passing Rate:</h4>
-                  <PeopleChart
-                    passed_tasks={10 - Number((failedStudents / 10).toFixed())}
-                    length={10}
-                    color="yellow"
-                  />
-                  <div className="flex justify-center">
-                    <p className="font-light text-center">
-                      {getPassingRemarks(100 - failedStudents, quarters.length)}
+              <div className="w-20 h-20 xl:w-40 xl:h-40 p-2">
+                <Link href={`/getting-started`} passHref>
+                  <div className="w-fit h-fit cursor-pointer">
+                    <Image
+                      src="/logo.png"
+                      alt="logo picture"
+                      width={100}
+                      height={100}
+                    />
+                  </div>
+                </Link>
+              </div>
+            </div>
+            <div className="grid place-content-center">
+              <div>
+                <h1 className="text-xl xl:text-2xl font-semibold">
+                  Classroom Evaluation:{" "}
+                  <span className="font-bold underline decoration-2"></span>
+                </h1>
+              </div>
+              <div className="flex gap-4">
+                {quarters.map((button, idx) => (
+                  <div key={idx}>
+                    <Link href={`/classroom`} passHref>
+                      <button
+                        onClick={() => {
+                          setQuarter(idx);
+                        }}
+                        className="rounded-3xl w-36 h-24 lg:w-36 lg:h-24 xl:w-60 xl:h-40 bg-ocean-100 grid place-items-center"
+                      >
+                        <h3 className="font-semibold text-lg">
+                          Quarter {button}
+                        </h3>
+                      </button>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-16 mx-12 lg:mx-20 xl:mx-24 h-[80vh]">
+              <h2 className="text-lg xl:text-2xl font-semibold">
+                Quarter Summary
+              </h2>
+              <div className="flex gap-1 text-sm xl:text-lg items-center">
+                {quarters.length === 4 ? (
+                  <>
+                    <CheckCircleIcon className="w-3 h-3 xl:w-5 xl:h-5 text-green-500" />
+                    <p className="font-light">Complete Quarter Summary</p>
+                  </>
+                ) : (
+                  <>
+                    <ExclamationCircleIcon className="w-3 h-3 xl:w-5 xl:h-5 text-yellow-500" />
+                    <p className="font-light">
+                      Grading Sheet is still incomplete. Displaying{" "}
+                      {quarters.length} of 4 quarters only
                     </p>
+                  </>
+                )}
+              </div>
+              <div className="grid grid-flow-row grid-cols-9 h-fit gap-8 mt-4">
+                <div className="col-span-9 xl:col-span-5">
+                  <div className="px-16 xl:p-4">
+                    <BarChart
+                      display={true}
+                      indexAxis="x"
+                      labels={getLabels("Quarter ", dataset?.set_a.length!)}
+                      datasets={[
+                        {
+                          label: "Very Good, Good, & Average",
+                          data: dataset?.set_a!,
+                          fill: true,
+                          backgroundColor: "#FFF598",
+                          borderColor: "#FFF598",
+                        },
+                        {
+                          label: "Poor & Very Poor",
+                          data: dataset?.set_b!,
+                          fill: true,
+                          backgroundColor: "#63C7FF",
+                          borderColor: "#63C7FF",
+                        },
+                      ]}
+                    />
+
+                    <div>
+                      {barchart_remarks.map((remarks, idx) => (
+                        <p key={idx} className="text-sm font-light">
+                          {remarks}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="pt-2 border-t">
-                  <h4 className="font-semibold text-lg">
-                    Average performance of a student:{" "}
-                    <span
-                      className={classNames(
-                        "underline font-bold",
-                        ave_remarks?.match(/Poor/g) ? "text-red-400" : ""
-                      )}
-                    >
-                      {ave_remarks} ({q_ave_grade})
-                    </span>
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    <div
-                      className={classNames(
-                        "py-3 px-5 rounded-2xl",
-                        ww_ave_grade! < 60 ? "bg-red-100" : "bg-green-100"
-                      )}
-                    >
-                      <h6 className="">Written Works</h6>
-                      <div className="flex justify-between">
-                        <div className="flex flex-col justify-center">
-                          <p className="font-semibold">{ww_ave_pct}%</p>
-                          <p className="italic text-sm">Ave Score PCT</p>
-                        </div>
-                        <div className="flex flex-col justify-center">
-                          <p className="font-bold text-xl text-right">
-                            {transmuteGrade(ww_ave_grade!)}%
-                          </p>
-                          <p className="italic text-sm">Ave Transmuted Grade</p>
-                        </div>
-                      </div>{" "}
+                <div className="col-span-9 md:px-16 xl:col-span-4 xl:px-2">
+                  <div className="pb-4 w-full">
+                    <h4 className="font-semibold text-lg">Passing Rate:</h4>
+                    <PeopleChart
+                      passed_tasks={
+                        10 - Number((failedStudents / 10).toFixed())
+                      }
+                      length={10}
+                      color="yellow"
+                    />
+                    <div className="flex justify-center">
+                      <p className="font-light text-center">
+                        {getPassingRemarks(
+                          100 - failedStudents,
+                          quarters.length
+                        )}
+                      </p>
                     </div>
-                    <div
-                      className={classNames(
-                        "py-3 px-5 rounded-2xl",
-                        pt_ave_grade! < 60 ? "bg-red-100" : "bg-green-100"
-                      )}
-                    >
-                      <h6 className="">Performance Tasks</h6>
-                      <div className="flex justify-between">
-                        <div className="flex flex-col justify-center">
-                          <p className="font-semibold">{pt_ave_pct}%</p>
-                          <p className="italic text-sm">Ave Score PCT</p>
-                        </div>
-                        <div className="flex flex-col justify-center">
-                          <p className="font-bold text-xl text-right">
-                            {transmuteGrade(pt_ave_grade!)}%
-                          </p>
-                          <p className="italic text-sm">Ave Transmuted Grade</p>
+                  </div>
+                  <div className="pt-2 border-t">
+                    <h4 className="font-semibold text-lg">
+                      Average performance of a student:{" "}
+                      <span
+                        className={classNames(
+                          "underline font-bold",
+                          ave_remarks?.match(/Poor/g) ? "text-red-400" : ""
+                        )}
+                      >
+                        {ave_remarks} ({q_ave_grade})
+                      </span>
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <div
+                        className={classNames(
+                          "py-3 px-5 rounded-2xl",
+                          ww_ave_grade! < 60 ? "bg-red-100" : "bg-green-100"
+                        )}
+                      >
+                        <h6 className="">Written Works</h6>
+                        <div className="flex justify-between">
+                          <div className="flex flex-col justify-center">
+                            <p className="font-semibold">
+                              {ww_ave_class_participation}%
+                            </p>
+                            <p className="italic text-sm">
+                              Ave Class Participation
+                            </p>
+                            <p className="font-semibold">{ww_ave_pct}%</p>
+                            <p className="italic text-sm">Ave Score PCT</p>
+                          </div>
+                          <div className="flex flex-col justify-center">
+                            <p className="font-bold text-xl text-right">
+                              {transmuteGrade(ww_ave_grade!)}%
+                            </p>
+                            <p className="italic text-sm">
+                              Ave Transmuted Grade
+                            </p>
+                          </div>
+                        </div>{" "}
+                      </div>
+                      <div
+                        className={classNames(
+                          "py-3 px-5 rounded-2xl",
+                          pt_ave_grade! < 60 ? "bg-red-100" : "bg-green-100"
+                        )}
+                      >
+                        <h6 className="">Performance Tasks</h6>
+                        <div className="flex justify-between">
+                          <div className="flex flex-col justify-center">
+                            <p className="font-semibold">
+                              {pt_ave_class_participation}%
+                            </p>
+                            <p className="italic text-sm">
+                              Ave Class Participation
+                            </p>
+                            <p className="font-semibold">{pt_ave_pct}%</p>
+                            <p className="italic text-sm">Ave Score PCT</p>
+                          </div>
+                          <div className="flex flex-col justify-center">
+                            <p className="font-bold text-xl text-right">
+                              {transmuteGrade(pt_ave_grade!)}%
+                            </p>
+                            <p className="italic text-sm">
+                              Ave Transmuted Grade
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="mt-4">
-                  <p className="font-light">
-                    {getClassPerformanceAssessment(
-                      quarters.length,
-                      dataset!,
-                      ave_remarks!,
-                      q_ave_grade!,
-                      ww_ave_grade!,
-                      ww_ave_pct!,
-                      pt_ave_grade!,
-                      pt_ave_grade!
-                    )}
-                  </p>
+                  <div className="mt-4">
+                    <p className="text-justify font-light">
+                      {getClassPerformanceAssessment(
+                        quarters.length,
+                        dataset!,
+                        ave_remarks!,
+                        q_ave_grade!,
+                        ww_ave_grade!,
+                        ww_ave_pct!,
+                        ww_ave_class_participation!,
+                        pt_ave_grade!,
+                        pt_ave_grade!,
+                        pt_ave_class_participation!
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+          <Footer />
+        </>
       )}
     </>
   );
