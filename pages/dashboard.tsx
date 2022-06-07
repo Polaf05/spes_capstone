@@ -49,6 +49,7 @@ import { classNames } from "../lib/functions/concat";
 import { getLabels } from "../lib/functions/chart";
 import {
   getClassPerformanceAssessment,
+  getMarginResults,
   getPassingRemarks,
 } from "../lib/functions/feedback";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
@@ -281,6 +282,8 @@ const Dashboard = () => {
     //}
   }, []);
 
+  const barchart_remarks: string[] = getMarginResults(dataset!, "");
+
   return (
     <>
       {students && (
@@ -290,7 +293,7 @@ const Dashboard = () => {
               <div className="flex justify-center items-center">
                 {" "}
                 <h2 className="text-xl xl:text-2xl font-bold">
-                  Student Performance Evaluation System
+                  Students' Performance Evaluation System
                 </h2>
               </div>
               <div className="w-20 h-20 xl:w-40 xl:h-40 p-2">
@@ -377,7 +380,13 @@ const Dashboard = () => {
                       ]}
                     />
 
-                    <p>ASDSADAS</p>
+                    <div>
+                      {barchart_remarks.map((remarks, idx) => (
+                        <p key={idx} className="text-sm font-light">
+                          {remarks}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div className="col-span-9 md:px-16 xl:col-span-4 xl:px-2">

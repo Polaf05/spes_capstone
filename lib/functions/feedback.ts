@@ -53,28 +53,110 @@ export const getRemarksAnalysis = (student: Student, remarks: string) => {
   else return REMARKS_MESSAGE[4];
 };
 
-export const getMarginResults = (dataset: Dataset, option: string) => {
-  let quarter_remarks: any[] = [];
+const recentQuarterComparison = (
+  set_a: number[],
+  set_b: number[],
+  i: number
+) => {
+  let quarter_remarks: string = ``;
+  // if recent quarter is greater than 0
 
-  if (option === "margin") {
+  const better_than = [
+    "slightly better than",
+    "better than",
+    "much better than",
+  ];
+  const remarks = (
+    better_at_quarter: string,
+    quarter_no: number,
+    index: number
+  ) => {
+    let better_at: number[] = [];
+    better_at =
+      better_at_quarter === "current"
+        ? [quarter_no + 1, quarter_no]
+        : [quarter_no, quarter_no + 1];
+
+    return `, quarter ${better_at[0]} performance is ${better_than[index]} quarter ${better_at[1]}.`;
+  };
+
+  type ClassRemarks = {
+    insight: string;
+    result: string;
+  };
+
+  const class_remarks: ClassRemarks = {
+    insight: "",
+    result: "",
+  };
+
+  if (i - 1 >= 0) {
+    const weight = [0, 0, 0, 0, 0];
+
+    // current quarter vs recent quarter
+    const recent_margin = set_a[i] - set_a[i - 1];
+    if (recent_margin > 60) {
+      // greater than 60
+      quarter_remarks = `${remarks("current", i, 2)}`;
+    } else if (recent_margin >= 30) {
+      // 30 to 60
+      quarter_remarks = `${remarks("current", i, 1)} `;
+    } else if (recent_margin > 0) {
+      // 1 to 30
+      quarter_remarks = `${remarks("current", i, 0)} `;
+    } else if (recent_margin === 0) {
+      // 0
+      //quarter_remarks = `${remarks("current", i)} `;
+    } else if (recent_margin >= -30) {
+      // -1 to -30
+      quarter_remarks = `${remarks("recent", i, 0)} `;
+    } else if (recent_margin >= -60) {
+      // -31 - -60
+      quarter_remarks = `${remarks("recent", i, 1)}`;
+    } else {
+      quarter_remarks = `${remarks("recent", i, 2)}`;
+    }
   } else {
-    if (dataset?.set_a && dataset.set_b) {
-      let set_a: number[] = dataset.set_a;
-      let set_b: number[] = dataset.set_b;
+    return ".";
+  }
 
-      for (let i = 0; i < dataset.set_a.length; i++) {
-        let margin = set_a[i] - set_b[i];
-        if (margin > 40) {
-          quarter_remarks.push("Very Good");
-        } else if (margin >= 20) {
-          quarter_remarks.push("Good");
-        } else if (margin >= 0) {
-          quarter_remarks.push("Average");
-        } else if (margin >= -20) {
-          quarter_remarks.push("Poor");
-        } else {
-          quarter_remarks.push("Very Poor");
-        }
+  return quarter_remarks;
+};
+
+export const getMarginResults = (dataset: Dataset, option: string) => {
+  let quarter_remarks: string[] = [];
+
+  if (dataset?.set_a && dataset.set_b) {
+    let set_a: number[] = dataset.set_a;
+    let set_b: number[] = dataset.set_b;
+
+    for (let i = 0; i < dataset.set_a.length; i++) {
+      let margin = set_a[i] - set_b[i];
+      if (margin > 40) {
+        quarter_remarks.push(
+          `For quarter ${i + 1}, students performed very good` +
+            recentQuarterComparison(set_a, set_b, i)
+        );
+      } else if (margin >= 20) {
+        quarter_remarks.push(
+          `For quarter ${i + 1}, students performed good` +
+            recentQuarterComparison(set_a, set_b, i)
+        );
+      } else if (margin >= 0) {
+        quarter_remarks.push(
+          `For quarter ${i + 1}, students performed quite good` +
+            recentQuarterComparison(set_a, set_b, i)
+        );
+      } else if (margin >= -20) {
+        quarter_remarks.push(
+          `For quarter ${i + 1}, students performed poor` +
+            recentQuarterComparison(set_a, set_b, i)
+        );
+      } else {
+        quarter_remarks.push(
+          `For quarter ${i + 1}, students performed very poor` +
+            recentQuarterComparison(set_a, set_b, i)
+        );
       }
     }
   }
