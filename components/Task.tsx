@@ -3,14 +3,17 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import { useClassroom } from "../hooks/useSetClassroom";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
-import { Student } from "../types/Students";
-import StudentDialog from "./StudentDialog";
+import { StruggledStudent, Student } from "../types/Students";
+import StudentDialog from "./dialogs/StudentDialog";
+import TutorialDialog from "./dialogs/TutorialDialog";
+
 import {
   displayData,
   getGrade,
   getRemarks,
 } from "../lib/functions/grade_computation";
 import { classNames, formatName } from "../lib/functions/concat";
+import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -21,6 +24,9 @@ export const Task = ({
   open,
   setIsOpen,
   quarter,
+  dialog,
+  setDialog,
+  strgStudent,
 }: {
   students: Student[];
   category: string;
@@ -28,6 +34,9 @@ export const Task = ({
   setIsOpen: any;
   open: boolean;
   quarter: number;
+  dialog: string;
+  strgStudent: StruggledStudent | null;
+  setDialog: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [sortingMethod, setSorting] = useState("Name");
   const { setStudent } = useSelectedStudent();
@@ -113,19 +122,36 @@ export const Task = ({
     ],
   };
 
+  const [openClassDialog, setClassDialogOpen] = useState<boolean>(false);
+  const [tutorial, setTutorial] = useState<string>("");
+
   return (
     students && (
       <>
         <div className="grid grid-cols-12 gap-4 px-12">
           <div className="col-span-7">
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold flex gap-2 items-center">
               <h1>
-                Clasroom Assessment:{" "}
+                Q{quarter + 1}: Clasroom Assessment:{" "}
                 <span className="underline decoration-2">{assessment}</span>
               </h1>
+              <QuestionMarkCircleIcon
+                onClick={() => {
+                  setClassDialogOpen(true);
+                  setTutorial("classTable");
+                }}
+                className="w-5 h-5 text-neutral-500 hover:cursor-pointer"
+              />
             </div>
-            <div className="text-lg font-semibold">
-              Sorted by: {sortingMethod ? sortingMethod : "Name"}
+            <div className="text-lg font-semibold flex items-center gap-2">
+              <h4>Sorted by: {sortingMethod ? sortingMethod : "Name"}</h4>
+              <QuestionMarkCircleIcon
+                onClick={() => {
+                  setClassDialogOpen(true);
+                  setTutorial("sorting");
+                }}
+                className="w-4 h-4 text-neutral-500 hover:cursor-pointer"
+              />
             </div>
             <div className="w-full overflow-y-auto h-[60vh]">
               <table className="table-fixed min-w-full rounded-md text-lg text-left border-collapse">
@@ -195,6 +221,7 @@ export const Task = ({
                             : "bg-red-200"
                         )}
                         onClick={() => {
+                          setDialog("student info");
                           setStudent(student);
                           setIsOpen(true);
                         }}
@@ -219,7 +246,9 @@ export const Task = ({
                         <td className="text-base">
                           (
                           {category === "Over All"
-                            ? student.quarter![quarter].diff
+                            ? student.quarter![quarter].grade_after > 0
+                              ? student.quarter![quarter].diff
+                              : 0
                             : 0}
                           )
                         </td>
@@ -310,20 +339,26 @@ export const Task = ({
               </p>
             </div>
           </div>
-          <div className="w-96">
-            {
-              <StudentDialog
-                students={students}
-                quarter={quarter}
-                category={category}
-                open={open}
-                setIsOpen={setIsOpen}
-              />
-            }
-          </div>
-          <pre>
-            {/*students ? JSON.stringify(students, null, 2) : "No data"*/}
-          </pre>
+        </div>
+        <div className="w-96">
+          {
+            <StudentDialog
+              dialog={dialog}
+              students={students}
+              quarter={quarter}
+              category={category}
+              open={open}
+              setIsOpen={setIsOpen}
+              strgStudent={strgStudent}
+            />
+          }
+        </div>
+        <div>
+          <TutorialDialog
+            tutorial={tutorial}
+            openClassDialog={openClassDialog}
+            setClassDialogOpen={setClassDialogOpen}
+          />
         </div>
       </>
     )
