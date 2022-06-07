@@ -11,6 +11,8 @@ const StruggledSections = ({
   setIsOpen,
   setDialog,
   setStrgStudent,
+  categoryTitle,
+  setCategoryTitle,
 }: {
   students: Student[];
   quarter: number;
@@ -18,6 +20,8 @@ const StruggledSections = ({
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setDialog: React.Dispatch<React.SetStateAction<string>>;
   setStrgStudent: React.Dispatch<React.SetStateAction<StruggledStudent | null>>;
+  categoryTitle: string;
+  setCategoryTitle: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const struggledStudents: StruggledStudent[] = [];
 
@@ -111,6 +115,8 @@ const StruggledSections = ({
               struggledStudents_length={struggledStudents_length[0]}
               setDialog={setDialog}
               setStrgStudent={setStrgStudent}
+              categoryTitle={categoryTitle}
+              setCategoryTitle={setCategoryTitle}
             />
             <StruggledStudentCard
               open={open}
@@ -120,6 +126,8 @@ const StruggledSections = ({
               struggledStudents_length={struggledStudents_length[1]}
               setDialog={setDialog}
               setStrgStudent={setStrgStudent}
+              categoryTitle={categoryTitle}
+              setCategoryTitle={setCategoryTitle}
             />
           </div>
         </div>
