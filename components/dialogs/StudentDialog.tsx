@@ -1,5 +1,9 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { ArrowSmDownIcon, ArrowSmUpIcon } from "@heroicons/react/outline";
+import {
+  ArrowSmDownIcon,
+  ArrowSmUpIcon,
+  XIcon,
+} from "@heroicons/react/outline";
 import React, { useContext, Fragment } from "react";
 import { useSelectedStudent } from "../../hooks/useSelectedStudent";
 import { Line } from "react-chartjs-2";
@@ -39,6 +43,7 @@ import { getGrade } from "../../lib/functions/grade_computation";
 import { getRemarks } from "../../lib/functions/formatting";
 import { StruggledStudent, Student } from "../../types/Students";
 import StudentScores from "../students/StudentScores";
+import { toggleModule } from "../../lib/functions/chart";
 
 Chart.register(
   ArcElement,
@@ -74,6 +79,7 @@ const StudentDialog = ({
   open,
   setIsOpen,
   strgStudent,
+  categoryTitle,
 }: {
   dialog: string;
   students: Student[];
@@ -81,6 +87,7 @@ const StudentDialog = ({
   category: string;
   open: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  categoryTitle: string;
   strgStudent: StruggledStudent | null;
 }) => {
   const { student } = useSelectedStudent();
@@ -219,7 +226,7 @@ const StudentDialog = ({
                   leaveFrom="opacity-100 scale-100"
                   leaveTo="opacity-0 scale-95"
                 >
-                  <Dialog.Panel className="w-full max-w-5xl h-[65vh] transform overflow-hidden rounded-2xl bg-white p-10 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Panel className="w-full max-w-5xl h-fit transform overflow-hidden rounded-2xl bg-white p-10 text-left align-middle shadow-xl transition-all">
                     {dialog === "student info" ? (
                       <div className="">
                         <div className="grid grid-cols-2">
@@ -234,39 +241,41 @@ const StudentDialog = ({
                               )}
                             >
                               <h1 className="font-bold text-xl">
-                                {student?.quarter![quarter].grade_after}
+                                {student?.quarter![quarter].grade_before}
                               </h1>
                             </span>
                             <div className="">
                               <h1 className="font-bold text-lg">
-                                Suggested Grade Adjustment
+                                Grade before
                               </h1>
                               <div className="flex place-items-center">
                                 <p className="">
-                                  Grade before:{" "}
-                                  {student?.quarter![quarter].grade_before}
+                                  Suggested Grade:{" "}
+                                  {student?.quarter![quarter].grade_after ===
+                                  0 ? (
+                                    <span className="font-light italic">
+                                      No Data Available
+                                    </span>
+                                  ) : (
+                                    student?.quarter![quarter].grade_after
+                                  )}
                                 </p>
-                                {diffArrow === "up" ? (
-                                  <ArrowSmUpIcon className="w-5 h-5 text-green-400" />
-                                ) : diffArrow === "down" ? (
-                                  <ArrowSmDownIcon className="w-5 h-5 text-red-400" />
-                                ) : (
-                                  ""
-                                )}
                               </div>
                             </div>
                           </div>
-                          <div className="col-span-1">
-                            <Dialog.Title
-                              as="h1"
-                              className="flex justify-end text-2xl font-semibold leading-6 text-gray-900 w-full mb-2"
-                            >
-                              {formatName(
-                                student ? student.name : "No Student Found"
-                              )}
-                            </Dialog.Title>
-                            <div className="flex justify-end font-medium border-b">
-                              {student?.gender}
+                          <div className="col-span-1 flex justify-end">
+                            <div>
+                              <Dialog.Title
+                                as="h1"
+                                className="flex justify-end text-2xl font-semibold leading-6 text-gray-900 w-full mb-2"
+                              >
+                                {formatName(
+                                  student ? student.name : "No Student Found"
+                                )}
+                              </Dialog.Title>
+                              <div className="flex justify-end font-medium border-b">
+                                {student?.gender}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -369,7 +378,13 @@ const StudentDialog = ({
                         </div>
                       </div>
                     ) : dialog === "struggled students" ? (
-                      <StudentScores strgStudent={strgStudent} />
+                      <StudentScores
+                        setIsOpen={setIsOpen}
+                        strgStudent={strgStudent}
+                        category={category}
+                        categoryTitle={categoryTitle}
+                        quarter={quarter}
+                      />
                     ) : (
                       <>No Data</>
                     )}

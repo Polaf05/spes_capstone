@@ -27,6 +27,7 @@ export const Task = ({
   dialog,
   setDialog,
   strgStudent,
+  categoryTitle,
 }: {
   students: Student[];
   category: string;
@@ -36,6 +37,7 @@ export const Task = ({
   quarter: number;
   dialog: string;
   strgStudent: StruggledStudent | null;
+  categoryTitle: string;
   setDialog: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [sortingMethod, setSorting] = useState("Name");
@@ -350,6 +352,7 @@ export const Task = ({
               open={open}
               setIsOpen={setIsOpen}
               strgStudent={strgStudent}
+              categoryTitle={categoryTitle}
             />
           }
         </div>

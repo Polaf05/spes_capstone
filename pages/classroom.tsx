@@ -403,9 +403,6 @@ export default function ClassroomInfo() {
                         )
                       }
                     >
-                      {() => {
-                        setCategoryTitle(category.title);
-                      }}
                       {category.title}
                     </Tab>
                   ))}
@@ -426,6 +423,7 @@ export default function ClassroomInfo() {
                       assessment={category.value}
                       quarter={quarter_index}
                       strgStudent={strgStudent}
+                      categoryTitle={categoryTitle}
                     />
                   </Tab.Panel>
                 ))}
@@ -443,6 +441,8 @@ export default function ClassroomInfo() {
                   setIsOpen={setIsOpen}
                   setDialog={setDialog}
                   setStrgStudent={setStrgStudent}
+                  categoryTitle={categoryTitle}
+                  setCategoryTitle={setCategoryTitle}
                 />
               </div>
               {/* Bar Chart */}
