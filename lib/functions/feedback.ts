@@ -20,6 +20,7 @@ type Gender = {
   heShe: string;
   himHer: string;
   hisHers: string;
+  hisHer: string;
 };
 
 export const getPronoun = (gender: string) => {
@@ -27,11 +28,13 @@ export const getPronoun = (gender: string) => {
     heShe: "he",
     himHer: "him",
     hisHers: "his",
+    hisHer: "his",
   };
   const female: Gender = {
     heShe: "she",
     himHer: "her",
     hisHers: "hers",
+    hisHer: "her",
   };
   return gender === "MALE" ? male : female;
 };

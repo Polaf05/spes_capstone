@@ -1043,8 +1043,16 @@ const StudentInfo = (user: any) => {
                 {/* Line Chart Assessment */}
                 <div className="h-[45vh] overflow-x-auto px-3">
                   <h5 className="text-justify">
-                    Assessment:{" "}
-                    {performanceAnalysis(student!, quarter, myquar.length)}
+                    {performanceAnalysis(
+                      student!,
+                      quarter,
+                      {
+                        ww: ww_surp_sum,
+                        pt: pt_surp_sum,
+                        len: students?.length,
+                      },
+                      { ww: tdata.ww.percentage, pt: tdata.pt.percentage }
+                    )}
                   </h5>
                 </div>
               </div>
