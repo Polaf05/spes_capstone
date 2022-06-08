@@ -32,7 +32,7 @@ const StruggledStudentCard = ({
     <div>
       {struggledStudents_length > 0 && (
         <div className="my-2 py-2 border-2 border-red-300 rounded-xl">
-          <div className="flex justify-between px-4">
+          <div className="flex justify-between px-4 font-semibold text-lg border-b-2 border-red-300 ">
             <h4>{title}</h4>
             <h4>Task No.</h4>
           </div>
@@ -48,13 +48,13 @@ const StruggledStudentCard = ({
                       setStrgStudent(student);
                       setCategoryTitle(title);
                     }}
-                    className="hover:bg-red-100 hover:cursor-pointer px-4"
+                    className="hover:bg-red-100 hover:cursor-pointer px-4 py-1"
                   >
-                    <div className="flex justify-between">
-                      <h4 className="text-lg font-semibold">
+                    <div className="flex justify-between hover:font-semibold">
+                      <h4 className="text-lg">
                         {formatName(student.student.name)}
                       </h4>
-                      <h4 className="text-lg font-semibold">
+                      <h4 className="text-lg">
                         {title === "Written Works"
                           ? student.failedTasks.ww.join(", ")
                           : student.failedTasks.pt.join(", ")}

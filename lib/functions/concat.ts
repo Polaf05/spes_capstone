@@ -19,12 +19,14 @@ export const studentInCategory = (
 
 export const formatName = (name: string) => {
   let myName: string[] = name.split(" ");
-  myName.forEach((element, idx) => {
-    myName[idx] = capitalize(element.toLowerCase());
-    if (idx === 0) {
-      myName[idx] = capitalize(element.toLowerCase().concat(", "));
-    }
-  });
+  if (!name.match(",")) {
+    myName.forEach((element, idx) => {
+      myName[idx] = capitalize(element.toLowerCase());
+      if (idx === 0) {
+        myName[idx] = capitalize(element.toLowerCase().concat(", "));
+      }
+    });
+  }
   return myName.join(" ");
 };
 
