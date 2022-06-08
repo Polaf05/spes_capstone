@@ -894,7 +894,7 @@ const StudentInfo = (user: any) => {
                   onClick={() => {
                     setQuarter(idx);
                     setMyStudent(student?.quarter![idx]!);
-                    console.log(student?.quarter[idx]);
+                    //console.log(student?.quarter[idx]);
                   }}
                 >
                   {myquar[idx]}
@@ -1121,7 +1121,7 @@ const StudentInfo = (user: any) => {
                               </h1>
                             </div>
                           ) : task === "Zero" ? (
-                            <div className="w-14 h-14 border-4 border-red-300 rounded-full">
+                            <div className="flex justify-center items-center w-14 h-14 border-4 border-red-300 rounded-full">
                               <h1 className="text-3xl font-bold text-red-300">
                                 0
                               </h1>

@@ -22,7 +22,7 @@ const PeopleChart = ({
           <div className="flex flex-col justify-center items-center">
             <div
               className={classNames(
-                "rounded-full w-5 h-5 mb-1",
+                "rounded-full w-4 h-4 mb-1",
                 color === "yellow"
                   ? person
                     ? "bg-yellow-200"
@@ -34,7 +34,7 @@ const PeopleChart = ({
             ></div>
             <div
               className={classNames(
-                "rounded-xl w-8 h-10",
+                "rounded-xl w-7 h-9",
                 color === "yellow"
                   ? person
                     ? "bg-yellow-200"
