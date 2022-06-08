@@ -659,7 +659,7 @@ export const barGraphhAssessment = (student: Student, len: number) => {
     } else {
       return {
         value: 5,
-        linguistic: "the students perfroamamce os very good.",
+        linguistic: "the students performance is very good.",
       };
     }
   }

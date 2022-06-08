@@ -576,33 +576,66 @@ const StudentInfo = (user: any) => {
       );
     }
 
+    let overall_highest = student?.quarter.reduce(function (prev, current) {
+      return prev.grade_before > current.grade_before ? prev : current;
+    });
+    let overall_index =
+      student?.quarter.reduce(
+        (iMax, x, i, arr) => (x > arr[iMax] ? i : iMax),
+        0
+      )! + 1;
+
+    let overall_lowest = student?.quarter.reduce(function (prev, current) {
+      return prev.grade_before < current.grade_before ? prev : current;
+    });
+
+    let overall_index_lowest =
+      student?.quarter.reduce(
+        (iMax, x, i, arr) => (x < arr[iMax] ? i : iMax),
+        0
+      )! + 1;
+
+    overall_feedback.push(
+      `${
+        gender.hisHer.charAt(0).toUpperCase() + gender.heShe.slice(1)
+      } highest grade is in quarter ${overall_index} with a grade of ${
+        overall_highest?.grade_before
+      } ranking ${overall_highest?.ranking} in class and ${
+        gender.hisHer
+      } lowest grade is in the quarter ${overall_index_lowest} with a grade of ${
+        overall_lowest?.grade_before
+      } ranking ${
+        overall_lowest?.ranking
+      } in class having an average rank of ${ave_rank}.`
+    );
+
     if (margin == 0 && lower_score >= 83) {
       overall_feedback.push(
-        "Student both performs better in Performance Tasks and Written Works"
+        "Student both performs better in Performance Tasks and Written Works."
       );
     } else if (margin < 4 && lower_score >= 83) {
       overall_feedback.push(
-        `Student performs slightly better in ${better} with a margin of (${margin})`
+        `Student performs slightly better in ${better} with a margin of (${margin}).`
       );
     } else if (margin > 3 && better_score >= 78) {
       overall_feedback.push(
-        `Student performs better in ${better} with a margin of (${margin})`
+        `Student performs better in ${better} with a margin of (${margin}).`
       );
     } else if (margin > 3 && ave_pt_pct >= 78 && ave_ww_pct >= 83) {
       overall_feedback.push(
-        `Student performs better in ${better} with a margin of (${margin})`
+        `Student performs better in ${better} with a margin of (${margin}).`
       );
     } else if (margin > 3 && better_score >= 78 && lower_score < 75) {
       overall_feedback.push(
         `Student performs better in ${better}however student needs attention in ${worst} since ${
           student?.gender == "MALE" ? "his" : "her"
-        } performance is very poor `
+        } performance is very poor.`
       );
     } else if (better_score <= 77) {
       overall_feedback.push(
         `Student need attention in both Performance Tasks and Written Works because ${
           student?.gender == "MALE" ? "he" : "she"
-        } performed poorly `
+        } performed poorly.`
       );
     }
 
