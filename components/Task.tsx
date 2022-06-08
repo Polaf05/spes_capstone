@@ -14,6 +14,7 @@ import {
 } from "../lib/functions/grade_computation";
 import { classNames, formatName } from "../lib/functions/concat";
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
+import ReactTooltip from "react-tooltip";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -126,6 +127,7 @@ export const Task = ({
 
   const [openClassDialog, setClassDialogOpen] = useState<boolean>(false);
   const [tutorial, setTutorial] = useState<string>("");
+  const [tooltip, showTooltip] = useState<boolean>(false);
 
   return (
     students && (
@@ -143,17 +145,20 @@ export const Task = ({
                   setTutorial("classTable");
                 }}
                 className="w-5 h-5 text-neutral-500 hover:cursor-pointer"
+                data-for="question"
+                data-tip="Click for a quick tutorial"
+                onMouseEnter={() => showTooltip(true)}
+                onMouseLeave={() => {
+                  showTooltip(false);
+                  setTimeout(() => showTooltip(true), 50);
+                }}
               />
+              {tooltip && (
+                <ReactTooltip id="question" type="light" effect="float" />
+              )}
             </div>
             <div className="text-lg font-semibold flex items-center gap-2">
               <h4>Sorted by: {sortingMethod ? sortingMethod : "Name"}</h4>
-              <QuestionMarkCircleIcon
-                onClick={() => {
-                  setClassDialogOpen(true);
-                  setTutorial("sorting");
-                }}
-                className="w-4 h-4 text-neutral-500 hover:cursor-pointer"
-              />
             </div>
             <div className="w-full overflow-y-auto h-[60vh]">
               <table className="table-fixed min-w-full rounded-md text-lg text-left border-collapse">
@@ -209,7 +214,7 @@ export const Task = ({
                     students?.map((student, idx) => (
                       <tr
                         className={classNames(
-                          "hover:cursor-pointer text-center",
+                          "hover:cursor-pointer text-center hover:font-semibold",
                           (category === "Over All"
                             ? student.quarter![quarter].grade_before
                             : getGrade(
@@ -219,7 +224,7 @@ export const Task = ({
                                   : student.quarter![quarter]
                                       .performance_percentage?.score
                               )) > 75
-                            ? "odd:bg-yellow-50"
+                            ? "odd:bg-yellow-50 even:bg-white"
                             : "bg-red-200"
                         )}
                         onClick={() => {
@@ -229,7 +234,7 @@ export const Task = ({
                         }}
                         key={idx}
                       >
-                        <td className="pl-4 font-semibold text-left">
+                        <td className="pl-4 text-left">
                           {formatName(student.name)}
                         </td>
                         <td>
@@ -356,7 +361,7 @@ export const Task = ({
             />
           }
         </div>
-        <div>
+        <div className="">
           <TutorialDialog
             tutorial={tutorial}
             openClassDialog={openClassDialog}
