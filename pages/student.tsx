@@ -55,7 +55,7 @@ import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { TaskDataScores } from "../types/Task";
 import Link from "next/link";
 import {
-  getInitialGrade,
+  getStudentAverage,
   studentFailed,
   transmuteGrade,
 } from "../lib/functions/grade_computation";
@@ -742,19 +742,26 @@ const StudentInfo = (user: any) => {
               <h1
                 className={classNames(
                   "font-bold  text-4xl",
-                  studentFailed(student.remarks)
+                  studentFailed(
+                    getRemarks(getStudentAverage(student, myquar.length))
+                  )
                     ? "text-red-400"
                     : "text-tallano_gold-300"
                 )}
               >
-                {student?.remarks}
+                {getRemarks(getStudentAverage(student, myquar.length))}
               </h1>
-              {student.remarks.match(/Poor/g) && (
+              {getRemarks(getStudentAverage(student, myquar.length)).match(
+                /Poor/g
+              ) && (
                 <ExclamationCircleIcon className="w-10 h-10 xl:w-12 xl:h-12 text-red-400" />
               )}
             </div>
             <h2 className="flex justify-end text-[0.8rem] text-neutral-500">
-              {getRemarksAnalysis(student, student?.remarks)}
+              {getRemarksAnalysis(
+                student,
+                getRemarks(getStudentAverage(student, myquar.length))
+              )}
             </h2>
           </div>
         </div>
@@ -766,7 +773,7 @@ const StudentInfo = (user: any) => {
               {myquar.length !== 4
                 ? `Initial Grade for ${
                     myquar.length
-                  } quarters: ${getInitialGrade(student, myquar.length)}`
+                  } quarters: ${getStudentAverage(student, myquar.length)}`
                 : `Final Grade: ${student?.final_grade_after}`}{" "}
             </h2>
             {/* Bar Chart */}
