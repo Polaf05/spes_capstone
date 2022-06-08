@@ -59,7 +59,12 @@ import {
   studentFailed,
   transmuteGrade,
 } from "../lib/functions/grade_computation";
-import { capitalize, classNames, formatName } from "../lib/functions/concat";
+import {
+  capitalize,
+  classNames,
+  formatName,
+  quarterIsOne,
+} from "../lib/functions/concat";
 import { getRemarksAnalysis } from "../lib/functions/feedback";
 
 Chart.register(
@@ -771,9 +776,9 @@ const StudentInfo = (user: any) => {
             <h3 className="text-justify mb-4">{getOverallFeedback()}</h3>
             <h2 className="font-semibold text-xl">
               {myquar.length !== 4
-                ? `Initial Grade for ${
+                ? `Initial Grade for ${myquar.length} ${quarterIsOne(
                     myquar.length
-                  } quarters: ${getStudentAverage(student, myquar.length)}`
+                  )}: ${getStudentAverage(student, myquar.length)}`
                 : `Final Grade: ${student?.final_grade_after}`}{" "}
             </h2>
             {/* Bar Chart */}
