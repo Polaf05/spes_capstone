@@ -32,3 +32,6 @@ export const formatName = (name: string) => {
 
 export const capitalize = (string: string) =>
   string ? string.charAt(0).toUpperCase() + string.slice(1) : "";
+
+export const quarterIsOne = (quarters: number) =>
+  quarters > 1 ? "quarters" : "quarter";

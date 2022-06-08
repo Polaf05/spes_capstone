@@ -41,7 +41,7 @@ export const Task = ({
   categoryTitle: string;
   setDialog: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const [sortingMethod, setSorting] = useState("Name");
+  const [sortingMethod, setSorting] = useState("Grade Before");
   const { setStudent } = useSelectedStudent();
   const [filteredStudents, setFilteredStudents] = useState<Student[] | null>(
     students!

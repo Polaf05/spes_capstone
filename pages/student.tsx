@@ -58,11 +58,16 @@ import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { TaskDataScores } from "../types/Task";
 import Link from "next/link";
 import {
-  getInitialGrade,
+  getStudentAverage,
   studentFailed,
   transmuteGrade,
 } from "../lib/functions/grade_computation";
-import { capitalize, classNames, formatName } from "../lib/functions/concat";
+import {
+  capitalize,
+  classNames,
+  formatName,
+  quarterIsOne,
+} from "../lib/functions/concat";
 import { getPronoun, getRemarksAnalysis } from "../lib/functions/feedback";
 
 Chart.register(
@@ -719,19 +724,26 @@ const StudentInfo = (user: any) => {
               <h1
                 className={classNames(
                   "font-bold  text-4xl",
-                  studentFailed(student.remarks)
+                  studentFailed(
+                    getRemarks(getStudentAverage(student, myquar.length))
+                  )
                     ? "text-red-400"
                     : "text-tallano_gold-300"
                 )}
               >
-                {student?.remarks}
+                {getRemarks(getStudentAverage(student, myquar.length))}
               </h1>
-              {student.remarks.match(/Poor/g) && (
+              {getRemarks(getStudentAverage(student, myquar.length)).match(
+                /Poor/g
+              ) && (
                 <ExclamationCircleIcon className="w-10 h-10 xl:w-12 xl:h-12 text-red-400" />
               )}
             </div>
             <h2 className="flex justify-end text-[0.8rem] text-neutral-500">
-              {getRemarksAnalysis(student, student?.remarks)}
+              {getRemarksAnalysis(
+                student,
+                getRemarks(getStudentAverage(student, myquar.length))
+              )}
             </h2>
           </div>
         </div>
@@ -741,9 +753,9 @@ const StudentInfo = (user: any) => {
             <h3 className="text-justify mb-4">{getOverallFeedback()}</h3>
             <h2 className="font-semibold text-xl">
               {myquar.length !== 4
-                ? `Initial Grade for ${
+                ? `Initial Grade for ${myquar.length} ${quarterIsOne(
                     myquar.length
-                  } quarters: ${getInitialGrade(student, myquar.length)}`
+                  )}: ${getStudentAverage(student, myquar.length)}`
                 : `Final Grade: ${student?.final_grade_after}`}{" "}
             </h2>
             {/* Bar Chart */}

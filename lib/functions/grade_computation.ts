@@ -154,12 +154,6 @@ export const transmuteGrade = (grade: number) => {
   return transmuted_grade;
 };
 
-export const getInitialGrade = (student: Student, quarter: number) => {
-  let sum = 0;
-  for (let i = 0; i < quarter; i++) sum += student.quarter[i].grade_after;
-  return (sum / quarter).toFixed();
-};
-
 export const studentFailed = (remarks: string) => {
   if (remarks.match(/Poor/g)) return true;
   return false;
