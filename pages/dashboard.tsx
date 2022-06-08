@@ -40,6 +40,7 @@ import {
   getGrade,
   getGradeArray,
   getScorePCT,
+  getStudentAverage,
   getTaskScores,
   transmuteGrade,
 } from "../lib/functions/grade_computation";
@@ -80,6 +81,7 @@ Chart.register(
   Tooltip
 );
 import { getTasksInfo } from "../lib/functions/tasks";
+import { Student } from "../types/Students";
 
 const Dashboard = () => {
   const { students } = useClassroom();
@@ -104,7 +106,7 @@ const Dashboard = () => {
   );
   const [ww_ave_participants_arr, setWWAveParArr] = useState<number[]>([]);
   const [pt_ave_participants_arr, setPTAveParArr] = useState<number[]>([]);
-
+  const [failedStudentsPCT, setFailedStudentsPCT] = useState<number>(0);
   useEffect(() => {
     // if (!user.user) {
     //   router.push("/login");
@@ -155,7 +157,7 @@ const Dashboard = () => {
       setAveRemarks(getRemarks(q_ave_grade));
 
       let arr_remarks: Remarks[] = [];
-      quarter_grades.map((quarter) => {
+      quarter_grades.map((quarter, i) => {
         let remarks: Remarks = {
           very_good: [],
           good: [],
@@ -172,6 +174,19 @@ const Dashboard = () => {
         });
         arr_remarks.push(remarks);
       });
+
+      let failedStudentsCount = 0;
+      students.map((student) => {
+        const student_ave_remarks = getRemarks(
+          getStudentAverage(student, qSum)
+        );
+
+        //console.log(student.name, ": ", student_ave_remarks);
+        if (student_ave_remarks.match(/Very Poor/g)) failedStudentsCount += 1;
+      });
+      //console.log(failedStudentsCount);
+
+      setFailedStudentsPCT(getScorePCT(failedStudentsCount, students.length));
 
       let chart_dataset: Dataset = {
         set_a: [],
@@ -226,6 +241,7 @@ const Dashboard = () => {
         poor: [],
         very_poor: [],
       };
+
       final_grades.map((grade, idx) => {
         if (grade < 75) remarks.very_poor.push(students[idx]);
         else if (grade < 83) remarks.poor.push(students[idx]);
@@ -234,9 +250,11 @@ const Dashboard = () => {
         else remarks.very_good.push(students[idx]);
       });
 
-      setFailedStudents(getScorePCT(remarks.very_poor.length, students.length));
-
-      setFailedStudents(getScorePCT(remarks.very_poor.length, students.length));
+      setFailedStudents(
+        quarters.length === 4
+          ? getScorePCT(remarks.very_poor.length, students.length)
+          : 0
+      );
 
       var buttons: number[] = [];
       for (var i = 1; i <= qSum; i++) {
@@ -309,30 +327,30 @@ const Dashboard = () => {
                 </Link>
               </div>
             </div>
-            <div className="grid place-content-center">
-              <div>
+            <div className="grid grid-cols-5">
+              <div className="col-span-3 col-start-2">
                 <h1 className="text-xl xl:text-2xl font-semibold">
                   Classroom Evaluation:{" "}
                   <span className="font-bold underline decoration-2"></span>
                 </h1>
-              </div>
-              <div className="flex gap-4">
-                {quarters.map((button, idx) => (
-                  <div key={idx}>
-                    <Link href={`/classroom`} passHref>
-                      <button
-                        onClick={() => {
-                          setQuarter(idx);
-                        }}
-                        className="rounded-3xl w-36 h-24 lg:w-36 lg:h-24 xl:w-60 xl:h-40 bg-ocean-100 grid place-items-center"
-                      >
-                        <h3 className="font-semibold text-lg">
-                          Quarter {button}
-                        </h3>
-                      </button>
-                    </Link>
-                  </div>
-                ))}
+                <div className="flex gap-4 justify-center">
+                  {quarters.map((button, idx) => (
+                    <div key={idx}>
+                      <Link href={`/classroom`} passHref>
+                        <button
+                          onClick={() => {
+                            setQuarter(idx);
+                          }}
+                          className="rounded-3xl w-36 h-24 lg:w-36 lg:h-24 xl:w-60 xl:h-40 bg-ocean-100 grid place-items-center"
+                        >
+                          <h3 className="font-semibold text-lg">
+                            Quarter {button}
+                          </h3>
+                        </button>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             <div className="mt-16 mx-12 lg:mx-20 xl:mx-24 h-[80vh]">
@@ -394,7 +412,7 @@ const Dashboard = () => {
                     <h4 className="font-semibold text-lg">Passing Rate:</h4>
                     <PeopleChart
                       passed_tasks={
-                        10 - Number((failedStudents / 10).toFixed())
+                        10 - Number((failedStudentsPCT / 10).toFixed())
                       }
                       length={10}
                       color="yellow"
@@ -402,7 +420,7 @@ const Dashboard = () => {
                     <div className="flex justify-center">
                       <p className="font-light text-center">
                         {getPassingRemarks(
-                          100 - failedStudents,
+                          100 - failedStudentsPCT,
                           quarters.length
                         )}
                       </p>

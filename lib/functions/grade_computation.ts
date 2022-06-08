@@ -16,6 +16,15 @@ export const getRemarks = (grade: number) => {
 export const getGrade = (grade: any) =>
   typeof grade === "string" ? -1 : grade;
 
+export const getStudentAverage = (student: Student, quarters: number) => {
+  const grade_array: number[] = [];
+  //console.log(quarters);
+  for (let i = 0; i < quarters; i++) {
+    grade_array.push(student.quarter[i].grade_before);
+  }
+  return getAverageGrade([grade_array])[0];
+};
+
 export const displayData = (grade: number) =>
   grade === -1 ? "no data" : grade;
 
@@ -143,12 +152,6 @@ export const transmuteGrade = (grade: number) => {
   }
 
   return transmuted_grade;
-};
-
-export const getInitialGrade = (student: Student, quarter: number) => {
-  let sum = 0;
-  for (let i = 0; i < quarter; i++) sum += student.quarter[i].grade_after;
-  return (sum / quarter).toFixed();
 };
 
 export const studentFailed = (remarks: string) => {
