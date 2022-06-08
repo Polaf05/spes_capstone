@@ -2,7 +2,10 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
-import { performanceAnalysis } from "../lib/functions/studentFeedback";
+import {
+  barGraphhAssessment,
+  performanceAnalysis,
+} from "../lib/functions/studentFeedback";
 import {
   Chart,
   ArcElement,
@@ -60,7 +63,7 @@ import {
   transmuteGrade,
 } from "../lib/functions/grade_computation";
 import { capitalize, classNames, formatName } from "../lib/functions/concat";
-import { getRemarksAnalysis } from "../lib/functions/feedback";
+import { getPronoun, getRemarksAnalysis } from "../lib/functions/feedback";
 
 Chart.register(
   ArcElement,
@@ -436,6 +439,7 @@ const StudentInfo = (user: any) => {
   const ave_pt_pct: number = Number((pt_qsum / qSum).toFixed(1));
   let better_at: string = "";
   let better: string = "";
+  let worst: string = "";
   let better_score: number = 0;
   let lower_score: number = 0;
   let flag = "both";
@@ -446,6 +450,7 @@ const StudentInfo = (user: any) => {
   } else if (ave_pt_pct > ave_ww_pct) {
     better_at = "better in Performance Tasks";
     better = "Performance Tasks";
+    worst = "Writtent Works";
     better_score = ave_pt_pct;
     lower_score = ave_ww_pct;
     flag = "pt";
@@ -453,6 +458,7 @@ const StudentInfo = (user: any) => {
   } else {
     better_at = "better in Written Works";
     better = "Written Works";
+    worst = "Performance Tasks";
     better_score = ave_ww_pct;
     lower_score = ave_pt_pct;
     flag = "ww";
@@ -464,80 +470,62 @@ const StudentInfo = (user: any) => {
   const getOverallFeedback = () => {
     let overall_feedback: string[] = [];
 
-    if (
-      student?.final_grade_before! >= 83 &&
-      student?.inference_result?.external_elements.value! >= 0.5
-    ) {
-      overall_feedback.push(
-        `Student performed ${student?.remarks} in ${
-          student?.gender == "MALE" ? "his" : "her"
-        } studies because ${
-          student?.gender == "MALE" ? "his" : "her"
-        } external factors is ${
-          student?.inference_result?.external_elements.linguistic
-        }.`
-      );
-    } else if (
-      student?.final_grade_before! < 83 &&
-      student?.inference_result?.external_elements.value! >= 0.5
-    ) {
-      overall_feedback.push(
-        `Student performed ${student?.remarks} in ${
-          student?.gender == "MALE" ? "his" : "her"
-        } studies even though ${
-          student?.gender == "MALE" ? "his" : "her"
-        } external factors is ${
-          student?.inference_result?.external_elements.linguistic
-        }.`
-      );
-    } else if (
-      student?.final_grade_before! >= 83 &&
-      student?.inference_result?.external_elements.value! < 0.5
-    ) {
-      overall_feedback.push(
-        `Student performed ${student?.remarks} in ${
-          student?.gender == "MALE" ? "his" : "her"
-        } studies even though ${
-          student?.gender == "MALE" ? "his" : "her"
-        } external factors is ${
-          student?.inference_result?.external_elements.linguistic
-        }.`
-      );
-    } else if (
-      student?.final_grade_before! < 83 &&
-      student?.inference_result?.external_elements.value! < 0.5
-    ) {
-      overall_feedback.push(
-        `Student performed ${student?.remarks} in ${
-          student?.gender == "MALE" ? "his" : "her"
-        } studies because ${
-          student?.gender == "MALE" ? "his" : "her"
-        } external factors is ${
-          student?.inference_result?.external_elements.linguistic
-        }.`
-      );
-    }
+    let gender = getPronoun(student?.gender as string);
 
-    if (
-      student?.quarter_analysis.fluctuation! > 3 ||
-      student?.quarter_analysis.fluctuation! < -3
-    ) {
-      overall_feedback.push(
-        `Students grade is not consistent and has a high fluctuation rate.`
-      );
-    } else if (student?.quarter_analysis.fluctuation! == 0) {
-      overall_feedback.push(
-        `Students grade is consistent and doesn’t fluctuate.`
-      );
-    } else if (
-      (student?.quarter_analysis.fluctuation! > 0 &&
-        student?.quarter_analysis.fluctuation! <= 3) ||
-      (student?.quarter_analysis.fluctuation! < 0 &&
-        student?.quarter_analysis.fluctuation! >= 3)
-    ) {
-      overall_feedback.push(
-        `Student grade is almost consistent, and his fluctuation rate is low.`
-      );
+    let performance = barGraphhAssessment(student!, myquar.length);
+
+    if (student?.remarks == "Very Poor") {
+      if (performance.value < 3) {
+        overall_feedback.push(
+          `The students requires attention because ${gender.hisHer} grade is very poor and ` +
+            performance.linguistic
+        );
+      } else {
+        overall_feedback.push(
+          `Although the students grade is very poor, ` + performance.linguistic
+        );
+      }
+    } else if (student?.remarks == "Poor") {
+      if (performance.value < 3) {
+        overall_feedback.push(
+          `The students requires attention because ${gender.hisHer} grade is poor and ` +
+            performance.linguistic
+        );
+      } else {
+        overall_feedback.push(
+          `Although the students grade is poor, ` + performance.linguistic
+        );
+      }
+    } else if (student?.remarks == "Average") {
+      if (performance.value < 3 && performance.value > 3) {
+        overall_feedback.push(
+          `The students grade is average but ` + performance.linguistic
+        );
+      } else {
+        overall_feedback.push(
+          `The student grade is average and ` + performance.linguistic
+        );
+      }
+    } else if (student?.remarks == "Good") {
+      if (performance.value < 3) {
+        overall_feedback.push(
+          `Although the students grade is good, ` + performance.linguistic
+        );
+      } else {
+        overall_feedback.push(
+          `The students grade is very and ` + performance.linguistic
+        );
+      }
+    } else {
+      if (performance.value < 3) {
+        overall_feedback.push(
+          `Although the students grade is very good, ` + performance.linguistic
+        );
+      } else {
+        overall_feedback.push(
+          `The students grade is very good and ` + performance.linguistic
+        );
+      }
     }
 
     if (
@@ -588,22 +576,11 @@ const StudentInfo = (user: any) => {
       );
     }
 
-    // else if (
-    //   student?.quarter_analysis.plunge_task.length! == 0 &&
-    //   student?.quarter_analysis.surge_task.length! == 0
-    // ) {
-    //   overall_feedback.push(
-    //     `${
-    //       student?.gender == "MALE" ? "he" : "she"
-    //     } grades suddenly plunge in ${student?.quarter_analysis.plunge_task.join()}`
-    //   );
-    // }
-
-    if (margin == 0 && ave_pt_pct >= 83 && ave_ww_pct >= 83) {
+    if (margin == 0 && lower_score >= 83) {
       overall_feedback.push(
         "Student both performs better in Performance Tasks and Written Works"
       );
-    } else if (margin <= 3 && ave_pt_pct >= 83 && ave_ww_pct >= 83) {
+    } else if (margin < 4 && lower_score >= 83) {
       overall_feedback.push(
         `Student performs slightly better in ${better} with a margin of (${margin})`
       );
@@ -617,7 +594,7 @@ const StudentInfo = (user: any) => {
       );
     } else if (margin > 3 && better_score >= 78 && lower_score < 75) {
       overall_feedback.push(
-        `Student performs better in ${better}however student needs attention in variable 2 since ${
+        `Student performs better in ${better}however student needs attention in ${worst} since ${
           student?.gender == "MALE" ? "his" : "her"
         } performance is very poor `
       );

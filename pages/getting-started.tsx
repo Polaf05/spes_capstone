@@ -42,7 +42,7 @@ import { useRouter } from "next/router";
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
 
-let errors: number[] = [0, 0, 0, 0, -1, -1, -1];
+let errors: number[] = [0, 0, 0, 0, 0, -1, -1, -1];
 
 const gettingStarted = (user: any) => {
   const { students, setStudents } = useClassroom();
@@ -54,6 +54,7 @@ const gettingStarted = (user: any) => {
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<any>(null);
   const router = useRouter();
+  const [hasData, setData] = useState<boolean>(false);
 
   // useEffect(() => {
   //   console.log(user);
@@ -94,6 +95,10 @@ const gettingStarted = (user: any) => {
 
   const handleFile = async (e: any) => {
     const [file] = e.target.files;
+
+    errors[2] = 0;
+    errors[3] = 0;
+    errors[4] = 0;
 
     if (file != null) {
       const file_name = file.name;
@@ -189,6 +194,13 @@ const gettingStarted = (user: any) => {
                           performance_weighted_score: item[30],
                         };
                         highest_score = score_total;
+                        if (
+                          highest_score.written_works.length > 0 ||
+                          highest_score.performance_work.length > 0
+                        ) {
+                          console.log(errors[4]);
+                          errors[4] = 2;
+                        }
                         task_length.push(highest_score);
                       }
                       if (item[1] !== 0 && !isNaN(item[0])) {
@@ -418,7 +430,9 @@ const gettingStarted = (user: any) => {
 
             // let download = await fetchJson(upload);
             console.log(class_list);
-
+            if (errors[4] === 0) {
+              errors[4] = 1;
+            }
             setStudents(class_list);
             setError(errors);
             // console.log("Error:", error);
@@ -462,6 +476,7 @@ const gettingStarted = (user: any) => {
     "Sheet template format is correct",
     "Uploaded file format is correct (.xlsx)",
     "DepEd Grading Sheet Template is met",
+    "There is no data inside the grading sheet",
     "Names of the students are correct",
     "Grading Sheet is in Alphabetical Order",
     "Complete data",
@@ -617,7 +632,7 @@ const gettingStarted = (user: any) => {
                         )}
                         <h5
                           className={classNames(
-                            idx > 3 ? "text-neutral-400" : ""
+                            idx > 4 ? "text-neutral-400" : ""
                           )}
                         >
                           {msg}
@@ -630,7 +645,7 @@ const gettingStarted = (user: any) => {
                       <Link
                         href={
                           (errors[0] === 2 && errors[1] === 2) ||
-                          (errors[2] === 2 && errors[3] === 2)
+                          (errors[2] === 2 && errors[3] === 2 && errors[4] == 2)
                             ? "/dashboard"
                             : "#"
                         }
@@ -642,8 +657,11 @@ const gettingStarted = (user: any) => {
                             (errors[0] === 2 &&
                               errors[1] === 2 &&
                               errors[2] === 2 &&
-                              errors[3] === 2) ||
-                              (errors[2] === 2 && errors[3] === 2)
+                              errors[3] === 2 &&
+                              errors[4] === 2) ||
+                              (errors[2] === 2 &&
+                                errors[3] === 2 &&
+                                errors[4] === 2)
                               ? "opacity-100 cursor-pointer"
                               : "cursor-not-allowed"
                           )}

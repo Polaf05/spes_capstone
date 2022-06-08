@@ -125,7 +125,7 @@ export const performanceAnalysis = (
   if (remarks === `very poor`) {
     if (task.value < 3) {
       quarter.push(
-        `The students needs attention, because ${gender.hisHer} grade is very poor and ` +
+        `The students requires attention because ${gender.hisHer} grade is very poor and ` +
           task.linguistics
       );
     } else {
@@ -172,38 +172,107 @@ export const performanceAnalysis = (
   }
 
   if (
-    student?.quarter_analysis.plunge_task.length! > 0 &&
-    student?.quarter_analysis.surge_task.length! > 0
+    student?.quarter[i].written_tasks_analysis.plunge_task.length > 0 &&
+    student?.quarter[i].written_tasks_analysis.surge_task.length > 0
   ) {
     quarter.push(
-      `${student?.gender == "MALE" ? "His" : "Her"} score suddenly plunged in ${
-        student?.quarter_analysis.plunge_task.length! > 1 ? "tasks" : "task"
+      `${
+        student?.gender == "MALE" ? "His" : "Her"
+      } score in written works suddenly plunged in ${
+        student?.quarter[i].written_tasks_analysis.plunge_task.length > 0
+          ? "tasks"
+          : "task"
       } ${formatArray(
-        student?.quarter_analysis.plunge_task
+        student?.quarter[i].written_tasks_analysis.plunge_task
       )} while it surged  in ${
-        student?.quarter_analysis.surge_task.length! > 1 ? "tasks" : "task"
-      }  ${formatArray(student?.quarter_analysis.surge_task)}.`
+        student?.quarter[i].written_tasks_analysis.surge_task.length > 0
+          ? "tasks"
+          : "task"
+      }  ${formatArray(student?.quarter[i].written_tasks_analysis.surge_task)}.`
     );
   } else if (
-    student?.quarter_analysis.plunge_task.length! > 0 &&
-    student?.quarter_analysis.surge_task.length! == 0
+    student?.quarter[i].written_tasks_analysis.plunge_task.length > 0 &&
+    student?.quarter[i].written_tasks_analysis.surge_task.length == 0
   ) {
     quarter.push(
-      `${student?.gender == "MALE" ? "His" : "Her"} score suddenly plunged in ${
-        student?.quarter_analysis.plunge_task.length! > 1 ? "tasks" : "task"
-      } ${formatArray(student?.quarter_analysis.plunge_task)}.`
+      `${
+        student?.gender == "MALE" ? "His" : "Her"
+      } score in written works suddenly plunged in ${
+        student?.quarter[i].written_tasks_analysis.plunge_task.length > 1
+          ? "tasks"
+          : "task"
+      } ${formatArray(student?.quarter[i].written_tasks_analysis.plunge_task)}.`
     );
   }
   if (
-    student?.quarter_analysis.plunge_task.length! == 0 &&
-    student?.quarter_analysis.surge_task.length! > 0
+    student?.quarter[i].written_tasks_analysis.plunge_task.length == 0 &&
+    student?.quarter[i].written_tasks_analysis.surge_task.length > 0
   ) {
     quarter.push(
-      `${student?.gender == "MALE" ? "His" : "Her"} score suddenly surged  in ${
-        student?.quarter_analysis.surge_task.length! > 1 ? "tasks" : "task"
-      }  ${formatArray(student?.quarter_analysis.surge_task)}.`
+      `${
+        student?.gender == "MALE" ? "His" : "Her"
+      } score in written works suddenly surged  in ${
+        student?.quarter[i].written_tasks_analysis.surge_task.length > 1
+          ? "tasks"
+          : "task"
+      }  ${formatArray(student?.quarter[i].written_tasks_analysis.surge_task)}.`
     );
   }
+
+  if (
+    student?.quarter[i].performace_tasks_analysis.plunge_task.length > 0 &&
+    student?.quarter[i].performace_tasks_analysis.surge_task.length > 0
+  ) {
+    quarter.push(
+      `${
+        student?.gender == "MALE" ? "His" : "Her"
+      } score in performance task suddenly plunged in ${
+        student?.quarter[i].performace_tasks_analysis.plunge_task.length > 0
+          ? "tasks"
+          : "task"
+      } ${formatArray(
+        student?.quarter[i].performace_tasks_analysis.plunge_task
+      )} while it surged  in ${
+        student?.quarter[i].performace_tasks_analysis.surge_task.length > 0
+          ? "tasks"
+          : "task"
+      }  ${formatArray(
+        student?.quarter[i].performace_tasks_analysis.surge_task
+      )}.`
+    );
+  } else if (
+    student?.quarter[i].performace_tasks_analysis.plunge_task.length > 0 &&
+    student?.quarter[i].written_tasks_analysis.surge_task.length == 0
+  ) {
+    quarter.push(
+      `${
+        student?.gender == "MALE" ? "His" : "Her"
+      } score in performance task suddenly plunged in ${
+        student?.quarter[i].performace_tasks_analysis.plunge_task.length > 1
+          ? "tasks"
+          : "task"
+      } ${formatArray(
+        student?.quarter[i].performace_tasks_analysis.plunge_task
+      )}.`
+    );
+  }
+  if (
+    student?.quarter[i].performace_tasks_analysis.plunge_task.length == 0 &&
+    student?.quarter[i].performace_tasks_analysis.surge_task.length > 0
+  ) {
+    quarter.push(
+      `${
+        student?.gender == "MALE" ? "His" : "Her"
+      } score in performance task suddenly surged  in ${
+        student?.quarter[i].performace_tasks_analysis.surge_task.length > 1
+          ? "tasks"
+          : "task"
+      }  ${formatArray(
+        student?.quarter[i].performace_tasks_analysis.surge_task
+      )}.`
+    );
+  }
+
   let writtenSummary = taskSummary(wwtaskSummary, "written works");
   let performanceSummary = taskSummary(pttaskSummary, "performance task");
 
@@ -291,7 +360,7 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 1:
         return {
           value: 1,
-          linguistics: `the students written works is very good because its trend is in an upward motion while ${gender.hisHer} performance in performance task is going on the opposite direction and needs direct attention.`,
+          linguistics: `the students written works is very good because its trend is in an upward motion while ${gender.hisHer} performance in performance task is going on the opposite direction and requires direct attention.`,
         };
         break;
       default:
@@ -331,7 +400,7 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 1:
         return {
           value: 1,
-          linguistics: `the students performance in ${gender.hisHer} written works is good because the trend is slightly going in an upward motion while ${gender.hisHer} performance in performance task is going on the opposite direction and needs direct attention.`,
+          linguistics: `the students performance in ${gender.hisHer} written works is good because the trend is slightly going in an upward motion while ${gender.hisHer} performance in performance task is going on the opposite direction and requires direct attention.`,
         };
       default:
         return {
@@ -370,7 +439,7 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 1:
         return {
           value: 1,
-          linguistics: `the students performance in ${gender.hisHer} written works is average because the trend is consistent while ${gender.hisHer} performance in performance task is very poor that needs a direct attention.`,
+          linguistics: `the students performance in ${gender.hisHer} written works is average because the trend is consistent while ${gender.hisHer} performance in performance task is very poor that requires a direct attention.`,
         };
         break;
       default:
@@ -410,7 +479,7 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 1:
         return {
           value: 1,
-          linguistics: `the students performance in ${gender.hisHer} written works is poor and its motion is slightly going downward while ${gender.hisHer} performance in performance task is very poor that needss a direct attention.`,
+          linguistics: `the students performance in ${gender.hisHer} written works is poor and its motion is slightly going downward while ${gender.hisHer} performance in performance task is very poor that requiress a direct attention.`,
         };
       default:
         return {
@@ -423,25 +492,25 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 5:
         return {
           value: 5,
-          linguistics: `the students performance in ${gender.hisHer} written works is very poor that needs a direct attention while ${gender.hisHer} performance in performance task is very good bacause it is going in an upward motion.`,
+          linguistics: `the students performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task is very good bacause it is going in an upward motion.`,
         };
         break;
       case 4:
         return {
           value: 4,
-          linguistics: `the students performance in ${gender.hisHer} written works is very poor that needs a direct attention while ${gender.hisHer} performance in performance task is good bacause the trend is slightly going upward.`,
+          linguistics: `the students performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task is good bacause the trend is slightly going upward.`,
         };
         break;
       case 3:
         return {
           value: 3,
-          linguistics: `the students performance in ${gender.hisHer} written works is very poor that needs a direct attention while ${gender.hisHer} performance in performance task si completely consistent.`,
+          linguistics: `the students performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task si completely consistent.`,
         };
         break;
       case 2:
         return {
           value: 2,
-          linguistics: `the students performance in ${gender.hisHer} written works is very poor that needs a direct attention while ${gender.hisHer} performance in performance task is slightly going downward.`,
+          linguistics: `the students performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task is slightly going downward.`,
         };
         break;
       case 1:
@@ -495,14 +564,103 @@ export const lineGraphAssessment = (student: Student, i: number) => {
   }
 };
 
-// if (trend == 0) {
-//     return `consistent linear`;
-//   } else if (trend > 0 && trend <= 2) {
-//     return `slightly upward`;
-//   } else if (trend < 0 && trend >= -2) {
-//     return `slightly downward`;
-//   } else if (trend > 3) {
-//     return `upward`;
-//   } else {
-//     return `downward`;
-//   }
+export const barGraphhAssessment = (student: Student, len: number) => {
+  if (student.quarter_analysis.trends === "upward") {
+    if (len >= 4) {
+      return {
+        value: 5,
+        linguistic:
+          "the students performance is very good and deserves a recognition.",
+      };
+    } else {
+      return {
+        value: 5,
+        linguistic:
+          "the students performance is very good and deserves a recognition.",
+      };
+    }
+  } else if (student.quarter_analysis.trends === "slightly upward") {
+    if (len >= 4) {
+      return {
+        value: 4,
+        linguistic:
+          "the students performance is slightly good and deserves a recognition",
+      };
+    } else {
+      return {
+        value: 4,
+        linguistic:
+          "the students performance is slithly good and deserves a recognition.",
+      };
+    }
+  } else if (student.quarter_analysis.trends === "consistently linear") {
+    if (len >= 4) {
+      return {
+        value: 3,
+        linguistic:
+          "the students performance is consistently linear to all quarters.",
+      };
+    } else {
+      return {
+        value: 3,
+        linguistic:
+          "the students performance is consistently linear to all quarters.",
+      };
+    }
+  } else if (student.quarter_analysis.trends === "slightly downward") {
+    if (len >= 4) {
+      return {
+        value: 2,
+        linguistic: "the students performance is slightly going downward",
+      };
+    } else {
+      return {
+        value: 2,
+        linguistic: "the students performance is slightly goind downward",
+      };
+    }
+  } else if (student.quarter_analysis.trends === "downward") {
+    if (len >= 4) {
+      return {
+        value: 1,
+        linguistic:
+          "the students performance is very poor all throughout the school year.",
+      };
+    } else {
+      return {
+        value: 1,
+        linguistic:
+          "the students performance is very poor and requires direct attention for the next incoming quarter.",
+      };
+    }
+  } else {
+    if (student.quarter_analysis.trends === "Very Poor") {
+      return {
+        value: 1,
+        linguistic:
+          "the students performance is very poor and requires direct attention for the next quarter.",
+      };
+    } else if (student.quarter_analysis.trends === "Poor") {
+      return {
+        value: 2,
+        linguistic:
+          "the students performance is poor and might need some attention for the next incoming quarter.",
+      };
+    } else if (student.quarter_analysis.trends === "Average") {
+      return {
+        value: 3,
+        linguistic: "the students perfomarnce is average.",
+      };
+    } else if (student.quarter_analysis.trends === "Good") {
+      return {
+        value: 4,
+        linguistic: "the students performance is good.",
+      };
+    } else {
+      return {
+        value: 5,
+        linguistic: "the students perfroamamce os very good.",
+      };
+    }
+  }
+};
