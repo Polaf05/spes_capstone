@@ -160,11 +160,18 @@ export function quarterAnalysis(quarter: Quarter[]) {
 
   let trends = "";
 
-  let lines: any = findLineByLeastSquares(x, percent);
+  let lines: any;
 
-  // //console.log(lines);
 
-  trends = lines.linguistic;
+  if (x.length > 1) {
+    lines = findLineByLeastSquares(x, percent);
+
+    // console.log(lines);
+
+    trends = lines.linguistic;
+  } else {
+    trends = getRemarks(x[x.length - 1]);
+  }
 
   const quarterData: TaskAnalysis = {
     fluctuation: fluctuate,
@@ -400,8 +407,6 @@ function findLineByLeastSquares(values_x: number[], values_y: number[]) {
   let trend = parseFloat(
     (result_values_y[values_length - 1] - result_values_y[0]).toFixed(1)
   );
-
-  //console.log(trend);
 
   if (trend == 0) {
     return { trend: trend, linguistic: "consistent linear" };
