@@ -165,6 +165,8 @@ export const getMarginResults = (dataset: Dataset, option: string) => {
 };
 
 export const getPassingRemarks = (passing_pct: number, quarter: number) => {
+  //console.log("here:", passing_pct, quarter);
+
   const failedStudents = 100 - passing_pct;
   const passing_student = `${
     10 - Number((failedStudents / 10).toFixed())
@@ -581,33 +583,53 @@ export const getClassPerformanceAssessment = (
   const participants_diff = ww_participation - pt_participation;
   if (participants_diff > 5) {
     if (ww_participation > 88) {
-      message_participants = `Students tend to participate on written works more than performance tasks. In-addition, the average classroom participation is ${ave_participants}% which resulted to an average student remark of "${ave_remarks}".`;
+      message_participants = `Students tend to participate on written works more than performance tasks. In-addition, the average classroom participation is ${ave_participants.toFixed(
+        1
+      )}% which resulted to an average student remark of "${ave_remarks}".`;
     } else {
-      message_participants = `Students tend to participate on written works more than performance tasks. However, it can also be seen that only an average of ${ave_participants}% of the classroom are actively participating on school tasks which resulted to an average student remark of "${ave_remarks}".`;
+      message_participants = `Students tend to participate on written works more than performance tasks. However, it can also be seen that only an average of ${ave_participants.toFixed(
+        1
+      )}% of the classroom are actively participating on school tasks which resulted to an average student remark of "${ave_remarks}".`;
     }
   } else if (participants_diff > 0) {
     if (ww_participation > 88) {
-      message_participants = `Students tend to participate on written works slightly more than performance tasks. In-addition, the average classroom participation is ${ave_participants}% which resulted to an average student remark of "${ave_remarks}".`;
+      message_participants = `Students tend to participate on written works slightly more than performance tasks. In-addition, the average classroom participation is ${ave_participants.toFixed(
+        1
+      )}% which resulted to an average student remark of "${ave_remarks}".`;
     } else {
-      message_participants = `Students tend to participate on written works slightly more than performance tasks. However, it can also be seen that only an average of ${ave_participants}% of the classroom are actively participating on school tasks which resulted to an average student remark of "${ave_remarks}".`;
+      message_participants = `Students tend to participate on written works slightly more than performance tasks. However, it can also be seen that only an average of ${ave_participants.toFixed(
+        1
+      )}% of the classroom are actively participating on school tasks which resulted to an average student remark of "${ave_remarks}".`;
     }
   } else if (participants_diff === 0) {
     if (ww_participation > 88) {
-      message_participants = `Wow! Students are actively participating on classroom activities. In-addition, the average classroom participation is ${ave_participants}% which resulted to an average student remark of "${ave_remarks}".`;
+      message_participants = `Wow! Students are actively participating on classroom activities. In-addition, the average classroom participation is ${ave_participants.toFixed(
+        1
+      )}% which resulted to an average student remark of "${ave_remarks}".`;
     } else {
-      message_participants = `Students tend to actively participate on both Written Works and Performance Tasks. However, it can also be seen that only an average of ${ave_participants}% of the classroom are actively participating on school tasks which resulted to an average student remark of "${ave_remarks}".`;
+      message_participants = `Students tend to actively participate on both Written Works and Performance Tasks. However, it can also be seen that only an average of ${ave_participants.toFixed(
+        1
+      )}% of the classroom are actively participating on school tasks which resulted to an average student remark of "${ave_remarks}".`;
     }
   } else if (participants_diff > -5) {
     if (ww_participation > 88) {
-      message_participants = `Students tend to participate on performance tasks slightly more than written works. In-addition, the average classroom participation is ${ave_participants}% which resulted to an average student remark of "${ave_remarks}".`;
+      message_participants = `Students tend to participate on performance tasks slightly more than written works. In-addition, the average classroom participation is ${ave_participants.toFixed(
+        1
+      )}% which resulted to an average student remark of "${ave_remarks}".`;
     } else {
-      message_participants = `Students tend to participate on performance tasks slightly more than performance tasks. However, it can also be seen that only an average of ${ave_participants}% of the classroom are actively participating on school tasks which resulted to an average student remark of "${ave_remarks}".`;
+      message_participants = `Students tend to participate on performance tasks slightly more than performance tasks. However, it can also be seen that only an average of ${ave_participants.toFixed(
+        1
+      )}% of the classroom are actively participating on school tasks which resulted to an average student remark of "${ave_remarks}".`;
     }
   } else {
     if (ww_participation > 88) {
-      message_participants = `Students tend to participate on performance tasks more than performance tasks. In-addition, the average classroom participation is ${ave_participants}% which resulted to an average student remark of "${ave_remarks}".`;
+      message_participants = `Students tend to participate on performance tasks more than performance tasks. In-addition, the average classroom participation is ${ave_participants.toFixed(
+        1
+      )}% which resulted to an average student remark of "${ave_remarks}".`;
     } else {
-      message_participants = `Students tend to participate on performance tasks than performance tasks. However, it can also be seen that only an average of ${ave_participants}% of the classroom are actively participating on school tasks which resulted to an average student remark of "${ave_remarks}".`;
+      message_participants = `Students tend to participate on performance tasks than performance tasks. However, it can also be seen that only an average of ${ave_participants.toFixed(
+        1
+      )}% of the classroom are actively participating on school tasks which resulted to an average student remark of "${ave_remarks}".`;
     }
   }
 
