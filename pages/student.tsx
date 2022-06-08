@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
 import { performanceAnalysis } from "../lib/functions/studentFeedback";
-import cookie from "cookie";
 import {
   Chart,
   ArcElement,
@@ -1184,10 +1183,10 @@ const StudentInfo = (user: any) => {
                               </h1>
                             </div>
                           ) : task === "Zero" ? (
-                            <div className="w-14 h-14 border-4 border-red-300 rounded-full">
-                              <h1 className="text-3xl font-bold text-red-300">
-                                0
-                              </h1>
+                            <div className="w-14 h-14 border-4 border-neutral-200 rounded-full">
+                              <div className="w-14 h-14 border-4 border-red-300 rounded-full">
+                                <XIcon className="text-red-300" />
+                              </div>
                             </div>
                           ) : (
                             <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
