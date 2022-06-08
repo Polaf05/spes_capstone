@@ -2,7 +2,10 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
-import { performanceAnalysis } from "../lib/functions/studentFeedback";
+import {
+  barGraphhAssessment,
+  performanceAnalysis,
+} from "../lib/functions/studentFeedback";
 import {
   Chart,
   ArcElement,
@@ -55,12 +58,17 @@ import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { TaskDataScores } from "../types/Task";
 import Link from "next/link";
 import {
-  getInitialGrade,
+  getStudentAverage,
   studentFailed,
   transmuteGrade,
 } from "../lib/functions/grade_computation";
-import { capitalize, classNames, formatName } from "../lib/functions/concat";
-import { getRemarksAnalysis } from "../lib/functions/feedback";
+import {
+  capitalize,
+  classNames,
+  formatName,
+  quarterIsOne,
+} from "../lib/functions/concat";
+import { getPronoun, getRemarksAnalysis } from "../lib/functions/feedback";
 
 Chart.register(
   ArcElement,
@@ -436,6 +444,7 @@ const StudentInfo = (user: any) => {
   const ave_pt_pct: number = Number((pt_qsum / qSum).toFixed(1));
   let better_at: string = "";
   let better: string = "";
+  let worst: string = "";
   let better_score: number = 0;
   let lower_score: number = 0;
   let flag = "both";
@@ -446,6 +455,7 @@ const StudentInfo = (user: any) => {
   } else if (ave_pt_pct > ave_ww_pct) {
     better_at = "better in Performance Tasks";
     better = "Performance Tasks";
+    worst = "Writtent Works";
     better_score = ave_pt_pct;
     lower_score = ave_ww_pct;
     flag = "pt";
@@ -453,6 +463,7 @@ const StudentInfo = (user: any) => {
   } else {
     better_at = "better in Written Works";
     better = "Written Works";
+    worst = "Performance Tasks";
     better_score = ave_ww_pct;
     lower_score = ave_pt_pct;
     flag = "ww";
@@ -464,80 +475,62 @@ const StudentInfo = (user: any) => {
   const getOverallFeedback = () => {
     let overall_feedback: string[] = [];
 
-    if (
-      student?.final_grade_before! >= 83 &&
-      student?.inference_result?.external_elements.value! >= 0.5
-    ) {
-      overall_feedback.push(
-        `Student performed ${student?.remarks} in ${
-          student?.gender == "MALE" ? "his" : "her"
-        } studies because ${
-          student?.gender == "MALE" ? "his" : "her"
-        } external factors is ${
-          student?.inference_result?.external_elements.linguistic
-        }.`
-      );
-    } else if (
-      student?.final_grade_before! < 83 &&
-      student?.inference_result?.external_elements.value! >= 0.5
-    ) {
-      overall_feedback.push(
-        `Student performed ${student?.remarks} in ${
-          student?.gender == "MALE" ? "his" : "her"
-        } studies even though ${
-          student?.gender == "MALE" ? "his" : "her"
-        } external factors is ${
-          student?.inference_result?.external_elements.linguistic
-        }.`
-      );
-    } else if (
-      student?.final_grade_before! >= 83 &&
-      student?.inference_result?.external_elements.value! < 0.5
-    ) {
-      overall_feedback.push(
-        `Student performed ${student?.remarks} in ${
-          student?.gender == "MALE" ? "his" : "her"
-        } studies even though ${
-          student?.gender == "MALE" ? "his" : "her"
-        } external factors is ${
-          student?.inference_result?.external_elements.linguistic
-        }.`
-      );
-    } else if (
-      student?.final_grade_before! < 83 &&
-      student?.inference_result?.external_elements.value! < 0.5
-    ) {
-      overall_feedback.push(
-        `Student performed ${student?.remarks} in ${
-          student?.gender == "MALE" ? "his" : "her"
-        } studies because ${
-          student?.gender == "MALE" ? "his" : "her"
-        } external factors is ${
-          student?.inference_result?.external_elements.linguistic
-        }.`
-      );
-    }
+    let gender = getPronoun(student?.gender as string);
 
-    if (
-      student?.quarter_analysis.fluctuation! > 3 ||
-      student?.quarter_analysis.fluctuation! < -3
-    ) {
-      overall_feedback.push(
-        `Students grade is not consistent and has a high fluctuation rate.`
-      );
-    } else if (student?.quarter_analysis.fluctuation! == 0) {
-      overall_feedback.push(
-        `Students grade is consistent and doesn’t fluctuate.`
-      );
-    } else if (
-      (student?.quarter_analysis.fluctuation! > 0 &&
-        student?.quarter_analysis.fluctuation! <= 3) ||
-      (student?.quarter_analysis.fluctuation! < 0 &&
-        student?.quarter_analysis.fluctuation! >= 3)
-    ) {
-      overall_feedback.push(
-        `Student grade is almost consistent, and his fluctuation rate is low.`
-      );
+    let performance = barGraphhAssessment(student!, myquar.length);
+
+    if (student?.remarks == "Very Poor") {
+      if (performance.value < 3) {
+        overall_feedback.push(
+          `The students requires attention because ${gender.hisHer} grade is very poor and ` +
+            performance.linguistic
+        );
+      } else {
+        overall_feedback.push(
+          `Although the students grade is very poor, ` + performance.linguistic
+        );
+      }
+    } else if (student?.remarks == "Poor") {
+      if (performance.value < 3) {
+        overall_feedback.push(
+          `The students requires attention because ${gender.hisHer} grade is poor and ` +
+            performance.linguistic
+        );
+      } else {
+        overall_feedback.push(
+          `Although the students grade is poor, ` + performance.linguistic
+        );
+      }
+    } else if (student?.remarks == "Average") {
+      if (performance.value < 3 && performance.value > 3) {
+        overall_feedback.push(
+          `The students grade is average but ` + performance.linguistic
+        );
+      } else {
+        overall_feedback.push(
+          `The student grade is average and ` + performance.linguistic
+        );
+      }
+    } else if (student?.remarks == "Good") {
+      if (performance.value < 3) {
+        overall_feedback.push(
+          `Although the students grade is good, ` + performance.linguistic
+        );
+      } else {
+        overall_feedback.push(
+          `The students grade is very and ` + performance.linguistic
+        );
+      }
+    } else {
+      if (performance.value < 3) {
+        overall_feedback.push(
+          `Although the students grade is very good, ` + performance.linguistic
+        );
+      } else {
+        overall_feedback.push(
+          `The students grade is very good and ` + performance.linguistic
+        );
+      }
     }
 
     if (
@@ -588,22 +581,11 @@ const StudentInfo = (user: any) => {
       );
     }
 
-    // else if (
-    //   student?.quarter_analysis.plunge_task.length! == 0 &&
-    //   student?.quarter_analysis.surge_task.length! == 0
-    // ) {
-    //   overall_feedback.push(
-    //     `${
-    //       student?.gender == "MALE" ? "he" : "she"
-    //     } grades suddenly plunge in ${student?.quarter_analysis.plunge_task.join()}`
-    //   );
-    // }
-
-    if (margin == 0 && ave_pt_pct >= 83 && ave_ww_pct >= 83) {
+    if (margin == 0 && lower_score >= 83) {
       overall_feedback.push(
         "Student both performs better in Performance Tasks and Written Works"
       );
-    } else if (margin <= 3 && ave_pt_pct >= 83 && ave_ww_pct >= 83) {
+    } else if (margin < 4 && lower_score >= 83) {
       overall_feedback.push(
         `Student performs slightly better in ${better} with a margin of (${margin})`
       );
@@ -617,7 +599,7 @@ const StudentInfo = (user: any) => {
       );
     } else if (margin > 3 && better_score >= 78 && lower_score < 75) {
       overall_feedback.push(
-        `Student performs better in ${better}however student needs attention in variable 2 since ${
+        `Student performs better in ${better}however student needs attention in ${worst} since ${
           student?.gender == "MALE" ? "his" : "her"
         } performance is very poor `
       );
@@ -742,19 +724,26 @@ const StudentInfo = (user: any) => {
               <h1
                 className={classNames(
                   "font-bold  text-4xl",
-                  studentFailed(student.remarks)
+                  studentFailed(
+                    getRemarks(getStudentAverage(student, myquar.length))
+                  )
                     ? "text-red-400"
                     : "text-tallano_gold-300"
                 )}
               >
-                {student?.remarks}
+                {getRemarks(getStudentAverage(student, myquar.length))}
               </h1>
-              {student.remarks.match(/Poor/g) && (
+              {getRemarks(getStudentAverage(student, myquar.length)).match(
+                /Poor/g
+              ) && (
                 <ExclamationCircleIcon className="w-10 h-10 xl:w-12 xl:h-12 text-red-400" />
               )}
             </div>
             <h2 className="flex justify-end text-[0.8rem] text-neutral-500">
-              {getRemarksAnalysis(student, student?.remarks)}
+              {getRemarksAnalysis(
+                student,
+                getRemarks(getStudentAverage(student, myquar.length))
+              )}
             </h2>
           </div>
         </div>
@@ -764,9 +753,9 @@ const StudentInfo = (user: any) => {
             <h3 className="text-justify mb-4">{getOverallFeedback()}</h3>
             <h2 className="font-semibold text-xl">
               {myquar.length !== 4
-                ? `Initial Grade for ${
+                ? `Initial Grade for ${myquar.length} ${quarterIsOne(
                     myquar.length
-                  } quarters: ${getInitialGrade(student, myquar.length)}`
+                  )}: ${getStudentAverage(student, myquar.length)}`
                 : `Final Grade: ${student?.final_grade_after}`}{" "}
             </h2>
             {/* Bar Chart */}
@@ -905,7 +894,7 @@ const StudentInfo = (user: any) => {
                   onClick={() => {
                     setQuarter(idx);
                     setMyStudent(student?.quarter![idx]!);
-                    console.log(student?.quarter[idx]);
+                    //console.log(student?.quarter[idx]);
                   }}
                 >
                   {myquar[idx]}
@@ -1042,8 +1031,16 @@ const StudentInfo = (user: any) => {
                 {/* Line Chart Assessment */}
                 <div className="h-[45vh] overflow-x-auto px-3">
                   <h5 className="text-justify">
-                    Assessment:{" "}
-                    {performanceAnalysis(student!, quarter, myquar.length)}
+                    {performanceAnalysis(
+                      student!,
+                      quarter,
+                      {
+                        ww: ww_surp_sum,
+                        pt: pt_surp_sum,
+                        len: students?.length,
+                      },
+                      { ww: tdata.ww.percentage, pt: tdata.pt.percentage }
+                    )}
                   </h5>
                 </div>
               </div>
@@ -1124,7 +1121,7 @@ const StudentInfo = (user: any) => {
                               </h1>
                             </div>
                           ) : task === "Zero" ? (
-                            <div className="w-14 h-14 border-4 border-red-300 rounded-full">
+                            <div className="flex justify-center items-center w-14 h-14 border-4 border-red-300 rounded-full">
                               <h1 className="text-3xl font-bold text-red-300">
                                 0
                               </h1>

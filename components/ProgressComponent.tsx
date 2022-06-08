@@ -22,7 +22,7 @@ const ProgressComponent = ({
 }) => {
   return (
     <div className="relative">
-      <div className="z-40 absolute inset-0 flex justify-center items-center">
+      <div className="z-10 absolute inset-0 flex justify-center items-center">
         <div className="flex flex-col justify-center items-center">
           <h2
             className={classNames(

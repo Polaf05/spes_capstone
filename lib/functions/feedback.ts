@@ -20,6 +20,120 @@ type Gender = {
   heShe: string;
   himHer: string;
   hisHers: string;
+  hisHer: string;
+};
+
+export const getPercentageRemarks = (
+  score: number,
+  participants: number,
+  option: string
+) => {
+  let analysis = "";
+
+  if (score > 90) {
+    // very high ave score score
+    analysis = ` very high score percentage of ${score}.`;
+  } else if (score > 85) {
+    // high ave score score
+    analysis = ` high score percentage of ${score}.`;
+  } else if (score > 75) {
+    // good ave score score
+    analysis = ` score percentage of ${score}.`;
+  } else if (score > 65) {
+    // quite bad ave score score, below passing rate
+    analysis = ` bad score percentage of ${score}.`;
+  } else if (score > 50) {
+    // bad ave score score, please consider reviewing your tasks.
+    analysis = ` bad score percentage of ${score}. Please consider reviewing your tasks, it may be too difficult for the students and/or other reasons.`;
+  } else {
+    // very bad ave score score, please consider reviewing your tasks.
+    analysis = ` very bad score percentage of ${score}. Please consider reviewing your tasks, it may be too difficult for the students and/or other reasons.`;
+  }
+
+  return analysis;
+};
+
+export const getTaskAnalysis = (
+  option: string,
+  students: number,
+  score_pct: number,
+  participants_pct: number
+) => {
+  let final_analysis = "";
+
+  if (participants_pct > 90) {
+    // very high ave score pct
+    final_analysis = `Great! ${participants_pct}% of the class are actively participating on ${option}`;
+  } else if (participants_pct > 85) {
+    // high ave score pct
+    final_analysis = `As should be, ${participants_pct}% of the class are actively participating on ${option}`;
+  } else if (participants_pct > 75) {
+    // good ave score pct
+    final_analysis = `Not bad, ${participants_pct}% of the class are participating on ${option}`;
+  } else if (participants_pct > 55) {
+    // quite bad ave score pct, below passing rate
+    final_analysis = `Only ${participants_pct}% of the class are participating on ${option}`;
+  } else {
+    // bad ave score pct, please consider reviewing your tasks.
+    final_analysis = `There might be something wrong, only ${participants_pct}% of the class are participating on ${option}`;
+  }
+
+  const whileAlso = "while also averaging a";
+  const plsConsider =
+    "Please consider reviewing your tasks, it may be too difficult for the students and/or other reasons.";
+  let analysis = "";
+
+  if (score_pct > 90) {
+    // very high ave score score
+    analysis = `${whileAlso} very high score percentage of ${score_pct}%.`;
+  } else if (score_pct > 85) {
+    // high ave score score
+    analysis = `${whileAlso} high score percentage of ${score_pct}%.`;
+  } else if (score_pct > 75) {
+    // good ave score score
+    analysis = `${whileAlso} score percentage of ${score_pct}%.`;
+  } else if (score_pct > 65) {
+    // quite bad ave score score, below passing rate
+    analysis = `${whileAlso} quite bad score percentage of ${score_pct}%.`;
+  } else if (score_pct > 50) {
+    // poor ave score score, please consider reviewing your tasks.
+    analysis = `${whileAlso} poor score percentage of ${score_pct}%. ${plsConsider}`;
+  } else {
+    // very poor ave score score, please consider reviewing your tasks.
+    analysis = `${whileAlso} very poor score percentage of ${score_pct}%. ${plsConsider}`;
+  }
+
+  return `${final_analysis} ${analysis}`;
+};
+
+export const getFinalTaskAnalysis = (
+  ww_passing_rate: number,
+  pt_passing_rate: number,
+  ww_ave_score: number,
+  pt_ave_score: number,
+  ww_ave_participants: number,
+  pt_ave_participants: number
+) => {
+  const final_analysis = "";
+
+  const passing_margin = ww_passing_rate - pt_passing_rate;
+  let margin_analysis = "";
+  if (passing_margin > 40) {
+    const remarks = getRemarks(ww_passing_rate);
+    if (remarks.match(/Good|Average/g)) {
+      margin_analysis = `The margin of (+${passing_margin}) between the passing rates indicates that students are having a hard time with performance tasks.`;
+    } else {
+      margin_analysis = `The margin of (+${passing_margin}) between the passing rates indicates that students are having a hard time with written works and much harder on performance tasks.`;
+    }
+  } else if (passing_margin >= 20) {
+  } else if (passing_margin > 0) {
+  } else if (passing_margin === 0) {
+  } else if (passing_margin >= -20) {
+  } else if (passing_margin >= 40) {
+  } else {
+  }
+
+  return final_analysis;
 };
 
 export const getPronoun = (gender: string) => {
@@ -27,11 +141,13 @@ export const getPronoun = (gender: string) => {
     heShe: "he",
     himHer: "him",
     hisHers: "his",
+    hisHer: "his",
   };
   const female: Gender = {
     heShe: "she",
     himHer: "her",
     hisHers: "hers",
+    hisHer: "her",
   };
   return gender === "MALE" ? male : female;
 };
