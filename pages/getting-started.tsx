@@ -81,6 +81,7 @@ const gettingStarted = (user: any) => {
 
       errors[2] = 0;
       errors[3] = 0;
+      errors[4] = 0;
     } else {
       setMessage("ERROR, INCORRECT TEMPLATE OR THE FORMS IS RESTRICTED");
       errors[0] = 1;

@@ -129,9 +129,7 @@ export const performanceAnalysis = (
           task.linguistics
       );
     } else {
-      quarter.push(
-        `Althought Students grade is very poor, ` + task.linguistics
-      );
+      quarter.push(`Although Students grade is very poor, ` + task.linguistics);
     }
   } else if (remarks === `poor`) {
     if (task.value < 3) {
@@ -139,7 +137,7 @@ export const performanceAnalysis = (
         `The students grade this quarter is poor and ` + task.linguistics
       );
     } else {
-      quarter.push(`Althought Students grade is poor, ` + task.linguistics);
+      quarter.push(`Although Students grade is poor, ` + task.linguistics);
     }
   } else if (remarks === `average`) {
     if (task.value < 3 || task.value > 3) {
@@ -153,7 +151,7 @@ export const performanceAnalysis = (
     }
   } else if (remarks === `good`) {
     if (task.value < 3) {
-      quarter.push(`Althought Students grade is good, ` + task.linguistics);
+      quarter.push(`Although Students grade is good, ` + task.linguistics);
     } else {
       quarter.push(
         `The students grade this quarter is good but ` + task.linguistics
@@ -161,9 +159,7 @@ export const performanceAnalysis = (
     }
   } else {
     if (task.value < 3) {
-      quarter.push(
-        `Althought Students grade is very good, ` + task.linguistics
-      );
+      quarter.push(`Although Students grade is very good, ` + task.linguistics);
     } else {
       quarter.push(
         `The students grade this quarter is good and ` + task.linguistics
@@ -664,3 +660,115 @@ export const barGraphhAssessment = (student: Student, len: number) => {
     }
   }
 };
+
+export const getEnvironmenetalAssessment = (
+  student: Student,
+  average: number
+) => {
+  let values: any = Object.values(student.survey_result.environment_factors);
+  let properties: any = Object.keys(student.survey_result.environment_factors);
+
+  let envGroup: string[] = [];
+  let envProps: string[] = [];
+
+  let group_values: any = [];
+
+  const reformat = (props: string) => {
+    let property = "";
+    if (props.includes("_")) {
+      property = props.replace("_", " ");
+
+      return property;
+    } else {
+      return props;
+    }
+  };
+
+  group_values["Greatly Affecting"] = [];
+  group_values["Affecting"] = [];
+  group_values["Quite Affecting"] = [];
+  group_values["Unaffecting at all"] = [];
+  for (let i = 0; i < values.length - 1; i++) {
+    envGroup.push(values[i]);
+    envProps.push(properties[i]);
+  }
+
+  envGroup.map((value, index) => {
+    group_values[value].push(reformat(properties[index]));
+  });
+
+  var assessment: string[] = [];
+
+  assessment.push(
+    `The students environmental factor is ${student.inference_result.environment.linguistic}.`
+  );
+
+  if (group_values["Greatly Affecting"].length > 0) {
+    if (average < 82) {
+      assessment.push(
+        `Factors like ${formatArray(
+          group_values["Greatly Affecting"]
+        )} is severly affecting his performance that may be the reason why his performance is poor.`
+      );
+    } else if (average >= 82 && average <= 89) {
+      assessment.push(
+        `Although factors like ${formatArray(
+          group_values["Greatly Affecting"]
+        )} severly affects his performance, he can still keep up in his studies.`
+      );
+    } else {
+      assessment.push(
+        `Although factors like ${formatArray(
+          group_values["Greatly Affecting"]
+        )} severly affects his performance, he still performs very well in his class.`
+      );
+    }
+  }
+  if (group_values["Affecting"].length > 0) {
+    if (group_values["Greatly Affecting"] == 0) {
+      if (average < 82) {
+        assessment.push(
+          `Factors like ${formatArray(
+            group_values["Affecting"]
+          )} is affecting his performance that may be the reason why his performance is poor.`
+        );
+      } else if (average >= 82 && average <= 89) {
+        assessment.push(
+          `Although factors like ${formatArray(
+            group_values["Affecting"]
+          )} affects his performance, he can still keep up in his studies`
+        );
+      } else {
+        assessment.push(
+          `Although factors like ${formatArray(
+            group_values["Affecting"]
+          )} affects his performance, he still performs very well in his class`
+        );
+      }
+    } else {
+      assessment.push(
+        `Factors like ${formatArray(
+          group_values["Affecting"]
+        )} also affects his performance.`
+      );
+    }
+  }
+  if (group_values["Quite Affecting"].length > 0) {
+    assessment.push(
+      `Factors like ${formatArray(
+        group_values["Quite Affecting"]
+      )} quitly affects his performance but isn't that really affecting.`
+    );
+  }
+  if (group_values["Unaffecting at all"].length > 0) {
+    assessment.push(
+      `Factors like ${formatArray(
+        group_values["Unaffecting at all"]
+      )} doesn't really affects his performance.`
+    );
+  }
+
+  return assessment.join(" ");
+};
+
+export const getTechnologicalAssesment = () => {};
