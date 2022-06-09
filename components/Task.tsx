@@ -138,9 +138,9 @@ export const Task = ({
   return (
     students && (
       <>
-        <div className="grid grid-cols-12 gap-4 px-12">
+        <div className="grid grid-cols-12 gap-4 lg:px-8 xl:px-12">
           <div className="col-span-7">
-            <div className="text-2xl font-bold flex gap-2 items-center">
+            <div className="lg:text-xl xl:text-2xl font-bold flex gap-2 items-center lg:pt-8">
               <h1>
                 Q{quarter + 1}: Clasroom Assessment:{" "}
                 <span
@@ -173,8 +173,8 @@ export const Task = ({
             <div className="text-lg font-semibold flex items-center gap-2">
               <h4>Sorted by: {sortingMethod ? sortingMethod : "Name"}</h4>
             </div>
-            <div className="w-full overflow-y-auto h-[50vh]">
-              <table className="table-fixed min-w-full rounded-md text-lg text-left border-collapse">
+            <div className="w-full overflow-y-auto lg:h-[80vh] xl:h-[50vh]">
+              <table className="table-fixed min-w-full rounded-md xl:text-lg text-left border-collapse">
                 {/* Table Head - Buttons */}
                 <thead className="border-b-2 bg-white sticky top-0">
                   <tr className="text-center">
@@ -306,44 +306,46 @@ export const Task = ({
             <h3 className="pt-10 pb-2 font-semibold text-lg">
               Chart Representation:
             </h3>
-            <div className="grid grid-cols-5 gap-4">
-              <div className="col-span-3">
-                <Doughnut
-                  data={data}
-                  options={{
-                    plugins: {
-                      legend: {
-                        display: false,
+            <div className="grid grid-cols-5 grid-flow-row gap-4">
+              <div className="lg:col-span-5 xl:col-span-3">
+                <div className="lg:px-8">
+                  <Doughnut
+                    data={data}
+                    options={{
+                      plugins: {
+                        legend: {
+                          display: false,
+                        },
                       },
-                    },
-                    cutout: 70,
-                  }}
-                />
+                      cutout: 70,
+                    }}
+                  />
+                </div>
               </div>
-              <div className="col-span-2 h-fit">
-                <h6 className="text-lg font-semibold pt-3 border-b-2 border-black">
+              <div className="lg:col-span-5 xl:col-span-2 h-fit">
+                <h6 className="xl:text-lg font-semibold pt-3 border-b-2 border-black">
                   Legend
                 </h6>
                 <section className="mt-4">
                   <div className="flex justify-between">
-                    <p>Very Good</p>
-                    <div className="bg-legend-vgood border w-9 h-4"></div>
+                    <p>{"Very Good:  (> 96) "}</p>
+                    <div className="bg-legend-vgood border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>Good</p>
-                    <div className="bg-legend-good border w-9 h-4"></div>
+                    <p>{"Good: (89 - 96) "}</p>
+                    <div className="bg-legend-good border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>Average</p>
-                    <div className="bg-legend-ave border w-9 h-4"></div>
+                    <p>{"Average: (82 - 98) "}</p>
+                    <div className="bg-legend-ave border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>Poor</p>
-                    <div className="bg-legend-poor border w-9 h-4"></div>
+                    <p>{"Poor: (75 - 81) "}</p>
+                    <div className="bg-legend-poor border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>Very Poor</p>
-                    <div className="bg-legend-vpoor border w-9 h-4"></div>
+                    <p>{"Poor: (< 75) "}</p>
+                    <div className="bg-legend-vpoor border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                 </section>
               </div>
