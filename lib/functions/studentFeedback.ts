@@ -771,4 +771,342 @@ export const getEnvironmenetalAssessment = (
   return assessment.join(" ");
 };
 
-export const getTechnologicalAssesment = () => {};
+export const getTechnologicalAssesment = (
+  student: Student,
+  average: number
+) => {
+  let technologicalAssessment: string[] = [];
+
+  const wifiAssessment = () => {
+    if (student.survey_result.wifi.linguistic === "Good") {
+      return 3;
+    } else if (student.survey_result.wifi.linguistic === "Bad") {
+      return 2;
+    } else if (student.survey_result.wifi.linguistic === "No Wifi Connection") {
+      return 1;
+    }
+  };
+
+  let wifi = wifiAssessment();
+
+  if (student.survey_result.data.linguistic === "Good") {
+    switch (wifi) {
+      case 1:
+        technologicalAssessment.push(
+          `The students data and wifi connection are both fast and reliable resulting that his internet is ${student.inference_result.internet.linguistic.toLowerCase()}.`
+        );
+        break;
+      case 2:
+        technologicalAssessment.push(
+          `Although the students have a fast and reliable data, his wifi connection is slow resulting that his internet is ${student.inference_result.internet.linguistic.toLowerCase()}.`
+        );
+        break;
+      default:
+        technologicalAssessment.push(
+          `The student doesn't have any available wifi connection however the students have a fast and reliable data connection resulting that his internet is ${student.inference_result.internet.linguistic.toLowerCase()}.`
+        );
+    }
+  } else if (student.survey_result.data.linguistic === "Bad") {
+    switch (wifi) {
+      case 1:
+        technologicalAssessment.push(
+          `Although the students data is bad, his wifi connection is fast and reliable resulting that his internet is ${student.inference_result.internet.linguistic.toLowerCase()}.`
+        );
+        break;
+      case 2:
+        technologicalAssessment.push(
+          `The student both have bad wifi and data resulting that his internet is ${student.inference_result.internet.linguistic.toLowerCase()}.`
+        );
+        break;
+      default:
+        technologicalAssessment.push(
+          `The student doesn't have an available wifi connection and the data connection is bad resulting that his internet is ${student.inference_result.internet.linguistic.toLowerCase()}.`
+        );
+    }
+  } else {
+    switch (wifi) {
+      case 1:
+        technologicalAssessment.push(
+          `Although the student doesn't have any data connection, he has a fast and reliable wifi resulting that his internet is ${student.inference_result.internet.linguistic.toLowerCase()}.`
+        );
+        break;
+      case 2:
+        technologicalAssessment.push(
+          `Although the student doesn't have data connection, he has a slow wifi connection resulting that his internet is ${student.inference_result.internet.linguistic.toLowerCase()}.`
+        );
+        break;
+      default:
+        technologicalAssessment.push(
+          `The student doesn't have any internet connection resulting that his internet is ${student.inference_result.internet.linguistic.toLowerCase()}.`
+        );
+    }
+  }
+
+  const accessibilty = () => {
+    if (student.inference_result.accessibility.linguistic === "Very Good") {
+      return 5;
+    } else if (student.inference_result.accessibility.linguistic === "Good") {
+      return 4;
+    } else if (
+      student.inference_result.accessibility.linguistic === "Average"
+    ) {
+      return 3;
+    } else if (student.inference_result.accessibility.linguistic === "Poor") {
+      return 2;
+    } else {
+      return 1;
+    }
+  };
+
+  if (student.survey_result.device.linguistic === "No Device") {
+    technologicalAssessment.push(
+      `He doesn't have  any device that may also affects his performance in his studies.`
+    );
+  } else if (student.survey_result.device.linguistic === "Renting Device") {
+    technologicalAssessment.push(
+      `He rents a device that may also affect gis perforamance in his studies.`
+    );
+  } else if (student.survey_result.device.linguistic === "Sharing Device") {
+    technologicalAssessment.push(
+      `He is sharing a device with his siblings, pertaining that they have a schedule in using the device`
+    );
+  } else if (student.survey_result.device.linguistic === "Borrowing a Device") {
+    technologicalAssessment.push(
+      `He is Borrowing a devie to his parent, peratining that they have a schedule in using the device`
+    );
+  } else if (student.survey_result.device.linguistic === "Mobile/Table only") {
+    technologicalAssessment.push(
+      `He have a Mobile/Tablet to use in his studies`
+    );
+  } else if (
+    student.survey_result.device.linguistic === "Laptop/Computer only"
+  ) {
+    technologicalAssessment.push(
+      `He have a Laptop/Computer to use int his Studies`
+    );
+  } else {
+    technologicalAssessment.push(
+      `He both have a Mobile/Tablet and Laptop/Computer to use in his studies`
+    );
+  }
+
+  let access = accessibilty();
+
+  if (student.inference_result.resource.linguistic === "Very Good") {
+    switch (access) {
+      case 5:
+        technologicalAssessment.push(
+          `His resources and accessibility and knowledge to technology that is both very good.`
+        );
+        break;
+      case 4:
+        technologicalAssessment.push(
+          `His resources that is very good while his accessibility and knowledge to technology is good.`
+        );
+        break;
+      case 3:
+        technologicalAssessment.push(
+          `His resources is very good while his accessibility and knowledge to technology is average.`
+        );
+        break;
+      case 2:
+        technologicalAssessment.push(
+          `Although his resouces is very good, his accessiblity and knowledge to technology is poor`
+        );
+        break;
+      default:
+        technologicalAssessment.push(
+          `Although his resources is very good, his accessiblity and knowldge to technology is very poor.`
+        );
+    }
+  } else if (student.inference_result.resource.linguistic === "Good") {
+    switch (access) {
+      case 5:
+        technologicalAssessment.push(
+          `His resources very good while his accessibility and knowledge to technology is very good.`
+        );
+        break;
+      case 4:
+        technologicalAssessment.push(
+          `His resources and accessibility and knowledge to technology that is both good.`
+        );
+        break;
+      case 3:
+        technologicalAssessment.push(
+          `His resources is good while his accessibility and knowledge to technology is average.`
+        );
+        break;
+      case 2:
+        technologicalAssessment.push(
+          `Although his resouces is good, his accessiblity and knowledge to technology is poor`
+        );
+        break;
+      default:
+        technologicalAssessment.push(
+          `Although his resources is good, his accessiblity and knowldge to technology is very poor.`
+        );
+    }
+  } else if (student.inference_result.resource.linguistic === "Average") {
+    switch (access) {
+      case 5:
+        technologicalAssessment.push(
+          `His resources is average while his accessibility and knowledge to technology is very good.`
+        );
+        break;
+      case 4:
+        technologicalAssessment.push(
+          `His resources is average while his accessibility and knowledge to technology is good.`
+        );
+        break;
+      case 3:
+        technologicalAssessment.push(
+          `His resources and accessiblity and knowledge to technology is both average.`
+        );
+        break;
+      case 2:
+        technologicalAssessment.push(
+          `Although his resouces is average, his accessiblity and knowledge to technology is poor.`
+        );
+        break;
+      default:
+        technologicalAssessment.push(
+          `Although his resources is average, his accessiblity and knowldge to technology is very poor.`
+        );
+    }
+  } else if (student.inference_result.resource.linguistic === "Poor") {
+    switch (access) {
+      case 5:
+        technologicalAssessment.push(
+          `Although his resources is poor, his accessibility and knowledge to technology is very good.`
+        );
+        break;
+      case 4:
+        technologicalAssessment.push(
+          `Although his resources is poor, his accessibility and knowledge to technology is good.`
+        );
+        break;
+      case 3:
+        technologicalAssessment.push(
+          `Although his resources is poor, his accessiblity and knowledge to technology is average.`
+        );
+        break;
+      case 2:
+        technologicalAssessment.push(
+          `Both of his resources, accessibility and knowledge to technology is poor.`
+        );
+        break;
+      default:
+        technologicalAssessment.push(
+          `His resources is poor. Accessibility and knowledge to technology is very poor.`
+        );
+    }
+  } else {
+    switch (access) {
+      case 5:
+        technologicalAssessment.push(
+          `Although his resources is very poor, his accessibility and knowledge to technology is very good.`
+        );
+        break;
+      case 4:
+        technologicalAssessment.push(
+          `Although his resources is very poor, his accessibility and knowledge to technology is good.`
+        );
+        break;
+      case 3:
+        technologicalAssessment.push(
+          `Although his resources is very poor, his accessiblity and knowledge to technology is average.`
+        );
+        break;
+      case 2:
+        technologicalAssessment.push(
+          `His resources is very poor. Accessibility and knowledge to technology is very poor.`
+        );
+        break;
+      default:
+        technologicalAssessment.push(
+          `His resources is poor. Accessibility and knowledge to technology is very poor.`
+        );
+    }
+  }
+
+  if (student.inference_result.technological.linguistic === "Very Good") {
+    if (average <= 82) {
+      technologicalAssessment.push(
+        `Overall, his technological factors is very good and his perfromance is ${getRemarks(
+          average
+        ).toLowerCase()}`
+      );
+    } else {
+      technologicalAssessment.push(
+        `Although his technological factors is very good, his performance is ${getRemarks(
+          average
+        ).toLowerCase()}`
+      );
+    }
+  } else if (student.inference_result.technological.linguistic === "Good") {
+    if (average <= 82) {
+      technologicalAssessment.push(
+        `Overall, his technological factors is good and his perfromance is ${getRemarks(
+          average
+        ).toLowerCase()}`
+      );
+    } else {
+      technologicalAssessment.push(
+        `Although his technological factors is good, his performance is ${getRemarks(
+          average
+        ).toLowerCase()}`
+      );
+    }
+  } else if (student.inference_result.technological.linguistic === "Average") {
+    if (average <= 82) {
+      technologicalAssessment.push(
+        `Overall, his technological factors is average and his perfromance is ${getRemarks(
+          average
+        ).toLowerCase()}`
+      );
+    } else {
+      technologicalAssessment.push(
+        `Although his technological factors is average, his performance is ${getRemarks(
+          average
+        ).toLowerCase()}`
+      );
+    }
+  } else if (student.inference_result.technological.linguistic === "Poor") {
+    if (average <= 82) {
+      technologicalAssessment.push(
+        `Although his technological factors is poor, his performance is ${getRemarks(
+          average
+        ).toLowerCase()}`
+      );
+    } else {
+      technologicalAssessment.push(
+        `Overall, his technological factors is poor and his perfromance is ${getRemarks(
+          average
+        ).toLowerCase()}`
+      );
+    }
+  } else {
+    if (average <= 82) {
+      technologicalAssessment.push(
+        `Although his technological factors is very poor, his performance is ${getRemarks(
+          average
+        ).toLowerCase()}`
+      );
+    } else {
+      technologicalAssessment.push(
+        `Overall, his technological factors is very poor and his perfromance is ${getRemarks(
+          average
+        ).toLowerCase()}`
+      );
+    }
+  }
+  return technologicalAssessment.join(" ");
+};
+
+// The students technological factors is average.
+//Student have their slow data and slow wifi that result his
+//internet conenction is average.
+// He only borrows device to his parents that may also affects his performance in
+// his studies. Factoring that his resource is average and his accessibilty and knowledge technology is average,
+// this may be one of the reason why he underperforms in class. It is also stated
+// that the implementation is effective and his experience is similar resulting his overall experience is Good.

@@ -607,6 +607,9 @@ const gettingStarted = (user: any) => {
                                     type="file"
                                     className="sr-only"
                                     onChange={handleFile}
+                                    onClick={(event) => {
+                                      event.currentTarget.value = "";
+                                    }}
                                   />
                                 </label>
                               </div>

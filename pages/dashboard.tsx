@@ -508,7 +508,7 @@ const Dashboard = () => {
                         ww_ave_pct!,
                         ww_ave_class_participation!,
                         pt_ave_grade!,
-                        pt_ave_grade!,
+                        pt_ave_pct!,
                         pt_ave_class_participation!
                       )}
                     </p>

@@ -5,6 +5,7 @@ import { useSelectedStudent } from "../hooks/useSelectedStudent";
 import {
   barGraphhAssessment,
   getEnvironmenetalAssessment,
+  getTechnologicalAssesment,
   performanceAnalysis,
 } from "../lib/functions/studentFeedback";
 import {
@@ -1496,7 +1497,12 @@ const StudentInfo = (user: any) => {
               </div>
               <div className="grid grid-cols-11 gap-4 pb-10">
                 <div className="col-span-6 h-96 overflow-x-auto text-justify pr-4">
-                  Assessment Technological Factors
+                  {student.survey_result.name == "No Data"
+                    ? "We currently have no data for this student"
+                    : getTechnologicalAssesment(
+                        student,
+                        getStudentAverage(student, myquar.length)
+                      )}
                 </div>
                 <div className="col-span-5">
                   <div className="grid grid-cols-2 gap-4 mb-4">

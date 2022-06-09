@@ -26,7 +26,10 @@ import { TaskInfo } from "../types/Task";
 import Link from "next/link";
 import StudentDialog from "../components/dialogs/StudentDialog";
 import ReactTooltip from "react-tooltip";
-import { getTaskAnalysis } from "../lib/functions/feedback";
+import {
+  getClassPerformanceAssessment,
+  getTaskAnalysis,
+} from "../lib/functions/feedback";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -910,22 +913,18 @@ export default function ClassroomInfo() {
                       </div>
                       <div className="px-24">
                         <p className="italic text-justify">
-                          Paragraph (Large) Lorem ipsum dolor sit amet,
-                          consectetuer adipiscing elit, sedlor sit amet,
-                          consectetuer adipiscing elit, sedParagraph (Large)
-                          Lorem ipsum dolor sit amet, consectetuer adipiscing
-                          elit, sedlor sit amet, consectetuer adipiscing elit,
-                          sedParagraph (Large) Lorem ipsum dolor sit amet,
-                          consectetuer adipiscing elit, sedlor sit amet,
-                          consectetuer adipiscing elit, sedParagraph (Large)
-                          Lorem ipsum dolor sit amet, consectetuer adipiscing
-                          elit, sedlor sit amet, consectetuer adipiscing elit,
-                          sedParagraph (Large) Lorem ipsum dolor sit amet,
-                          consectetuer adipiscing elit, sedlor sit amet,
-                          consectetuer adipiscing elit, sedParagraph (Large)
-                          Lorem ipsum dolor sit amet, consectetuer adipiscing
-                          elit, sedlor sit amet, consectetuer adipiscing elit,
-                          sed
+                          {getClassPerformanceAssessment(
+                            quarter + 1,
+                            null,
+                            categories[0].value,
+                            0,
+                            ww_passing_ave,
+                            ww_ave_pct,
+                            ww_ave_participants,
+                            pt_passing_ave,
+                            pt_ave_pct,
+                            pt_ave_participants
+                          )}
                         </p>
                       </div>
                     </div>
