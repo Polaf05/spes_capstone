@@ -4,6 +4,8 @@ import ReactTooltip from "react-tooltip";
 import { useSelectedStudent } from "../hooks/useSelectedStudent";
 import {
   barGraphhAssessment,
+  getEnvironmenetalAssessment,
+  getTechnologicalAssesment,
   performanceAnalysis,
 } from "../lib/functions/studentFeedback";
 import {
@@ -479,7 +481,7 @@ const StudentInfo = (user: any) => {
 
     let performance = barGraphhAssessment(student!, myquar.length);
 
-    if (student?.remarks == "Very Poor") {
+    if (getRemarks(getStudentAverage(student!, myquar.length)) == "Very Poor") {
       if (performance.value < 3) {
         overall_feedback.push(
           `The students requires attention because ${gender.hisHer} grade is very poor and ` +
@@ -490,7 +492,9 @@ const StudentInfo = (user: any) => {
           `Although the students grade is very poor, ` + performance.linguistic
         );
       }
-    } else if (student?.remarks == "Poor") {
+    } else if (
+      getRemarks(getStudentAverage(student!, myquar.length)) == "Poor"
+    ) {
       if (performance.value < 3) {
         overall_feedback.push(
           `The students requires attention because ${gender.hisHer} grade is poor and ` +
@@ -501,7 +505,9 @@ const StudentInfo = (user: any) => {
           `Although the students grade is poor, ` + performance.linguistic
         );
       }
-    } else if (student?.remarks == "Average") {
+    } else if (
+      getRemarks(getStudentAverage(student!, myquar.length)) == "Average"
+    ) {
       if (performance.value < 3 && performance.value > 3) {
         overall_feedback.push(
           `The students grade is average but ` + performance.linguistic
@@ -511,14 +517,16 @@ const StudentInfo = (user: any) => {
           `The student grade is average and ` + performance.linguistic
         );
       }
-    } else if (student?.remarks == "Good") {
+    } else if (
+      getRemarks(getStudentAverage(student!, myquar.length)) == "Good"
+    ) {
       if (performance.value < 3) {
         overall_feedback.push(
           `Although the students grade is good, ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students grade is very and ` + performance.linguistic
+          `The students grade is good and ` + performance.linguistic
         );
       }
     } else {
@@ -581,33 +589,66 @@ const StudentInfo = (user: any) => {
       );
     }
 
+    let overall_highest = student?.quarter.reduce(function (prev, current) {
+      return prev.grade_before > current.grade_before ? prev : current;
+    });
+    let overall_index =
+      student?.quarter.reduce(
+        (iMax, x, i, arr) => (x > arr[iMax] ? i : iMax),
+        0
+      )! + 1;
+
+    let overall_lowest = student?.quarter.reduce(function (prev, current) {
+      return prev.grade_before < current.grade_before ? prev : current;
+    });
+
+    let overall_index_lowest =
+      student?.quarter.reduce(
+        (iMax, x, i, arr) => (x < arr[iMax] ? i : iMax),
+        0
+      )! + 1;
+
+    overall_feedback.push(
+      `${
+        gender.hisHer.charAt(0).toUpperCase() + gender.heShe.slice(1)
+      } highest grade is in quarter ${overall_index} with a grade of ${
+        overall_highest?.grade_before
+      } ranking ${overall_highest?.ranking} in class and ${
+        gender.hisHer
+      } lowest grade is in the quarter ${overall_index_lowest} with a grade of ${
+        overall_lowest?.grade_before
+      } ranking ${
+        overall_lowest?.ranking
+      } in class having an average rank of ${ave_rank}.`
+    );
+
     if (margin == 0 && lower_score >= 83) {
       overall_feedback.push(
-        "Student both performs better in Performance Tasks and Written Works"
+        "Student both performs better in Performance Tasks and Written Works."
       );
     } else if (margin < 4 && lower_score >= 83) {
       overall_feedback.push(
-        `Student performs slightly better in ${better} with a margin of (${margin})`
+        `Student performs slightly better in ${better} with a margin of (+${margin}).`
       );
     } else if (margin > 3 && better_score >= 78) {
       overall_feedback.push(
-        `Student performs better in ${better} with a margin of (${margin})`
+        `Student performs better in ${better} with a margin of (+${margin}).`
       );
     } else if (margin > 3 && ave_pt_pct >= 78 && ave_ww_pct >= 83) {
       overall_feedback.push(
-        `Student performs better in ${better} with a margin of (${margin})`
+        `Student performs better in ${better} with a margin of (+${margin}).`
       );
     } else if (margin > 3 && better_score >= 78 && lower_score < 75) {
       overall_feedback.push(
         `Student performs better in ${better}however student needs attention in ${worst} since ${
           student?.gender == "MALE" ? "his" : "her"
-        } performance is very poor `
+        } performance is very poor.`
       );
     } else if (better_score <= 77) {
       overall_feedback.push(
         `Student need attention in both Performance Tasks and Written Works because ${
           student?.gender == "MALE" ? "he" : "she"
-        } performed poorly `
+        } performed poorly.`
       );
     }
 
@@ -1433,13 +1474,15 @@ const StudentInfo = (user: any) => {
                       <div className="flex justify-between">
                         <p>Greatly Affecting </p> <p>0.75</p>
                       </div>
-                      <div className="flex justify-between">
-                        <p>Extremely Affecting </p> <p>1.00</p>
-                      </div>
                     </div>
                   </div>
                   <div className="h-96 overflow-x-auto text-justify pr-4">
-                    Assessment - Environmental factors
+                    {student.survey_result.name == "No Data"
+                      ? "We currently have no data for this student"
+                      : getEnvironmenetalAssessment(
+                          student,
+                          getStudentAverage(student, myquar.length)
+                        )}
                   </div>
                 </div>
               </div>
@@ -1454,7 +1497,12 @@ const StudentInfo = (user: any) => {
               </div>
               <div className="grid grid-cols-11 gap-4 pb-10">
                 <div className="col-span-6 h-96 overflow-x-auto text-justify pr-4">
-                  Assessment Technological Factors
+                  {student.survey_result.name == "No Data"
+                    ? "We currently have no data for this student"
+                    : getTechnologicalAssesment(
+                        student,
+                        getStudentAverage(student, myquar.length)
+                      )}
                 </div>
                 <div className="col-span-5">
                   <div className="grid grid-cols-2 gap-4 mb-4">
