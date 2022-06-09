@@ -98,7 +98,7 @@ const StruggledSections = ({
   return struggledStudents_length[0] + struggledStudents_length[1] > 0 ? (
     <div className="grid grid-cols-10 gap-4">
       <div className="col-span-7">
-        <h2 className="text-xl font-bold">Students Struggled</h2>
+        <h2 className="lg:text-lg xl:text-xl font-bold">Students Struggled</h2>
         <div className="flex gap-1 items-center">
           {/* <QuestionMarkCircleIcon className="w-4 h-4 text-neutral-500" /> */}
           <p className="text-neutral-600 text-[0.7rem]">
@@ -133,7 +133,7 @@ const StruggledSections = ({
         </div>
       </div>
       <div className="col-span-3">
-        <h2 className="text-xl font-bold">Students Excelled</h2>
+        <h2 className="lg:text-lg xl:text-xl font-bold">Students Excelled</h2>
         <div className="flex gap-1 items-center">
           {/* <QuestionMarkCircleIcon className="w-4 h-4 text-neutral-500" /> */}
           <p className="text-neutral-600 text-[0.7rem]">
@@ -144,7 +144,7 @@ const StruggledSections = ({
         <div className="mt-4 px-4 py-2 border-2 border-green-300 rounded-xl max-h-[50vh] overflow-auto">
           <div className="mt-4">
             {studentsExcelled.map((student) => (
-              <h4 className="text-lg">{formatName(student.name)}</h4>
+              <h4 className="xl:text-lg">{formatName(student.name)}</h4>
             ))}
           </div>
         </div>

@@ -538,7 +538,7 @@ const gettingStarted = (user: any) => {
                         <h3 className="font-bold text-white">1</h3>
                       </div>
                       <h3 className="font-semibold text-lg">
-                        Google Spreadsheet Link:
+                        Google Spreadsheet Link: (Optional)
                       </h3>
                     </div>
                     <div className="">

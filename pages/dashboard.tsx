@@ -410,13 +410,17 @@ const Dashboard = () => {
                 <div className="col-span-9 md:px-16 xl:col-span-4 xl:px-2">
                   <div className="pb-4 w-full">
                     <h4 className="font-semibold text-lg">Passing Rate:</h4>
-                    <PeopleChart
-                      passed_tasks={
-                        10 - Number((failedStudentsPCT / 10).toFixed())
-                      }
-                      length={10}
-                      color="yellow"
-                    />
+                    <div className="flex justify-center">
+                      <div className="">
+                        <PeopleChart
+                          passed_tasks={
+                            10 - Number((failedStudentsPCT / 10).toFixed())
+                          }
+                          length={10}
+                          color="yellow"
+                        />
+                      </div>
+                    </div>
                     <div className="flex justify-center">
                       <p className="font-light text-center">
                         {getPassingRemarks(
