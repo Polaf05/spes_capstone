@@ -484,12 +484,12 @@ const StudentInfo = (user: any) => {
     if (getRemarks(getStudentAverage(student!, myquar.length)) == "Very Poor") {
       if (performance.value < 3) {
         overall_feedback.push(
-          `The students requires attention because ${gender.hisHer} grade is very poor and ` +
+          `The students' requires attention because ${gender.hisHer} grade is very poor and ` +
             performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `Although the students grade is very poor, ` + performance.linguistic
+          `Although the students' grade is very poor, ` + performance.linguistic
         );
       }
     } else if (
@@ -497,12 +497,12 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3) {
         overall_feedback.push(
-          `The students requires attention because ${gender.hisHer} grade is poor and ` +
+          `The students' requires attention because ${gender.hisHer} grade is poor and ` +
             performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `Although the students grade is poor, ` + performance.linguistic
+          `Although the students' grade is poor, ` + performance.linguistic
         );
       }
     } else if (
@@ -510,11 +510,11 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3 && performance.value > 3) {
         overall_feedback.push(
-          `The students grade is average but ` + performance.linguistic
+          `The students' grade is average but ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The student grade is average and ` + performance.linguistic
+          `The students' grade is average and ` + performance.linguistic
         );
       }
     } else if (
@@ -522,21 +522,21 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3) {
         overall_feedback.push(
-          `Although the students grade is good, ` + performance.linguistic
+          `Although the students' grade is good, ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students grade is good and ` + performance.linguistic
+          `The students' grade is good and ` + performance.linguistic
         );
       }
     } else {
       if (performance.value < 3) {
         overall_feedback.push(
-          `Although the students grade is very good, ` + performance.linguistic
+          `Although the students' grade is very good, ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students grade is very good and ` + performance.linguistic
+          `The students' grade is very good and ` + performance.linguistic
         );
       }
     }
@@ -548,13 +548,13 @@ const StudentInfo = (user: any) => {
       overall_feedback.push(
         `${
           student?.gender == "MALE" ? "His" : "Her"
-        } grades suddenly plunged in ${
+        } grades suddenly plummeted in ${
           student?.quarter_analysis.plunge_task.length! > 1
             ? "quarters"
             : " quarter"
         } ${formatArray(
           student?.quarter_analysis.plunge_task
-        )} while it surged  in ${
+        )} while it soared  in ${
           student?.quarter_analysis.surge_task.length! > 1
             ? "quarters"
             : "quarter"
@@ -567,7 +567,7 @@ const StudentInfo = (user: any) => {
       overall_feedback.push(
         `${
           student?.gender == "MALE" ? "His" : "Her"
-        } grades suddenly plunged in ${
+        } grades suddenly plummet in ${
           student?.quarter_analysis.plunge_task.length! > 1
             ? "quarters"
             : "quarter"
@@ -581,7 +581,7 @@ const StudentInfo = (user: any) => {
       overall_feedback.push(
         `${
           student?.gender == "MALE" ? "His" : "Her"
-        } grades suddenly surged  in ${
+        } grades suddenly soared  in ${
           student?.quarter_analysis.surge_task.length! > 1
             ? "quarters"
             : "quarter"
@@ -592,25 +592,25 @@ const StudentInfo = (user: any) => {
     let overall_highest = student?.quarter.reduce(function (prev, current) {
       return prev.grade_before > current.grade_before ? prev : current;
     });
-    let overall_index =
-      student?.quarter.reduce(
-        (iMax, x, i, arr) => (x > arr[iMax] ? i : iMax),
-        0
-      )! + 1;
+
+    let tmp: number[] = [];
+
+    for (let i = 0; i < myquar.length; i++) {
+      tmp.push(student?.quarter[i].grade_before!);
+    }
+    const max = Math.max(...tmp);
+    const min = Math.min(...tmp);
+    let overall_index = tmp.indexOf(max) + 1;
 
     let overall_lowest = student?.quarter.reduce(function (prev, current) {
       return prev.grade_before < current.grade_before ? prev : current;
     });
 
-    let overall_index_lowest =
-      student?.quarter.reduce(
-        (iMax, x, i, arr) => (x < arr[iMax] ? i : iMax),
-        0
-      )! + 1;
+    let overall_index_lowest = tmp.indexOf(min) + 1;
 
     overall_feedback.push(
       `${
-        gender.hisHer.charAt(0).toUpperCase() + gender.heShe.slice(1)
+        gender.hisHer.charAt(0).toUpperCase() + gender.hisHer.slice(1)
       } highest grade is in quarter ${overall_index} with a grade of ${
         overall_highest?.grade_before
       } ranking ${overall_highest?.ranking} in class and ${
@@ -628,15 +628,15 @@ const StudentInfo = (user: any) => {
       );
     } else if (margin < 4 && lower_score >= 83) {
       overall_feedback.push(
-        `Student performs slightly better in ${better} with a margin of (+${margin}).`
+        `With a margin of (+${margin}), student performs slightly better in ${better}.`
       );
     } else if (margin > 3 && better_score >= 78) {
       overall_feedback.push(
-        `Student performs better in ${better} with a margin of (+${margin}).`
+        `With a margin of (+${margin}), the student performs better in ${better}.`
       );
     } else if (margin > 3 && ave_pt_pct >= 78 && ave_ww_pct >= 83) {
       overall_feedback.push(
-        `Student performs better in ${better} with a margin of (+${margin}).`
+        `With a margin of (+${margin}), the student performs better in ${better} .`
       );
     } else if (margin > 3 && better_score >= 78 && lower_score < 75) {
       overall_feedback.push(
@@ -1391,152 +1391,153 @@ const StudentInfo = (user: any) => {
           </div>
         </div>
         {/* External Elements Section */}
-        <div className="min-h-fit bg-ocean-100">
-          <div className="mx-12 my-10">
-            <div className="pt-10">
-              <h2 className="text-2xl font-bold">
-                What affected my performance?
-              </h2>
-              <h3 className="italic">External Elements/Factors</h3>
-            </div>
-            <div className="pb-10">
-              <div className="flex gap-3 mt-6">
-                <h2 className="font-bold text-lg">Environmental Factors: </h2>
-                <h2 className="font-bold text-lg">
-                  {capitalize(
-                    student?.inference_result?.environment.linguistic!
-                  )}
+        {student.survey_result.name !== "No Data" && (
+          <div className="min-h-fit bg-ocean-100">
+            <div className="mx-12 my-10">
+              <div className="pt-10">
+                <h2 className="text-2xl font-bold">
+                  What affected my performance?
                 </h2>
+                <h3 className="italic">External Elements/Factors</h3>
               </div>
-              <div className="grid grid-cols-11 py-4">
-                <div className="col-span-5">
-                  {/* Radar Chart */}
-                  <div className="bg-white p-5 rounded-xl">
-                    <h3 className="font-semibold">
-                      Average Degree of Truth: {ave_env_fuzzy}
-                    </h3>
-                    <div>
-                      <Radar
-                        data={{
-                          labels: [
-                            "Unwanted Noise",
-                            "Limited Space",
-                            "House Chores",
-                            "Comfortability",
-                            "Support",
-                            "Internet",
-                            "Device",
-                            "Faculty Readiness",
-                          ],
-                          datasets: radarData,
-                        }}
-                        options={{
-                          responsive: true,
-                          scales: {
-                            r: {
-                              angleLines: {
+              <div className="pb-10">
+                <div className="flex gap-3 mt-6">
+                  <h2 className="font-bold text-lg">Environmental Factors: </h2>
+                  <h2 className="font-bold text-lg">
+                    {capitalize(
+                      student?.inference_result?.environment.linguistic!
+                    )}
+                  </h2>
+                </div>
+                <div className="grid grid-cols-11 py-4">
+                  <div className="col-span-5">
+                    {/* Radar Chart */}
+                    <div className="bg-white p-5 rounded-xl">
+                      <h3 className="font-semibold">
+                        Average Degree of Truth: {ave_env_fuzzy}
+                      </h3>
+                      <div>
+                        <Radar
+                          data={{
+                            labels: [
+                              "Unwanted Noise",
+                              "Limited Space",
+                              "House Chores",
+                              "Comfortability",
+                              "Support",
+                              "Internet",
+                              "Device",
+                              "Faculty Readiness",
+                            ],
+                            datasets: radarData,
+                          }}
+                          options={{
+                            responsive: true,
+                            scales: {
+                              r: {
+                                angleLines: {
+                                  display: false,
+                                },
+                                suggestedMin: 0,
+                                suggestedMax: 1,
+                                ticks: {
+                                  stepSize: 0.2,
+                                },
+                              },
+                            },
+                            plugins: {
+                              legend: {
                                 display: false,
                               },
-                              suggestedMin: 0,
-                              suggestedMax: 1,
-                              ticks: {
-                                stepSize: 0.2,
+
+                              title: {
+                                display: true,
                               },
                             },
-                          },
-                          plugins: {
-                            legend: {
-                              display: false,
-                            },
-
-                            title: {
-                              display: true,
-                            },
-                          },
-                        }}
-                      />
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-span-6 ml-6 flex flex-col justify-between">
+                    <div className="w-1/2 p-4 rounded-lg bg-yellow-50 font-bold">
+                      <h4>Legend in Fuzzy Range</h4>
+                      <div className="font-normal border-t border-neutral-400 mt-2 pt-2">
+                        <div className="flex justify-between">
+                          <p>Unaffecting at all</p> <p>0.0</p>
+                        </div>
+                        <div className="flex justify-between">
+                          <p>Quite Affecting </p> <p>0.25</p>
+                        </div>
+                        <div className="flex justify-between">
+                          <p>Affecting </p> <p>0.50</p>
+                        </div>
+                        <div className="flex justify-between">
+                          <p>Greatly Affecting </p> <p>0.75</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-96 overflow-x-auto text-justify pr-4">
+                      {student.survey_result.name == "No Data"
+                        ? "We currently have no data for this student"
+                        : getEnvironmenetalAssessment(
+                            student,
+                            getStudentAverage(student, myquar.length)
+                          )}
                     </div>
                   </div>
                 </div>
-                <div className="col-span-6 ml-6 flex flex-col justify-between">
-                  <div className="w-1/2 p-4 rounded-lg bg-yellow-50 font-bold">
-                    <h4>Legend in Fuzzy Range</h4>
-                    <div className="font-normal border-t border-neutral-400 mt-2 pt-2">
-                      <div className="flex justify-between">
-                        <p>Unaffecting at all</p> <p>0.0</p>
-                      </div>
-                      <div className="flex justify-between">
-                        <p>Quite Affecting </p> <p>0.25</p>
-                      </div>
-                      <div className="flex justify-between">
-                        <p>Affecting </p> <p>0.50</p>
-                      </div>
-                      <div className="flex justify-between">
-                        <p>Greatly Affecting </p> <p>0.75</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="h-96 overflow-x-auto text-justify pr-4">
+
+                <div className="flex gap-3 py-6">
+                  <h2 className="font-bold text-lg">Technological Factors: </h2>
+                  <h2 className="font-bold text-lg">
+                    {capitalize(
+                      student?.inference_result?.technological.linguistic!
+                    )}
+                  </h2>
+                </div>
+                <div className="grid grid-cols-11 gap-4 pb-10">
+                  <div className="col-span-6 h-96 overflow-x-auto text-justify pr-4">
                     {student.survey_result.name == "No Data"
                       ? "We currently have no data for this student"
-                      : getEnvironmenetalAssessment(
+                      : getTechnologicalAssesment(
                           student,
                           getStudentAverage(student, myquar.length)
                         )}
                   </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3 py-6">
-                <h2 className="font-bold text-lg">Technological Factors: </h2>
-                <h2 className="font-bold text-lg">
-                  {capitalize(
-                    student?.inference_result?.technological.linguistic!
-                  )}
-                </h2>
-              </div>
-              <div className="grid grid-cols-11 gap-4 pb-10">
-                <div className="col-span-6 h-96 overflow-x-auto text-justify pr-4">
-                  {student.survey_result.name == "No Data"
-                    ? "We currently have no data for this student"
-                    : getTechnologicalAssesment(
-                        student,
-                        getStudentAverage(student, myquar.length)
-                      )}
-                </div>
-                <div className="col-span-5">
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between font-light">
-                      <h6 className="px-4 ">Wi-Fi Connection</h6>
-                      <div className="flex justify-end">
-                        <h1 className="font-bold text-xl px-6">
-                          {student?.survey_result?.wifi.linguistic}
-                        </h1>
+                  <div className="col-span-5">
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between font-light">
+                        <h6 className="px-4 ">Wi-Fi Connection</h6>
+                        <div className="flex justify-end">
+                          <h1 className="font-bold text-xl px-6">
+                            {student?.survey_result?.wifi.linguistic}
+                          </h1>
+                        </div>
+                      </div>
+                      <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between font-light">
+                        <h6 className="px-4 ">Data Connection</h6>
+                        <div className="flex justify-end">
+                          <h1 className="font-bold text-xl px-6">
+                            {student?.survey_result?.data.linguistic}
+                          </h1>
+                        </div>
                       </div>
                     </div>
-                    <div className=" h-24 bg-tallano_gold-100 py-2 rounded-3xl flex flex-col justify-between font-light">
-                      <h6 className="px-4 ">Data Connection</h6>
+                    <div className=" h-28 border border-black py-2 rounded-3xl flex flex-col justify-between">
+                      <h6 className="px-4 ">Device Availability</h6>
                       <div className="flex justify-end">
                         <h1 className="font-bold text-xl px-6">
-                          {student?.survey_result?.data.linguistic}
+                          {student?.survey_result?.device.linguistic}
                         </h1>
                       </div>
-                    </div>
-                  </div>
-                  <div className=" h-28 border border-black py-2 rounded-3xl flex flex-col justify-between">
-                    <h6 className="px-4 ">Device Availability</h6>
-                    <div className="flex justify-end">
-                      <h1 className="font-bold text-xl px-6">
-                        {student?.survey_result?.device.linguistic}
-                      </h1>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
+        )}
         {/* Footer */}
         <div className="bg-white h-[10vh]"></div>
       </>

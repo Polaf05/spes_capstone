@@ -44,6 +44,7 @@ import { getRemarks } from "../../lib/functions/formatting";
 import { StruggledStudent, Student } from "../../types/Students";
 import StudentScores from "../students/StudentScores";
 import { toggleModule } from "../../lib/functions/chart";
+import { performanceAnalysis } from "../../lib/functions/studentFeedback";
 
 Chart.register(
   ArcElement,
@@ -110,6 +111,7 @@ const StudentDialog = ({
     backgroundColor: string;
     borderColor: string;
   };
+
   const ww_labels: string[] = [];
   const pt_labels: string[] = [];
 
@@ -191,6 +193,39 @@ const StudentDialog = ({
       : category === "Performance Tasks"
       ? student?.quarter![quarter].performance_tasks
       : null;
+
+  //surpassed students
+  const ww_ranks: number[] = [];
+  const pt_ranks: number[] = [];
+  //initialize ranks
+  students?.map((s) => {
+    ww_ranks.push(0);
+    pt_ranks.push(0);
+  });
+  students?.map((s) => {
+    const ww_index = Math.trunc(
+      s.quarter![quarter].written_percentage?.ranking!
+    );
+    const pt_index = Math.trunc(
+      s.quarter![quarter].performance_percentage?.ranking!
+    );
+
+    ww_ranks[ww_index - 1] += 1;
+    pt_ranks[pt_index - 1] += 1;
+  });
+
+  const my_ranking = Math.trunc(
+    student?.quarter![quarter].written_percentage?.ranking!
+  );
+
+  //sum of surpassed
+  let ww_surp_sum = 0;
+  let pt_surp_sum = 0;
+
+  for (let i = my_ranking; i < students?.length!; i++) {
+    ww_surp_sum += ww_ranks[i];
+    pt_surp_sum += pt_ranks[i];
+  }
 
   return (
     student && (
@@ -364,15 +399,21 @@ const StudentDialog = ({
                               )}
                             </div>
                             <p className="inline-block text-justify">
-                              Assessment: Paragraph (Large) Lorem ipsum dolor
-                              sit amet, consectetuer adipiscing elit, sed diam
-                              nonummy nibh euismod tincidunt ut laoreet dolore
-                              magna. Lorem ipsum dolor sit amet, consectetuer
-                              adipiscing elit, sed diam nonummy nibh euismod
-                              tincidunt ut laoreet dolore magna. Lorem ipsum
-                              dolor sit amet, consectetuer adipiscing elit, sed
-                              diam nonummy nibh euismod tincidunt ut laoreet
-                              dolore magna.
+                              {performanceAnalysis(
+                                student!,
+                                quarter,
+                                {
+                                  ww: ww_surp_sum,
+                                  pt: pt_surp_sum,
+                                  len: students?.length,
+                                },
+                                {
+                                  ww: student.quarter[quarter]
+                                    .written_percentage.score,
+                                  pt: student.quarter[quarter]
+                                    .performance_percentage.score,
+                                }
+                              )}
                             </p>
                           </div>
                         </div>

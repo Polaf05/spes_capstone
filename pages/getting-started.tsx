@@ -596,9 +596,12 @@ const gettingStarted = (user: any) => {
                             <div className="space-y-1 text-center">
                               <div className="flex text-lg text-gray-600">
                                 <label
-                                  className={
-                                    "font-bold relative cursor-pointer text-ocean-400 hover:text-ocean-400"
-                                  }
+                                  className={classNames(
+                                    "font-bold relative",
+                                    isLoading
+                                      ? "text-misc-disable"
+                                      : "cursor-pointer text-ocean-400 hover:text-ocean-400"
+                                  )}
                                 >
                                   <span>Upload a file</span>
                                   <input
@@ -610,6 +613,7 @@ const gettingStarted = (user: any) => {
                                     onClick={(event) => {
                                       event.currentTarget.value = "";
                                     }}
+                                    disabled={isLoading}
                                   />
                                 </label>
                               </div>
