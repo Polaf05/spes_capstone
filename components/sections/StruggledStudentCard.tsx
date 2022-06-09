@@ -32,11 +32,11 @@ const StruggledStudentCard = ({
     <div>
       {struggledStudents_length > 0 && (
         <div className="my-2 py-2 border-2 border-red-300 rounded-xl">
-          <div className="flex justify-between px-4 font-semibold text-lg border-b-2 border-red-300 ">
+          <div className="flex justify-between px-4 font-semibold text-lg border-b-2 border-red-300">
             <h4>{title}</h4>
             <h4>Task No.</h4>
           </div>
-          <div className={"space-y-2"}>
+          <div className={"space-y-2 max-h-[50vh] overflow-auto"}>
             {struggledStudents.map(
               (student) =>
                 toggleModule(title, student) && (

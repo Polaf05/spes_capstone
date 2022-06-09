@@ -29,6 +29,10 @@ export const Task = ({
   setDialog,
   strgStudent,
   categoryTitle,
+  openClassDialog,
+  setClassDialogOpen,
+  tutorial,
+  setTutorial,
 }: {
   students: Student[];
   category: string;
@@ -40,6 +44,10 @@ export const Task = ({
   strgStudent: StruggledStudent | null;
   categoryTitle: string;
   setDialog: React.Dispatch<React.SetStateAction<string>>;
+  openClassDialog: boolean;
+  setClassDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  tutorial: string;
+  setTutorial: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [sortingMethod, setSorting] = useState("Grade Before");
   const { setStudent } = useSelectedStudent();
@@ -125,8 +133,6 @@ export const Task = ({
     ],
   };
 
-  const [openClassDialog, setClassDialogOpen] = useState<boolean>(false);
-  const [tutorial, setTutorial] = useState<string>("");
   const [tooltip, showTooltip] = useState<boolean>(false);
 
   return (
@@ -137,7 +143,14 @@ export const Task = ({
             <div className="text-2xl font-bold flex gap-2 items-center">
               <h1>
                 Q{quarter + 1}: Clasroom Assessment:{" "}
-                <span className="underline decoration-2">{assessment}</span>
+                <span
+                  className={classNames(
+                    "underline decoration-2",
+                    assessment.match(/Poor/g) ? "text-red-400" : ""
+                  )}
+                >
+                  {assessment}
+                </span>
               </h1>
               <QuestionMarkCircleIcon
                 onClick={() => {
@@ -154,13 +167,13 @@ export const Task = ({
                 }}
               />
               {tooltip && (
-                <ReactTooltip id="question" type="light" effect="float" />
+                <ReactTooltip id="question" type="dark" effect="float" />
               )}
             </div>
             <div className="text-lg font-semibold flex items-center gap-2">
               <h4>Sorted by: {sortingMethod ? sortingMethod : "Name"}</h4>
             </div>
-            <div className="w-full overflow-y-auto h-[60vh]">
+            <div className="w-full overflow-y-auto h-[50vh]">
               <table className="table-fixed min-w-full rounded-md text-lg text-left border-collapse">
                 {/* Table Head - Buttons */}
                 <thead className="border-b-2 bg-white sticky top-0">
@@ -290,6 +303,9 @@ export const Task = ({
             </div>
           </div>
           <div className="col-span-5 h-fit">
+            <h3 className="pt-10 pb-2 font-semibold text-lg">
+              Chart Representation:
+            </h3>
             <div className="grid grid-cols-5 gap-4">
               <div className="col-span-3">
                 <Doughnut
@@ -332,7 +348,7 @@ export const Task = ({
                 </section>
               </div>
             </div>
-            <div className="row-span-2 overflow-auto h-44 md:overflow-auto mt-5">
+            {/* <div className="row-span-2 overflow-auto h-44 md:overflow-auto mt-5">
               <p className="inline-block text-justify">
                 Chart Description: Paragraph (Large) Lorem ipsum dolor sit amet,
                 consectetuer adipiscing elit, sed diam nonummy nibh euismod
@@ -344,7 +360,7 @@ export const Task = ({
                 (Large) Lorem ipsum dolor sit amet, consectetuer adipiscing
                 elit,
               </p>
-            </div>
+            </div> */}
           </div>
         </div>
         <div className="w-96">

@@ -341,7 +341,7 @@ const Dashboard = () => {
                           onClick={() => {
                             setQuarter(idx);
                           }}
-                          className="rounded-3xl w-36 h-24 lg:w-36 lg:h-24 xl:w-60 xl:h-40 bg-ocean-100 grid place-items-center"
+                          className="rounded-3xl w-36 h-24 lg:w-36 lg:h-24 xl:w-48 xl:h-36 bg-ocean-100 grid place-items-center"
                         >
                           <h3 className="font-semibold text-lg">
                             Quarter {button}

@@ -1,8 +1,9 @@
 import React, { useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import ClassTable from "../tutorials/ClassTable";
-import Sorting from "../tutorials/Sorting";
-import { XIcon } from "@heroicons/react/outline";
+import Sorting from "../tutorials/TaskAssessment";
+import { QuestionMarkCircleIcon, XIcon } from "@heroicons/react/outline";
+import TaskAssessment from "../tutorials/TaskAssessment";
 
 const TutorialDialog = ({
   tutorial,
@@ -45,7 +46,12 @@ const TutorialDialog = ({
             >
               <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <div className="flex justify-between">
-                  <h4 className="text-lg font-semibold">SPES Quick Tutorial</h4>
+                  <h4 className="text-lg font-semibold flex items-center gap-2">
+                    <span>
+                      <QuestionMarkCircleIcon className="w-5 h-5 text-neutral-700" />
+                    </span>
+                    SPES Quick Tutorial
+                  </h4>
                   <div
                     onClick={() => setClassDialogOpen(false)}
                     className="cursor-pointer rounded-full w-8 h-8 flex items-center justify-center hover:bg-ocean-300 hover:text-white"
@@ -55,8 +61,8 @@ const TutorialDialog = ({
                 </div>
                 {tutorial === "classTable" ? (
                   <ClassTable />
-                ) : tutorial === "sorting" ? (
-                  <Sorting />
+                ) : tutorial === "taskAssessment" ? (
+                  <TaskAssessment />
                 ) : (
                   "Nothing to show here..."
                 )}

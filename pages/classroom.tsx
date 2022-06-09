@@ -14,13 +14,19 @@ import {
   QuestionMarkCircleIcon,
   ArrowLeftIcon,
 } from "@heroicons/react/outline";
-import { getGrade, transmuteGrade } from "../lib/functions/grade_computation";
+import {
+  getAverageGrade,
+  getGrade,
+  transmuteGrade,
+} from "../lib/functions/grade_computation";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { classNames } from "../lib/functions/concat";
 import { TaskInfo } from "../types/Task";
 
 import Link from "next/link";
 import StudentDialog from "../components/dialogs/StudentDialog";
+import ReactTooltip from "react-tooltip";
+import { getTaskAnalysis } from "../lib/functions/feedback";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -72,7 +78,7 @@ export default function ClassroomInfo() {
     if (!students) {
       router.back();
     } else {
-      console.log(students);
+      // console.log(students);
       const myStudent = students![0].quarter![quarter];
       // get weighted omsim of a written works and performance task
       const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
@@ -359,10 +365,31 @@ export default function ClassroomInfo() {
     ).toFixed(1)
   );
 
+  let ww_ave_participants = 0;
+  let pt_ave_participants = 0;
+
+  if (students) {
+    const ww_arr: number[] = [];
+    const pt_arr: number[] = [];
+    ww_task_array.map((task) => {
+      ww_arr.push((task.participated / students.length) * 100);
+    });
+    pt_task_array.map((task) => {
+      pt_arr.push((task.participated / students.length) * 100);
+    });
+    ww_ave_participants = getAverageGrade([ww_arr])[0];
+    pt_ave_participants = getAverageGrade([pt_arr])[0];
+  }
+
   const tasks_buttons = [ww_render_labels, pt_render_labels];
   const [dialog, setDialog] = useState<string>("");
   const [strgStudent, setStrgStudent] = useState<StruggledStudent | null>(null);
   const [categoryTitle, setCategoryTitle] = useState<string>("");
+  const [taskPage, setTaskPage] = useState<boolean>(true);
+  const [tooltip, showTooltip] = useState<boolean>(false);
+  const [openClassDialog, setClassDialogOpen] = useState<boolean>(false);
+  const [tutorial, setTutorial] = useState<string>("");
+
   return (
     <>
       {students && (
@@ -411,7 +438,7 @@ export default function ClassroomInfo() {
 
               <Tab.Panels>
                 {categories.map((category, idx) => (
-                  <Tab.Panel key={idx} className="h-[90vh] bg-ocean-100 pt-10">
+                  <Tab.Panel key={idx} className="h-fit bg-ocean-100 py-10">
                     {/* Content Section */}
                     <Task
                       dialog={dialog}
@@ -424,6 +451,10 @@ export default function ClassroomInfo() {
                       quarter={quarter_index}
                       strgStudent={strgStudent}
                       categoryTitle={categoryTitle}
+                      openClassDialog={openClassDialog}
+                      setClassDialogOpen={setClassDialogOpen}
+                      tutorial={tutorial}
+                      setTutorial={setTutorial}
                     />
                   </Tab.Panel>
                 ))}
@@ -446,311 +477,460 @@ export default function ClassroomInfo() {
                 />
               </div>
               {/* Bar Chart */}
-              <div className="h-fit m-8 px-24 border-b-2 border-ocean-400">
+              <div className="h-fit m-8 px-24">
                 <div className="flex justify-between">
                   <div>
                     <h1 className="text-3xl font-bold">Tasks Assessment</h1>
-                    <div className="flex gap-1 items-center">
+                    <div
+                      data-for="tip"
+                      data-tip="Click for a quick tutorial"
+                      onMouseEnter={() => showTooltip(true)}
+                      onMouseLeave={() => {
+                        showTooltip(false);
+                        setTimeout(() => showTooltip(true), 50);
+                      }}
+                      onClick={() => {
+                        setClassDialogOpen(true);
+                        setTutorial("taskAssessment");
+                      }}
+                      className="flex gap-1 items-center w-fit hover:cursor-pointer hover:underline decoration-neutral-400"
+                    >
                       <QuestionMarkCircleIcon className="w-4 h-4 text-neutral-500" />
                       <p className="text-neutral-600 text-sm">
                         Click on the chart label to view the task info
                       </p>
                     </div>
+                    {tooltip && (
+                      <div className="font-semibold">
+                        <ReactTooltip
+                          id="tip"
+                          place="bottom"
+                          type="dark"
+                          effect="float"
+                        />
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <a
-                      href={"#analysis"}
+                    <p
+                      onClick={() => {
+                        setTaskPage(!taskPage);
+                      }}
                       className="text-xl font-semibold underline decoration-2 hover:cursor-pointer hover:text-ocean-400 underline-offset-8"
                     >
-                      View Analysis
-                    </a>
+                      View{taskPage ? " Analysis" : " Breakdown"}
+                    </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-12 gap-4 mt-4">
-                  <div className="col-span-4 py-4">
-                    <h2 className="text-xl font-semibold">
-                      Written Work: {task + 1}
-                    </h2>
-                    <div>
-                      <h6 className="font-light">
-                        Average Score:{" "}
-                        <span className="font-semibold">
-                          {ww_task_array[task].ave_score} /{" "}
-                          {ww_task_array[task].total}
-                        </span>
-                      </h6>
-                      <h6 className="font-light">
-                        Average Score PCT:{" "}
-                        <span className="font-semibold">
-                          {ww_task_array[task].ave_score_pct}
-                        </span>
-                      </h6>
+                {taskPage ? (
+                  <div>
+                    <div className="grid grid-cols-12 gap-4 mt-4">
+                      <div className="col-span-4 py-4">
+                        <h2 className="text-xl font-semibold">
+                          Written Work: {task + 1}
+                        </h2>
+                        <div>
+                          <h6 className="font-light">
+                            Average Score:{" "}
+                            <span
+                              className={classNames(
+                                "font-semibold",
+                                ww_task_array[task].ave_score_pct < 70
+                                  ? "text-red-500"
+                                  : ""
+                              )}
+                            >
+                              {ww_task_array[task].ave_score} /{" "}
+                              {ww_task_array[task].total}
+                            </span>
+                          </h6>
+                          <h6 className="font-light">
+                            Average Score PCT:{" "}
+                            <span
+                              className={classNames(
+                                "font-semibold",
+                                ww_task_array[task].ave_score_pct < 70
+                                  ? "text-red-500"
+                                  : ""
+                              )}
+                            >
+                              {ww_task_array[task].ave_score_pct}%
+                            </span>
+                          </h6>
 
-                      <h6 className="font-light">
-                        No. of Students Participated:{" "}
-                        <span className="font-semibold">
-                          {ww_task_array[task].participated}
-                        </span>
-                      </h6>
-                      <h6 className="font-light">
-                        No. of Students Passed:{" "}
-                        <span className="font-semibold">
-                          {ww_task_array[task].passed.length +
-                            ww_task_array[task].perfect.length}
-                        </span>
-                      </h6>
-                      <div className="w-full">
-                        <PeopleChart
-                          passed_tasks={Number(
-                            (
-                              ((ww_task_array[task].passed.length +
-                                ww_task_array[task].perfect.length) /
-                                ww_task_array[task].participated) *
-                              10
-                            ).toFixed()
-                          )}
-                          length={10}
-                          color="yellow"
-                        />
-                        <p className="font-light text-center">
-                          <span className="font-semibold">
-                            {Number(
-                              (
+                          <h6 className="font-light">
+                            No. of Students Participated:{" "}
+                            <span
+                              className={classNames(
+                                "font-semibold",
+                                (ww_task_array[task].participated /
+                                  students.length) *
+                                  100 <
+                                  70
+                                  ? "text-red-500"
+                                  : ""
+                              )}
+                            >
+                              {ww_task_array[task].participated} (
+                              {(
+                                (ww_task_array[task].participated /
+                                  students.length) *
+                                100
+                              ).toFixed(1)}
+                              %)
+                            </span>
+                          </h6>
+                          <h6 className="font-light">
+                            No. of Students Passed:{" "}
+                            <span
+                              className={classNames(
+                                "font-semibold",
                                 ((ww_task_array[task].passed.length +
                                   ww_task_array[task].perfect.length) /
                                   ww_task_array[task].participated) *
-                                10
-                              ).toFixed()
-                            )}{" "}
-                            out of 10
-                          </span>{" "}
-                          students passed task no. {task + 1}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-span-8 pl-4 border-l">
-                    <div className="relative">
-                      <div className="z-40 absolute py-8 w-[3vw] h-full bg-white flex flex-col justify-around">
-                        {tasks_buttons[0].map((button, idx) => (
-                          <button
-                            className="text-sm"
-                            onClick={() => {
-                              setTask(idx);
-                            }}
-                          >
-                            {button}
-                          </button>
-                        ))}
-                      </div>
-                      <BarChart
-                        display={false}
-                        indexAxis="y"
-                        labels={tasks_buttons[0]}
-                        datasets={ww_quarter_dataset}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="h-fit pb-12">
-                  <div className="grid grid-cols-12 gap-4 mt-4">
-                    <div className="col-span-4 py-4">
-                      <h2 className="text-xl font-semibold">
-                        Performance Task: {pt_task + 1}
-                      </h2>
-
-                      <div>
-                        <h6 className="font-light">
-                          Average Score:{" "}
-                          <span className="font-semibold">
-                            {pt_task_array[pt_task].ave_score} /{" "}
-                            {pt_task_array[pt_task].total}
-                          </span>
-                        </h6>
-                        <h6 className="font-light">
-                          Average Score PCT:{" "}
-                          <span className="font-semibold">
-                            {pt_task_array[pt_task].ave_score_pct}
-                          </span>
-                        </h6>
-
-                        <h6 className="font-light">
-                          No. of Students Participated:{" "}
-                          <span className="font-semibold">
-                            {pt_task_array[pt_task].participated}
-                          </span>
-                        </h6>
-                        <h6 className="font-light">
-                          No. of Students Passed:{" "}
-                          <span className="font-semibold">
-                            {pt_task_array[pt_task].passed.length +
-                              pt_task_array[pt_task].perfect.length}
-                          </span>
-                        </h6>
-                        <div className="w-full">
-                          <PeopleChart
-                            passed_tasks={Number(
-                              (
-                                ((pt_task_array[pt_task].passed.length +
-                                  pt_task_array[pt_task].perfect.length) /
-                                  pt_task_array[pt_task].participated) *
-                                10
-                              ).toFixed()
-                            )}
-                            length={10}
-                            color="blue"
-                          />
-                          <p className="font-light text-center">
-                            <span className="font-semibold">
-                              {Number(
+                                  100 <
+                                  70
+                                  ? "text-red-500"
+                                  : ""
+                              )}
+                            >
+                              {ww_task_array[task].passed.length +
+                                ww_task_array[task].perfect.length}
+                            </span>
+                          </h6>
+                          <div className="w-full">
+                            <PeopleChart
+                              passed_tasks={Number(
                                 (
+                                  ((ww_task_array[task].passed.length +
+                                    ww_task_array[task].perfect.length) /
+                                    ww_task_array[task].participated) *
+                                  10
+                                ).toFixed()
+                              )}
+                              length={10}
+                              color="yellow"
+                            />
+                            <p className="font-light text-center">
+                              <span className="font-semibold">
+                                {Number(
+                                  (
+                                    ((ww_task_array[task].passed.length +
+                                      ww_task_array[task].perfect.length) /
+                                      ww_task_array[task].participated) *
+                                    10
+                                  ).toFixed()
+                                )}{" "}
+                                out of 10
+                              </span>{" "}
+                              students passed task no. {task + 1}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-span-8 pl-4 border-l">
+                        <div className="relative">
+                          <div className="z-10 absolute py-8 w-[3vw] h-full bg-white flex flex-col justify-around">
+                            {tasks_buttons[0].map((button, idx) => (
+                              <button
+                                className={classNames(
+                                  "text-sm font-semibold hover:underline",
+                                  ((ww_task_array[idx].passed.length +
+                                    ww_task_array[idx].perfect.length) /
+                                    ww_task_array[idx].participated) *
+                                    10 <
+                                    7 ||
+                                    (ww_task_array[idx].participated /
+                                      students.length) *
+                                      100 <
+                                      70
+                                    ? "text-red-500"
+                                    : ""
+                                )}
+                                onClick={() => {
+                                  setTask(idx);
+                                }}
+                              >
+                                {button}
+                              </button>
+                            ))}
+                          </div>
+                          <BarChart
+                            display={false}
+                            indexAxis="y"
+                            labels={tasks_buttons[0]}
+                            datasets={ww_quarter_dataset}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-fit pb-12">
+                      <div className="grid grid-cols-12 gap-4 mt-4">
+                        <div className="col-span-4 py-4">
+                          <h2 className="text-xl font-semibold">
+                            Performance Task: {pt_task + 1}
+                          </h2>
+
+                          <div className="">
+                            <h6 className="font-light">
+                              Average Score:{" "}
+                              <span
+                                className={classNames(
+                                  "font-semibold",
+                                  pt_task_array[pt_task].ave_score_pct < 70
+                                    ? "text-red-500"
+                                    : ""
+                                )}
+                              >
+                                {pt_task_array[pt_task].ave_score} /{" "}
+                                {pt_task_array[pt_task].total}
+                              </span>
+                            </h6>
+                            <h6 className="font-light">
+                              Average Score PCT:{" "}
+                              <span
+                                className={classNames(
+                                  "font-semibold",
+                                  pt_task_array[pt_task].ave_score_pct < 70
+                                    ? "text-red-500"
+                                    : ""
+                                )}
+                              >
+                                {pt_task_array[pt_task].ave_score_pct}
+                              </span>
+                            </h6>
+
+                            <h6 className="font-light">
+                              No. of Students Participated:{" "}
+                              <span
+                                className={classNames(
+                                  "font-semibold",
+                                  (pt_task_array[pt_task].participated /
+                                    students.length) *
+                                    100 <
+                                    70
+                                    ? "text-red-500"
+                                    : ""
+                                )}
+                              >
+                                {pt_task_array[pt_task].participated} (
+                                {(
+                                  (pt_task_array[pt_task].participated /
+                                    students.length) *
+                                  100
+                                ).toFixed(1)}
+                                %)
+                              </span>
+                            </h6>
+                            <h6 className="font-light">
+                              No. of Students Passed:{" "}
+                              <span
+                                className={classNames(
+                                  "font-semibold",
                                   ((pt_task_array[pt_task].passed.length +
                                     pt_task_array[pt_task].perfect.length) /
                                     pt_task_array[pt_task].participated) *
-                                  10
-                                ).toFixed()
-                              )}{" "}
-                              out of 10
-                            </span>{" "}
-                            students passed task no. {task + 1}
-                          </p>
+                                    100 <
+                                    70
+                                    ? "text-red-500"
+                                    : ""
+                                )}
+                              >
+                                {pt_task_array[pt_task].passed.length +
+                                  pt_task_array[pt_task].perfect.length}
+                              </span>
+                            </h6>
+                            <div className="w-full">
+                              <PeopleChart
+                                passed_tasks={Number(
+                                  (
+                                    ((pt_task_array[pt_task].passed.length +
+                                      pt_task_array[pt_task].perfect.length) /
+                                      pt_task_array[pt_task].participated) *
+                                    10
+                                  ).toFixed()
+                                )}
+                                length={10}
+                                color="blue"
+                              />
+                              <p className="font-light text-center">
+                                <span className="font-semibold">
+                                  {Number(
+                                    (
+                                      ((pt_task_array[pt_task].passed.length +
+                                        pt_task_array[pt_task].perfect.length) /
+                                        pt_task_array[pt_task].participated) *
+                                      10
+                                    ).toFixed()
+                                  )}{" "}
+                                  out of 10
+                                </span>{" "}
+                                students passed task no. {task + 1}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-span-8 pl-4 border-l">
+                          <div className="relative">
+                            <div className="z-10 absolute py-8 w-[3vw] h-full bg-white flex flex-col justify-around">
+                              {tasks_buttons[1].map((button, idx) => (
+                                <button
+                                  className={classNames(
+                                    "text-sm font-semibold hover:underline",
+                                    ((pt_task_array[idx].passed.length +
+                                      pt_task_array[idx].perfect.length) /
+                                      pt_task_array[idx].participated) *
+                                      10 <
+                                      7 ||
+                                      (pt_task_array[idx].participated /
+                                        students.length) *
+                                        100 <
+                                        70
+                                      ? "text-red-500"
+                                      : ""
+                                  )}
+                                  onClick={() => {
+                                    setPtTask(idx);
+                                  }}
+                                >
+                                  {button}
+                                </button>
+                              ))}
+                            </div>
+                            <BarChart
+                              display={false}
+                              indexAxis="y"
+                              labels={tasks_buttons[1]}
+                              datasets={pt_quarter_dataset}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-span-8 pl-4 border-l">
-                      <div className="relative">
-                        <div className="z-40 absolute py-8 w-[3vw] h-full bg-white flex flex-col justify-around">
-                          {tasks_buttons[1].map((button, idx) => (
-                            <button
-                              className="text-sm"
-                              onClick={() => {
-                                setPtTask(idx);
-                              }}
-                            >
-                              {button}
-                            </button>
-                          ))}
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <div className="my-12 grid grid-cols-2 gap-4 h-fit">
+                        {/* Circular Progress */}
+                        <div className="col-span-5 grid grid-cols-12 gap-3">
+                          {/* WW Data */}
+                          <div className="col-span-6">
+                            {/* Written Works Circular Progress */}
+                            <div className="flex justify-end">
+                              <div
+                                className={classNames(
+                                  wgh_ww! > wgh_pt!
+                                    ? "w-4/5"
+                                    : wgh_pt! > wgh_ww!
+                                    ? "w-3/5"
+                                    : "w-3/4"
+                                )}
+                              >
+                                <ProgressComponent
+                                  value={ww_passing_ave}
+                                  title="Written Works"
+                                  subtitle="Students Passed"
+                                  pathColor="#FFF598"
+                                  strokeWidth={8}
+                                  size="large"
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-12 gap-8 mt-4">
+                              <div className="col-span-8 flex justify-center items-center">
+                                <p className="text-right italic">
+                                  {getTaskAnalysis(
+                                    "Written Works",
+                                    students.length,
+                                    ww_ave_pct,
+                                    ww_ave_participants
+                                  )}
+                                </p>
+                              </div>
+                              <div className="col-span-4 ">
+                                <ProgressComponent
+                                  value={ww_ave_pct}
+                                  title="Average"
+                                  subtitle="Score PCT"
+                                  pathColor="#FFF598"
+                                  strokeWidth={10}
+                                  size="small"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          {/* PT Data */}
+                          <div className="col-span-6">
+                            {/* Performance Tasks Circular Progress */}
+                            <div className="grid grid-cols-12 gap-8 mb-4">
+                              <div className="col-span-4">
+                                <ProgressComponent
+                                  value={pt_ave_pct}
+                                  title="Average"
+                                  subtitle="Score PCT"
+                                  pathColor="#63C7FF"
+                                  strokeWidth={10}
+                                  size="small"
+                                />
+                              </div>
+                              <div className="col-span-8 flex justify-center items-center">
+                                <p className="italic">
+                                  {getTaskAnalysis(
+                                    "Performance Tasks",
+                                    students.length,
+                                    pt_ave_pct,
+                                    pt_ave_participants
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="">
+                              <div
+                                className={classNames(
+                                  wgh_ww! < wgh_pt!
+                                    ? "w-4/5"
+                                    : wgh_pt! < wgh_ww!
+                                    ? "w-3/5"
+                                    : "w-3/4"
+                                )}
+                              >
+                                <ProgressComponent
+                                  value={pt_passing_ave}
+                                  title="Performance Tasks"
+                                  subtitle="Students Passed"
+                                  pathColor="#63C7FF"
+                                  strokeWidth={8}
+                                  size="large"
+                                />
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <BarChart
-                          display={false}
-                          indexAxis="y"
-                          labels={tasks_buttons[1]}
-                          datasets={pt_quarter_dataset}
-                        />
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Circular Progress Chart */}
-              <div id="analysis" className="my-12 grid grid-cols-2 gap-4 h-fit">
-                {/* Circular Progress */}
-                <div className="col-span-5 grid grid-cols-12 gap-3">
-                  {/* WW Data */}
-                  <div className="col-span-6">
-                    {/* Written Works Circular Progress */}
-                    <div className="flex justify-end">
-                      <div
-                        className={classNames(
-                          wgh_ww! > wgh_pt!
-                            ? "w-4/5"
-                            : wgh_pt! > wgh_ww!
-                            ? "w-3/5"
-                            : "w-3/4"
-                        )}
-                      >
-                        <ProgressComponent
-                          value={ww_passing_ave}
-                          title="Written Works"
-                          subtitle="Students Passed"
-                          pathColor="#FFF598"
-                          strokeWidth={8}
-                          size="large"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-12 gap-8 mt-4">
-                      <div className="col-span-8 flex justify-center items-center">
-                        <p className="text-right italic">
+                      <div className="px-24">
+                        <p className="italic text-justify">
                           Paragraph (Large) Lorem ipsum dolor sit amet,
                           consectetuer adipiscing elit, sedlor sit amet,
-                          consectetuer adipiscing elit, sed
-                        </p>
-                      </div>
-                      <div className="col-span-4 ">
-                        <ProgressComponent
-                          value={ww_ave_pct}
-                          title="Average"
-                          subtitle="Score PCT"
-                          pathColor="#FFF598"
-                          strokeWidth={10}
-                          size="small"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  {/* PT Data */}
-                  <div className="col-span-6">
-                    {/* Performance Tasks Circular Progress */}
-                    <div className="grid grid-cols-12 gap-8 mb-4">
-                      <div className="col-span-4">
-                        <ProgressComponent
-                          value={pt_ave_pct}
-                          title="Average"
-                          subtitle="Score PCT"
-                          pathColor="#63C7FF"
-                          strokeWidth={10}
-                          size="small"
-                        />
-                      </div>
-                      <div className="col-span-8 flex justify-center items-center">
-                        <p className="italic">
-                          Paragraph (Large) Lorem ipsum dolor sit amet,
+                          consectetuer adipiscing elit, sedParagraph (Large)
+                          Lorem ipsum dolor sit amet, consectetuer adipiscing
+                          elit, sedlor sit amet, consectetuer adipiscing elit,
+                          sedParagraph (Large) Lorem ipsum dolor sit amet,
                           consectetuer adipiscing elit, sedlor sit amet,
-                          consectetuer adipiscing elit, sed
+                          consectetuer adipiscing elit, sedParagraph (Large)
+                          Lorem ipsum dolor sit amet, consectetuer adipiscing
+                          elit, sedlor sit amet, consectetuer adipiscing elit,
+                          sedParagraph (Large) Lorem ipsum dolor sit amet,
+                          consectetuer adipiscing elit, sedlor sit amet,
+                          consectetuer adipiscing elit, sedParagraph (Large)
+                          Lorem ipsum dolor sit amet, consectetuer adipiscing
+                          elit, sedlor sit amet, consectetuer adipiscing elit,
+                          sed
                         </p>
                       </div>
                     </div>
-                    <div className="">
-                      <div
-                        className={classNames(
-                          wgh_ww! < wgh_pt!
-                            ? "w-4/5"
-                            : wgh_pt! < wgh_ww!
-                            ? "w-3/5"
-                            : "w-3/4"
-                        )}
-                      >
-                        <ProgressComponent
-                          value={pt_passing_ave}
-                          title="Performance Tasks"
-                          subtitle="Students Passed"
-                          pathColor="#63C7FF"
-                          strokeWidth={8}
-                          size="large"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="px-24">
-                <p className="italic text-justify">
-                  Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
-                  adipiscing elit, sedlor sit amet, consectetuer adipiscing
-                  elit, sedParagraph (Large) Lorem ipsum dolor sit amet,
-                  consectetuer adipiscing elit, sedlor sit amet, consectetuer
-                  adipiscing elit, sedParagraph (Large) Lorem ipsum dolor sit
-                  amet, consectetuer adipiscing elit, sedlor sit amet,
-                  consectetuer adipiscing elit, sedParagraph (Large) Lorem ipsum
-                  dolor sit amet, consectetuer adipiscing elit, sedlor sit amet,
-                  consectetuer adipiscing elit, sedParagraph (Large) Lorem ipsum
-                  dolor sit amet, consectetuer adipiscing elit, sedlor sit amet,
-                  consectetuer adipiscing elit, sedParagraph (Large) Lorem ipsum
-                  dolor sit amet, consectetuer adipiscing elit, sedlor sit amet,
-                  consectetuer adipiscing elit, sed
-                </p>
+                  </>
+                )}
               </div>
             </div>
           </div>

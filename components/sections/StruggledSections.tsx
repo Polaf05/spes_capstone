@@ -141,32 +141,34 @@ const StruggledSections = ({
           </p>
         </div>
 
-        <div className="mt-4 h-fit px-4 py-2 border-2 border-green-300 rounded-xl">
+        <div className="mt-4 px-4 py-2 border-2 border-green-300 rounded-xl max-h-[50vh] overflow-auto">
           <div className="mt-4">
             {studentsExcelled.map((student) => (
-              <h4 className="text-lg font-semibold">
-                {formatName(student.name)}
-              </h4>
+              <h4 className="text-lg">{formatName(student.name)}</h4>
             ))}
           </div>
         </div>
       </div>
     </div>
   ) : (
-    <div className="flex flex-col">
-      <h3 className="text-xl font-bold">
-        Wow! Outstanding classroom performance{" "}
-      </h3>
-      <p className="font-light"> All students passed all the tasks</p>
-      <div className="w-1/2">
-        <div className="my-2 h-fit px-4 py-2 border-2 border-green-300 rounded-xl">
-          <div className="flex justify-between">
-            <h4>Students Excelled</h4>
-          </div>
-          <div className="mt-4">
-            {studentsExcelled.map((student) => (
-              <h4 className="text-lg font-bold">{student.name}</h4>
-            ))}
+    <div className="flex justify-center">
+      <div className="flex flex-col">
+        <h3 className="text-xl font-bold">
+          Wow! Outstanding classroom performance{" "}
+        </h3>
+        <p className="font-light"> All students passed all the tasks</p>
+        <div className="w-1/2">
+          <div className="my-2 px-4 py-2 w-[60vw] border-2 border-green-300 rounded-xl">
+            <div className="flex justify-between">
+              <h4>Students Excelled</h4>
+            </div>
+            <div className="mt-4 grid grid-cols-6 grid-flow-row gap-1 h-[50vh] overflow-auto">
+              {studentsExcelled.map((student) => (
+                <div className="col-span-3">
+                  <h4 className="text-lg">{student.name}</h4>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

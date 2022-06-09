@@ -226,9 +226,9 @@ const StudentDialog = ({
                   leaveFrom="opacity-100 scale-100"
                   leaveTo="opacity-0 scale-95"
                 >
-                  <Dialog.Panel className="w-full max-w-5xl h-fit transform overflow-hidden rounded-2xl bg-white p-10 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Panel className="w-fit h-fit transform overflow-hidden rounded-2xl bg-white p-10 text-left align-middle shadow-xl transition-all">
                     {dialog === "student info" ? (
-                      <div className="">
+                      <div className="max-w-5xl">
                         <div className="grid grid-cols-2">
                           <div className="col-span-1 flex gap-4">
                             <span
@@ -378,13 +378,15 @@ const StudentDialog = ({
                         </div>
                       </div>
                     ) : dialog === "struggled students" ? (
-                      <StudentScores
-                        setIsOpen={setIsOpen}
-                        strgStudent={strgStudent}
-                        category={category}
-                        categoryTitle={categoryTitle}
-                        quarter={quarter}
-                      />
+                      <div className="">
+                        <StudentScores
+                          setIsOpen={setIsOpen}
+                          strgStudent={strgStudent}
+                          category={category}
+                          categoryTitle={categoryTitle}
+                          quarter={quarter}
+                        />
+                      </div>
                     ) : (
                       <>No Data</>
                     )}
@@ -392,7 +394,7 @@ const StudentDialog = ({
                       <Link href={`/student`} passHref>
                         <button
                           type="button"
-                          className="inline-flex justify-center rounded-md border border-transparent bg-ocean-100 px-4 py-2 text-base font-medium text-ocean-400 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                          className="px-4 py-2 bg-ocean-100 mt-4 hover:bg-ocean-300 hover:text-white"
                           onClick={() => {
                             setIsOpen(false);
                           }}
