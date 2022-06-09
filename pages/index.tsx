@@ -33,7 +33,7 @@ const Home: NextPage = () => {
         </div>
       </div>
       <div className="float-right pr-4">
-        <p className="text-sm text-neutral-400">ver 0.1.3</p>
+        <p className="text-sm text-neutral-400">ver 0.1.4</p>
       </div>
     </div>
   );

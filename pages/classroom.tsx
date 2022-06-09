@@ -426,7 +426,7 @@ export default function ClassroomInfo() {
                       key={category.title}
                       className={({ selected }: { selected: any }) =>
                         classNames(
-                          "w-60 text-xl font-bold mx-2",
+                          "w-60 lg:text-lg xl:text-xl font-bold mx-2",
                           selected
                             ? "text-ocean-400 decoration-4 border-b-8 border-ocean-400"
                             : ""
@@ -441,7 +441,7 @@ export default function ClassroomInfo() {
 
               <Tab.Panels>
                 {categories.map((category, idx) => (
-                  <Tab.Panel key={idx} className="h-fit bg-ocean-100 py-10">
+                  <Tab.Panel key={idx} className="h-fit bg-ocean-100 xl:py-10">
                     {/* Content Section */}
                     <Task
                       dialog={dialog}
@@ -464,7 +464,7 @@ export default function ClassroomInfo() {
               </Tab.Panels>
             </Tab.Group>
 
-            <div className="bg-white h-fit px-12 py-10">
+            <div className="bg-white h-fit px-12 xl:py-10">
               {/* Omsim Chart */}
               {/* Student Cards */}
               <div className="m-8 pb-24">
@@ -480,10 +480,12 @@ export default function ClassroomInfo() {
                 />
               </div>
               {/* Bar Chart */}
-              <div className="h-fit m-8 px-24">
+              <div className="h-fit xl:m-8 xl:px-24">
                 <div className="flex justify-between">
                   <div>
-                    <h1 className="text-3xl font-bold">Tasks Assessment</h1>
+                    <h1 className="lg:text-xl xl:text-3xl font-bold">
+                      Tasks Assessment
+                    </h1>
                     <div
                       data-for="tip"
                       data-tip="Click for a quick tutorial"
@@ -499,7 +501,7 @@ export default function ClassroomInfo() {
                       className="flex gap-1 items-center w-fit hover:cursor-pointer hover:underline decoration-neutral-400"
                     >
                       <QuestionMarkCircleIcon className="w-4 h-4 text-neutral-500" />
-                      <p className="text-neutral-600 text-sm">
+                      <p className="text-neutral-600 lg:text-[0.8rem]">
                         Click on the chart label to view the task info
                       </p>
                     </div>
@@ -519,7 +521,7 @@ export default function ClassroomInfo() {
                       onClick={() => {
                         setTaskPage(!taskPage);
                       }}
-                      className="text-xl font-semibold underline decoration-2 hover:cursor-pointer hover:text-ocean-400 underline-offset-8"
+                      className="lg:text-lg xl:text-xl font-semibold underline decoration-2 hover:cursor-pointer hover:text-ocean-400 underline-offset-8"
                     >
                       View{taskPage ? " Analysis" : " Breakdown"}
                     </p>
@@ -633,7 +635,7 @@ export default function ClassroomInfo() {
                       </div>
                       <div className="col-span-8 pl-4 border-l">
                         <div className="relative">
-                          <div className="z-10 absolute py-8 w-[3vw] h-full bg-white flex flex-col justify-around">
+                          <div className="z-10 absolute py-8 lg:w-[4vw] xl:w-[3vw] h-full bg-white flex flex-col justify-around">
                             {tasks_buttons[0].map((button, idx) => (
                               <button
                                 className={classNames(
@@ -775,7 +777,7 @@ export default function ClassroomInfo() {
                         </div>
                         <div className="col-span-8 pl-4 border-l">
                           <div className="relative">
-                            <div className="z-10 absolute py-8 w-[3vw] h-full bg-white flex flex-col justify-around">
+                            <div className="z-10 absolute py-8 lg:w-[4vw] xl:w-[3vw] h-full bg-white flex flex-col justify-around">
                               {tasks_buttons[1].map((button, idx) => (
                                 <button
                                   className={classNames(
