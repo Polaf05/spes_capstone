@@ -699,6 +699,8 @@ export const getClassPerformanceAssessment = (
   const participants_diff = ww_participation - pt_participation;
   const ave_score_pct = ((ww_ave_pct + pt_ave_pct) / 2).toFixed(1);
 
+  console.log(ww_ave_pct, pt_ave_pct, ave_score_pct);
+
   if (participants_diff > 5) {
     if (ww_participation > 88) {
       message_participants = `Students tend to participate on written works more than performance tasks. In-addition, the average classroom participation is ${ave_participants.toFixed(
