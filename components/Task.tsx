@@ -336,7 +336,7 @@ export const Task = ({
                     <div className="bg-legend-good border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>{"Average: (82 - 98) "}</p>
+                    <p>{"Average: (82 - 88) "}</p>
                     <div className="bg-legend-ave border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
