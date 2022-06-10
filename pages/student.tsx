@@ -484,12 +484,12 @@ const StudentInfo = (user: any) => {
     if (getRemarks(getStudentAverage(student!, myquar.length)) == "Very Poor") {
       if (performance.value < 3) {
         overall_feedback.push(
-          `The students requires attention because ${gender.hisHer} grade is very poor and ` +
+          `The student's requires attention because ${gender.hisHer} grade is very poor and ` +
             performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `Although the students grade is very poor, ` + performance.linguistic
+          `Although the student's grade is very poor, ` + performance.linguistic
         );
       }
     } else if (
@@ -497,12 +497,12 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3) {
         overall_feedback.push(
-          `The students requires attention because ${gender.hisHer} grade is poor and ` +
+          `The student's requires attention because ${gender.hisHer} grade is poor and ` +
             performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `Although the students grade is poor, ` + performance.linguistic
+          `Although the student's grade is poor, ` + performance.linguistic
         );
       }
     } else if (
@@ -510,11 +510,11 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3 && performance.value > 3) {
         overall_feedback.push(
-          `The students grade is average but ` + performance.linguistic
+          `The student's grade is average but ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students grade is average and ` + performance.linguistic
+          `The student's grade is average and ` + performance.linguistic
         );
       }
     } else if (
@@ -522,21 +522,21 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3) {
         overall_feedback.push(
-          `Although the students grade is good, ` + performance.linguistic
+          `Although the student's grade is good, ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students grade is good and ` + performance.linguistic
+          `The student's grade is good and ` + performance.linguistic
         );
       }
     } else {
       if (performance.value < 3) {
         overall_feedback.push(
-          `Although the students grade is very good, ` + performance.linguistic
+          `Although the student's grade is very good, ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students grade is very good and ` + performance.linguistic
+          `The student's grade is very good and ` + performance.linguistic
         );
       }
     }
@@ -1548,16 +1548,16 @@ const StudentInfo = (user: any) => {
                       <h4>Legend in Fuzzy Range</h4>
                       <div className="font-normal border-t border-neutral-400 mt-2 pt-2">
                         <div className="flex justify-between">
-                          <p>Unaffecting at all</p> <p>0.0</p>
+                          <p>Unaffecting at all</p> <p>0.0 - 0.24</p>
                         </div>
                         <div className="flex justify-between">
-                          <p>Quite Affecting </p> <p>0.25</p>
+                          <p>Quite Affecting </p> <p>0.25 - 0.49</p>
                         </div>
                         <div className="flex justify-between">
-                          <p>Affecting </p> <p>0.50</p>
+                          <p>Affecting </p> <p>0.50 - 0.74</p>
                         </div>
                         <div className="flex justify-between">
-                          <p>Greatly Affecting </p> <p>0.75</p>
+                          <p>Greatly Affecting </p> <p>0.75 - 1.0</p>
                         </div>
                       </div>
                     </div>
