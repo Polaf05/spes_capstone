@@ -229,6 +229,47 @@ export function giveValue(item: any) {
   return surveyData;
 }
 
+export function formatName(names: string) {
+  let name = "";
+  if (names.includes(",")) {
+    let nname = "";
+    if (names.includes(", ")) {
+      nname = names.replace(",", "");
+    } else {
+      nname = names.replace(",", " ");
+    }
+
+    nname = nname.replace(/[&\/\\#,+()$~%.'":*?<>{}.]/g, "");
+    nname = nname.replace(/\s+/g, " ").trim();
+    nname = nname.toUpperCase();
+
+    let namesplit = nname.split(" ");
+
+    if (namesplit[namesplit.length - 1].length == 1) {
+      namesplit = namesplit.slice(0, -1);
+    }
+    let fullname = namesplit.join(" ");
+
+    name = fullname;
+  } else {
+    let nname = names;
+    nname = nname.replace(/[&\/\\#,+()$~%.'":*?<>{}.]/g, "");
+    nname = nname.replace(/\s+/g, " ").trim();
+    nname = nname.toUpperCase();
+
+    let namesplit = nname.split(" ");
+
+    if (namesplit[namesplit.length - 1].length == 1) {
+      namesplit = namesplit.slice(0, -1);
+    }
+    let fullname = namesplit.join(" ");
+
+    name = fullname;
+  }
+
+  return name;
+}
+
 export function getEnvironmentalData(row: any, counter: number) {
   let environment = [];
 
@@ -248,7 +289,11 @@ export function getEnvironmentalData(row: any, counter: number) {
 }
 
 export function getSurveyResults(survey_list: SurveyResult[], name: string) {
-  let survey = survey_list.find((element) => element.name == name);
+  let survey = survey_list.find(
+    (element) => element.name.toUpperCase() == formatName(name.toUpperCase())
+  );
+
+  console.log(survey);
 
   return survey as SurveyResult;
 }
