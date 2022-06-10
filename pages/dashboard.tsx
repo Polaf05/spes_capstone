@@ -308,14 +308,20 @@ const Dashboard = () => {
         <>
           <div className="m-4">
             <div className="w-full flex justify-between px-12">
-              <div className="flex justify-center items-center">
+              <div className="flex flex-col justify-center">
                 {" "}
                 <h2 className="text-xl xl:text-2xl font-bold">
-                  Students Performance Evaluation System
+
+                  Student Performance Evaluation System
                 </h2>
+                <Link href="/getting-started" passHref>
+                  <button className="border-2 border-neutral-400 w-60 py-3 px-2 text-semibold bg-white hover:bg-ocean-100 hover:border-ocean-100 ">
+                    Generate new evaluation
+                  </button>
+                </Link>
               </div>
               <div className="w-20 h-20 xl:w-40 xl:h-40 p-2">
-                <Link href={`/getting-started`} passHref>
+                <Link href={`/`} passHref>
                   <div className="w-fit h-fit cursor-pointer">
                     <Image
                       src="/logo.png"
