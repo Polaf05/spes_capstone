@@ -38,7 +38,7 @@ export async function getSurveyList(link: string) {
             const environment_factors = {
               unwanted_noise: row[11],
               limited_space: row[12],
-              household_chorse: row[13],
+              household_chores: row[13],
               comfortability: row[14],
               support: row[15],
               internet: row[16],

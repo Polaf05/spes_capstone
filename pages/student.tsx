@@ -155,7 +155,7 @@ const StudentInfo = (user: any) => {
     // if (!user.user) {
     //   router.push("/login");
     // } else {
-    if (!students || !student) router.back();
+    if (!students || !student) router.push("/classroom");
     else {
       setMyStudent(student?.quarter![quarter]!);
       let ww_available_scores: number[] = [];
@@ -484,12 +484,12 @@ const StudentInfo = (user: any) => {
     if (getRemarks(getStudentAverage(student!, myquar.length)) == "Very Poor") {
       if (performance.value < 3) {
         overall_feedback.push(
-          `The students' requires attention because ${gender.hisHer} grade is very poor and ` +
+          `The students requires attention because ${gender.hisHer} grade is very poor and ` +
             performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `Although the students' grade is very poor, ` + performance.linguistic
+          `Although the students grade is very poor, ` + performance.linguistic
         );
       }
     } else if (
@@ -497,12 +497,12 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3) {
         overall_feedback.push(
-          `The students' requires attention because ${gender.hisHer} grade is poor and ` +
+          `The students requires attention because ${gender.hisHer} grade is poor and ` +
             performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `Although the students' grade is poor, ` + performance.linguistic
+          `Although the students grade is poor, ` + performance.linguistic
         );
       }
     } else if (
@@ -510,11 +510,11 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3 && performance.value > 3) {
         overall_feedback.push(
-          `The students' grade is average but ` + performance.linguistic
+          `The students grade is average but ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students' grade is average and ` + performance.linguistic
+          `The students grade is average and ` + performance.linguistic
         );
       }
     } else if (
@@ -522,21 +522,21 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3) {
         overall_feedback.push(
-          `Although the students' grade is good, ` + performance.linguistic
+          `Although the students grade is good, ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students' grade is good and ` + performance.linguistic
+          `The students grade is good and ` + performance.linguistic
         );
       }
     } else {
       if (performance.value < 3) {
         overall_feedback.push(
-          `Although the students' grade is very good, ` + performance.linguistic
+          `Although the students grade is very good, ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students' grade is very good and ` + performance.linguistic
+          `The students grade is very good and ` + performance.linguistic
         );
       }
     }
@@ -1391,7 +1391,7 @@ const StudentInfo = (user: any) => {
           </div>
         </div>
         {/* External Elements Section */}
-        {student.survey_result.name !== "No Data" && (
+        {student.survey_result.name !== "No Data" ? (
           <div className="min-h-fit bg-ocean-100">
             <div className="mx-12 my-10">
               <div className="pt-10">
@@ -1422,7 +1422,7 @@ const StudentInfo = (user: any) => {
                             labels: [
                               "Unwanted Noise",
                               "Limited Space",
-                              "House Chores",
+                              "House chores",
                               "Comfortability",
                               "Support",
                               "Internet",
@@ -1534,6 +1534,22 @@ const StudentInfo = (user: any) => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="min-h-fit bg-ocean-100">
+            <div className="mx-12 my-10">
+              <div className="pt-10">
+                <h2 className="text-2xl font-bold">
+                  What affected my performance? Submit your survey results
+                  <Link href="/getting-started">
+                    <a className="cursor-pointer font-bold underline decoration-2 underline-offset-2 text-ocean-400 italic">
+                      {" "}
+                      here
+                    </a>
+                  </Link>
+                </h2>
               </div>
             </div>
           </div>
