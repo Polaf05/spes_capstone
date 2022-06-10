@@ -1548,16 +1548,16 @@ const StudentInfo = (user: any) => {
                       <h4>Legend in Fuzzy Range</h4>
                       <div className="font-normal border-t border-neutral-400 mt-2 pt-2">
                         <div className="flex justify-between">
-                          <p>Unaffecting at all</p> <p>0.0</p>
+                          <p>Unaffecting at all</p> <p>0.0 - 0.24</p>
                         </div>
                         <div className="flex justify-between">
-                          <p>Quite Affecting </p> <p>0.25</p>
+                          <p>Quite Affecting </p> <p>0.25 - 0.49</p>
                         </div>
                         <div className="flex justify-between">
-                          <p>Affecting </p> <p>0.50</p>
+                          <p>Affecting </p> <p>0.50 - 0.74</p>
                         </div>
                         <div className="flex justify-between">
-                          <p>Greatly Affecting </p> <p>0.75</p>
+                          <p>Greatly Affecting </p> <p>0.75 - 1.0</p>
                         </div>
                       </div>
                     </div>

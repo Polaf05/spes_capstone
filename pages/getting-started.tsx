@@ -650,7 +650,11 @@ const gettingStarted = (user: any) => {
                     {
                       <Link
                         href={
-                          (errors[0] === 2 && errors[1] === 2) ||
+                          (errors[0] === 2 &&
+                            errors[1] === 2 &&
+                            errors[2] === 2 &&
+                            errors[3] === 2 &&
+                            errors[4] === 2) ||
                           (errors[2] === 2 && errors[3] === 2 && errors[4] == 2)
                             ? "/dashboard"
                             : "#"
