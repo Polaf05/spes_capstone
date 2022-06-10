@@ -155,7 +155,7 @@ const StudentInfo = (user: any) => {
     // if (!user.user) {
     //   router.push("/login");
     // } else {
-    if (!students || !student) router.back();
+    if (!students || !student) router.push("/classroom");
     else {
       setMyStudent(student?.quarter![quarter]!);
       let ww_available_scores: number[] = [];
@@ -484,12 +484,12 @@ const StudentInfo = (user: any) => {
     if (getRemarks(getStudentAverage(student!, myquar.length)) == "Very Poor") {
       if (performance.value < 3) {
         overall_feedback.push(
-          `The students' requires attention because ${gender.hisHer} grade is very poor and ` +
+          `The students requires attention because ${gender.hisHer} grade is very poor and ` +
             performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `Although the students' grade is very poor, ` + performance.linguistic
+          `Although the students grade is very poor, ` + performance.linguistic
         );
       }
     } else if (
@@ -497,12 +497,12 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3) {
         overall_feedback.push(
-          `The students' requires attention because ${gender.hisHer} grade is poor and ` +
+          `The students requires attention because ${gender.hisHer} grade is poor and ` +
             performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `Although the students' grade is poor, ` + performance.linguistic
+          `Although the students grade is poor, ` + performance.linguistic
         );
       }
     } else if (
@@ -510,11 +510,11 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3 && performance.value > 3) {
         overall_feedback.push(
-          `The students' grade is average but ` + performance.linguistic
+          `The students grade is average but ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students' grade is average and ` + performance.linguistic
+          `The students grade is average and ` + performance.linguistic
         );
       }
     } else if (
@@ -522,21 +522,21 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3) {
         overall_feedback.push(
-          `Although the students' grade is good, ` + performance.linguistic
+          `Although the students grade is good, ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students' grade is good and ` + performance.linguistic
+          `The students grade is good and ` + performance.linguistic
         );
       }
     } else {
       if (performance.value < 3) {
         overall_feedback.push(
-          `Although the students' grade is very good, ` + performance.linguistic
+          `Although the students grade is very good, ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students' grade is very good and ` + performance.linguistic
+          `The students grade is very good and ` + performance.linguistic
         );
       }
     }
@@ -727,6 +727,10 @@ const StudentInfo = (user: any) => {
   if (count_nd[1] === myStudent?.performance_tasks?.length!)
     no_data_found[1] = true;
   const percentage: number = 0;
+
+  const [tooltip, setTooltip] = useState<boolean>(false);
+  const [score, setScore] = useState<string>("no data");
+  const [scr_remarks, setRemarks] = useState<string>("no data");
 
   return (
     student && (
@@ -959,9 +963,13 @@ const StudentInfo = (user: any) => {
                     <h1 className="text-lg font-semibold">Quarter Grade:</h1>
                     <h3 className="text-base">
                       Suggested Grade:{" "}
-                      <span className="font-bold">
-                        {myStudent?.grade_after}
-                      </span>
+                      {myStudent?.grade_after === 0 ? (
+                        <span className="font-light">{"No data"}</span>
+                      ) : (
+                        <span className="font-bold">
+                          {myStudent?.grade_after}
+                        </span>
+                      )}
                     </h3>
                     <div className="flex gap-3">
                       <h3>
@@ -1138,31 +1146,97 @@ const StudentInfo = (user: any) => {
                       <div className="flex gap-2">
                         {wworks.map((task, idx) =>
                           task === "Perfect" ? (
-                            <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
+                            <div
+                              data-for="tip"
+                              data-tip={`Perfect! ${tdata.ww.scores[idx]} / ${tdata.ww.hp_scores[idx]}`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="rounded-full border-4 w-14 h-14 border-yellow-300"
+                            >
                               <StarIcon className="text-tallano_gold-300" />
                             </div>
                           ) : task === "??" ? (
-                            <div className="flex justify-center items-center w-14 h-14 bg-neutral-50 border-4 rounded-full">
+                            <div
+                              data-for="tip"
+                              data-tip={`No data found`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="flex justify-center items-center w-14 h-14 bg-neutral-50 border-4 rounded-full"
+                            >
                               <h1 className="text-sm font-bold text-neutral-500">
                                 No data
                               </h1>
                             </div>
                           ) : task === "Passed" ? (
-                            <div className="w-14 h-14 border-4 rounded-full border-green-300">
+                            <div
+                              data-for="tip"
+                              data-tip={`Great! ${tdata.ww.scores[idx]} / ${tdata.ww.hp_scores[idx]}`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="w-14 h-14 border-4 rounded-full border-green-300"
+                            >
                               <CheckIcon className="text-green-300" />
                             </div>
                           ) : task === "Failed" ? (
-                            <div className="w-14 h-14 border-4 border-red-300 rounded-full">
+                            <div
+                              data-for="tip"
+                              data-tip={`Failed :( ${tdata.ww.scores[idx]} / ${tdata.ww.hp_scores[idx]}`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="w-14 h-14 border-4 border-red-300 rounded-full"
+                            >
                               <XIcon className="text-red-300" />
                             </div>
                           ) : task === "Considerable" ? (
-                            <div className="flex justify-center items-center w-14 h-14 border-4 border-orange-300 rounded-full">
+                            <div
+                              data-for="tip"
+                              data-tip={`Care to consider? ${tdata.ww.scores[idx]} / ${tdata.ww.hp_scores[idx]}`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="flex justify-center items-center w-14 h-14 border-4 border-orange-300 rounded-full"
+                            >
                               <h1 className="text-3xl font-bold text-orange-300">
                                 C
                               </h1>
                             </div>
                           ) : task === "Zero" ? (
-                            <div className="flex justify-center items-center w-14 h-14 border-4 border-red-300 rounded-full">
+                            <div
+                              data-for="tip"
+                              data-tip={`Quail egg :( ${tdata.ww.scores[idx]} / ${tdata.ww.hp_scores[idx]}`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="flex justify-center items-center w-14 h-14 border-4 border-red-300 rounded-full"
+                            >
                               <h1 className="text-3xl font-bold text-red-300">
                                 0
                               </h1>
@@ -1174,6 +1248,16 @@ const StudentInfo = (user: any) => {
                               className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"
                             ></div>
                           )
+                        )}
+                        {tooltip && (
+                          <div className="font-semibold">
+                            <ReactTooltip
+                              id="tip"
+                              place="bottom"
+                              type="dark"
+                              effect="float"
+                            />
+                          </div>
                         )}
                       </div>
                     </div>
@@ -1187,40 +1271,120 @@ const StudentInfo = (user: any) => {
                         </h6>
                       </div>
                       <div className="flex gap-2">
-                        {ptasks.map((task) =>
+                        {ptasks.map((task, idx) =>
                           task === "Perfect" ? (
-                            <div className="rounded-full border-4 w-14 h-14 border-yellow-300">
+                            <div
+                              data-for="tip"
+                              data-tip={`Perfect! ${tdata.pt.scores[idx]} / ${tdata.pt.hp_scores[idx]}`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="rounded-full border-4 w-14 h-14 border-yellow-300"
+                            >
                               <StarIcon className="text-tallano_gold-300" />
                             </div>
                           ) : task === "??" ? (
-                            <div className="flex justify-center items-center w-14 h-14 bg-neutral-50 border-4 rounded-full">
+                            <div
+                              data-for="tip"
+                              data-tip={`No data found`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="flex justify-center items-center w-14 h-14 bg-neutral-50 border-4 rounded-full"
+                            >
                               <h1 className="text-sm font-bold text-neutral-500">
                                 No data
                               </h1>
                             </div>
                           ) : task === "Passed" ? (
-                            <div className="w-14 h-14 border-4 rounded-full border-green-300">
+                            <div
+                              data-for="tip"
+                              data-tip={`Great! ${tdata.pt.scores[idx]} / ${tdata.pt.hp_scores[idx]}`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="w-14 h-14 border-4 rounded-full border-green-300"
+                            >
                               <CheckIcon className="text-green-300" />
                             </div>
                           ) : task === "Failed" ? (
-                            <div className="w-14 h-14 border-4 border-red-300 rounded-full">
+                            <div
+                              data-for="tip"
+                              data-tip={`Failed :( ${tdata.pt.scores[idx]} / ${tdata.pt.hp_scores[idx]}`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="w-14 h-14 border-4 border-red-300 rounded-full"
+                            >
                               <XIcon className="text-red-300" />
                             </div>
                           ) : task === "Considerable" ? (
-                            <div className="flex justify-center items-center w-14 h-14 border-4 border-orange-300 rounded-full">
+                            <div
+                              data-for="tip"
+                              data-tip={`Care to consider? ${tdata.pt.scores[idx]} / ${tdata.pt.hp_scores[idx]}`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="flex justify-center items-center w-14 h-14 border-4 border-orange-300 rounded-full"
+                            >
                               <h1 className="text-3xl font-bold text-orange-300">
                                 C
                               </h1>
                             </div>
                           ) : task === "Zero" ? (
-                            <div className="w-14 h-14 border-4 border-neutral-200 rounded-full">
-                              <div className="w-14 h-14 border-4 border-red-300 rounded-full">
-                                <XIcon className="text-red-300" />
-                              </div>
+                            <div
+                              data-for="tip"
+                              data-tip={`Quail egg :( ${tdata.pt.scores[idx]} / ${tdata.pt.hp_scores[idx]}`}
+                              onMouseEnter={() => {
+                                setTooltip(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltip(false);
+                                setTimeout(() => setTooltip(true), 50);
+                              }}
+                              className="flex justify-center items-center w-14 h-14 border-4 border-red-300 rounded-full"
+                            >
+                              <h1 className="text-3xl font-bold text-red-300">
+                                0
+                              </h1>
                             </div>
                           ) : (
-                            <div className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"></div>
+                            <div
+                              data-tip
+                              data-for={idx.toString()}
+                              className="w-14 h-14 bg-neutral-50 border-dashed border-2 rounded-full"
+                            ></div>
                           )
+                        )}
+                        {tooltip && (
+                          <div className="font-semibold">
+                            <ReactTooltip
+                              id="tip"
+                              place="bottom"
+                              type="dark"
+                              effect="float"
+                            />
+                          </div>
                         )}
                       </div>
                     </div>
@@ -1391,7 +1555,7 @@ const StudentInfo = (user: any) => {
           </div>
         </div>
         {/* External Elements Section */}
-        {student.survey_result.name !== "No Data" && (
+        {student.survey_result.name !== "No Data" ? (
           <div className="min-h-fit bg-ocean-100">
             <div className="mx-12 my-10">
               <div className="pt-10">
@@ -1422,7 +1586,7 @@ const StudentInfo = (user: any) => {
                             labels: [
                               "Unwanted Noise",
                               "Limited Space",
-                              "House Chores",
+                              "House chores",
                               "Comfortability",
                               "Support",
                               "Internet",
@@ -1534,6 +1698,22 @@ const StudentInfo = (user: any) => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="min-h-fit bg-ocean-100">
+            <div className="mx-12 my-10">
+              <div className="pt-10">
+                <h2 className="text-2xl font-bold">
+                  What affected my performance? Submit your survey results
+                  <Link href="/getting-started">
+                    <a className="cursor-pointer font-bold underline decoration-2 underline-offset-2 text-ocean-400 italic">
+                      {" "}
+                      here
+                    </a>
+                  </Link>
+                </h2>
               </div>
             </div>
           </div>

@@ -11,13 +11,20 @@ const TaskAssessment = () => {
   const [step, setStep] = useState<number>(0);
 
   return (
-    <div>
-      <div className="flex items-center gap-4 px-2">
+    <div className="pt-2">
+      <div className="flex items-center gap-4 px-2 pb-4">
         <p className="font-normal">
           {step + 1}: {tutorial_msg[step]}
         </p>
       </div>
-      <div className="w-full h-80 border"></div>
+      <div
+        className={classNames(
+          "w-full h-80 border",
+          step === 0
+            ? "bg-[url('/select.jpg')] bg-cover"
+            : "bg-[url('/redlabel.jpg')] bg-cover"
+        )}
+      ></div>
       <div className="grid grid-cols-3 mt-2">
         <p
           onClick={() => {

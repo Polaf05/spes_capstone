@@ -428,7 +428,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Greatly Affecting",
         limited_space: "Greatly Affecting",
-        household_chorse: "Greatly Affecting",
+        household_chores: "Greatly Affecting",
         comfortability: "Affecting",
         support: "Unaffecting at all",
         internet: "Greatly Affecting",
@@ -914,7 +914,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Affecting",
-        household_chorse: "Quite Affecting",
+        household_chores: "Quite Affecting",
         comfortability: "Affecting",
         support: "Affecting",
         internet: "Quite Affecting",
@@ -1399,7 +1399,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Unaffecting at all",
         limited_space: "Quite Affecting",
-        household_chorse: "Quite Affecting",
+        household_chores: "Quite Affecting",
         comfortability: "Unaffecting at all",
         support: "Unaffecting at all",
         internet: "Quite Affecting",
@@ -1884,7 +1884,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Greatly Affecting",
-        household_chorse: "Greatly Affecting",
+        household_chores: "Greatly Affecting",
         comfortability: "Affecting",
         support: "Affecting",
         internet: "Greatly Affecting",
@@ -2370,7 +2370,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Quite Affecting",
         limited_space: "Unaffecting at all",
-        household_chorse: "Quite Affecting",
+        household_chores: "Quite Affecting",
         comfortability: "Greatly Affecting",
         support: "Quite Affecting",
         internet: "Affecting",
@@ -2856,7 +2856,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Unaffecting at all",
         limited_space: "Unaffecting at all",
-        household_chorse: "Quite Affecting",
+        household_chores: "Quite Affecting",
         comfortability: "Quite Affecting",
         support: "Unaffecting at all",
         internet: "Affecting",
@@ -3342,7 +3342,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Unaffecting at all",
-        household_chorse: "Quite Affecting",
+        household_chores: "Quite Affecting",
         comfortability: "Quite Affecting",
         support: "Quite Affecting",
         internet: "Unaffecting at all",
@@ -3828,7 +3828,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Quite Affecting",
         limited_space: "Quite Affecting",
-        household_chorse: "Greatly Affecting",
+        household_chores: "Greatly Affecting",
         comfortability: "Unaffecting at all",
         support: "Quite Affecting",
         internet: "Greatly Affecting",
@@ -4313,7 +4313,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Unaffecting at all",
         limited_space: "Quite Affecting",
-        household_chorse: "Quite Affecting",
+        household_chores: "Quite Affecting",
         comfortability: "Unaffecting at all",
         support: "Greatly Affecting",
         internet: "Unaffecting at all",
@@ -4798,7 +4798,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Quite Affecting",
-        household_chorse: "Unaffecting at all",
+        household_chores: "Unaffecting at all",
         comfortability: "Unaffecting at all",
         support: "Unaffecting at all",
         internet: "Quite Affecting",
@@ -5284,7 +5284,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Greatly Affecting",
-        household_chorse: "Affecting",
+        household_chores: "Affecting",
         comfortability: "Quite Affecting",
         support: "Greatly Affecting",
         internet: "Quite Affecting",
@@ -5770,7 +5770,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Greatly Affecting",
         limited_space: "Affecting",
-        household_chorse: "Affecting",
+        household_chores: "Affecting",
         comfortability: "Greatly Affecting",
         support: "Affecting",
         internet: "Greatly Affecting",
@@ -6256,7 +6256,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Quite Affecting",
         limited_space: "Unaffecting at all",
-        household_chorse: "Unaffecting at all",
+        household_chores: "Unaffecting at all",
         comfortability: "Quite Affecting",
         support: "Quite Affecting",
         internet: "Greatly Affecting",
@@ -6742,7 +6742,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Affecting",
-        household_chorse: "Quite Affecting",
+        household_chores: "Quite Affecting",
         comfortability: "Affecting",
         support: "Affecting",
         internet: "Greatly Affecting",
@@ -7228,7 +7228,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Affecting",
-        household_chorse: "Greatly Affecting",
+        household_chores: "Greatly Affecting",
         comfortability: "Greatly Affecting",
         support: "Greatly Affecting",
         internet: "Greatly Affecting",
@@ -7714,7 +7714,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Quite Affecting",
-        household_chorse: "Affecting",
+        household_chores: "Affecting",
         comfortability: "Quite Affecting",
         support: "Quite Affecting",
         internet: "Affecting",
@@ -8200,7 +8200,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Quite Affecting",
         limited_space: "Quite Affecting",
-        household_chorse: "Quite Affecting",
+        household_chores: "Quite Affecting",
         comfortability: "Quite Affecting",
         support: "Quite Affecting",
         internet: "Affecting",
@@ -8686,7 +8686,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Greatly Affecting",
         limited_space: "Quite Affecting",
-        household_chorse: "Affecting",
+        household_chores: "Affecting",
         comfortability: "Affecting",
         support: "Quite Affecting",
         internet: "Quite Affecting",
@@ -9172,7 +9172,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Quite Affecting",
         limited_space: "Affecting",
-        household_chorse: "Greatly Affecting",
+        household_chores: "Greatly Affecting",
         comfortability: "Affecting",
         support: "Greatly Affecting",
         internet: "Greatly Affecting",
@@ -9658,7 +9658,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Greatly Affecting",
         limited_space: "Greatly Affecting",
-        household_chorse: "Affecting",
+        household_chores: "Affecting",
         comfortability: "Greatly Affecting",
         support: "Unaffecting at all",
         internet: "Greatly Affecting",
@@ -10144,7 +10144,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Affecting",
-        household_chorse: "Quite Affecting",
+        household_chores: "Quite Affecting",
         comfortability: "Affecting",
         support: "Quite Affecting",
         internet: "Affecting",
@@ -10630,7 +10630,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Greatly Affecting",
         limited_space: "Quite Affecting",
-        household_chorse: "Quite Affecting",
+        household_chores: "Quite Affecting",
         comfortability: "Unaffecting at all",
         support: "Affecting",
         internet: "Quite Affecting",
@@ -11116,7 +11116,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Quite Affecting",
-        household_chorse: "Quite Affecting",
+        household_chores: "Quite Affecting",
         comfortability: "Quite Affecting",
         support: "Quite Affecting",
         internet: "Affecting",
@@ -11602,7 +11602,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Greatly Affecting",
         limited_space: "Greatly Affecting",
-        household_chorse: "Greatly Affecting",
+        household_chores: "Greatly Affecting",
         comfortability: "Affecting",
         support: "Affecting",
         internet: "Greatly Affecting",
@@ -12088,7 +12088,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Quite Affecting",
-        household_chorse: "Affecting",
+        household_chores: "Affecting",
         comfortability: "Quite Affecting",
         support: "Quite Affecting",
         internet: "Affecting",
@@ -12574,7 +12574,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Affecting",
         limited_space: "Quite Affecting",
-        household_chorse: "Affecting",
+        household_chores: "Affecting",
         comfortability: "Quite Affecting",
         support: "Quite Affecting",
         internet: "Unaffecting at all",
@@ -13060,7 +13060,7 @@ export const students_json = [
       environment_factors: {
         unwanted_noise: "Quite Affecting",
         limited_space: "Quite Affecting",
-        household_chorse: "Affecting",
+        household_chores: "Affecting",
         comfortability: "Greatly Affecting",
         support: "Affecting",
         internet: "Quite Affecting",
