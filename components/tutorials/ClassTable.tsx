@@ -12,8 +12,17 @@ const ClassTable = () => {
 
   return (
     <div>
-      <div>{tutorial_msg[step]}</div>
-      <div className="w-full h-80 border"></div>
+      <div>
+        {step + 1}: {tutorial_msg[step]}
+      </div>
+      <div
+        className={classNames(
+          "w-full h-96 border",
+          step === 0
+            ? "bg-[url('/selectstudent.jpg')] bg-cover"
+            : "bg-[url('/sort.jpg')] bg-cover"
+        )}
+      ></div>
       <div className="grid grid-cols-3 mt-2">
         <p
           onClick={() => {
