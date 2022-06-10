@@ -484,12 +484,12 @@ const StudentInfo = (user: any) => {
     if (getRemarks(getStudentAverage(student!, myquar.length)) == "Very Poor") {
       if (performance.value < 3) {
         overall_feedback.push(
-          `The students requires attention because ${gender.hisHer} grade is very poor and ` +
+          `The student's requires attention because ${gender.hisHer} grade is very poor and ` +
             performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `Although the students grade is very poor, ` + performance.linguistic
+          `Although the student's grade is very poor, ` + performance.linguistic
         );
       }
     } else if (
@@ -497,12 +497,12 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3) {
         overall_feedback.push(
-          `The students requires attention because ${gender.hisHer} grade is poor and ` +
+          `The student's requires attention because ${gender.hisHer} grade is poor and ` +
             performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `Although the students grade is poor, ` + performance.linguistic
+          `Although the student's grade is poor, ` + performance.linguistic
         );
       }
     } else if (
@@ -510,11 +510,11 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3 && performance.value > 3) {
         overall_feedback.push(
-          `The students grade is average but ` + performance.linguistic
+          `The student's grade is average but ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students grade is average and ` + performance.linguistic
+          `The student's grade is average and ` + performance.linguistic
         );
       }
     } else if (
@@ -522,21 +522,21 @@ const StudentInfo = (user: any) => {
     ) {
       if (performance.value < 3) {
         overall_feedback.push(
-          `Although the students grade is good, ` + performance.linguistic
+          `Although the student's grade is good, ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students grade is good and ` + performance.linguistic
+          `The student's grade is good and ` + performance.linguistic
         );
       }
     } else {
       if (performance.value < 3) {
         overall_feedback.push(
-          `Although the students grade is very good, ` + performance.linguistic
+          `Although the student's grade is very good, ` + performance.linguistic
         );
       } else {
         overall_feedback.push(
-          `The students grade is very good and ` + performance.linguistic
+          `The student's grade is very good and ` + performance.linguistic
         );
       }
     }
