@@ -3,10 +3,23 @@ import React, { useState } from "react";
 import { classNames } from "../../lib/functions/concat";
 
 const msg = [
-  "Survey Requirement",
-  "Paste Google Spreadsheet",
+  "Survey Requirement (Optional)",
+  "Paste Google Spreadsheet Link (Optional)",
   "Upload Grading Sheet File",
   "Generate Evaluation",
+];
+
+const tuts = [
+  [
+    [
+      "Data gathering is pre-conducted, if you wish to know what are the external elements that are a affecting your students' performance and let SPES use this vital information to automate a much accurate evaluation and suggest grade adjustments, please contact us here:",
+    ],
+    ["franzarvae.ignacio@tup.edu.ph"],
+    ["and we'll help you conduct data gathering."],
+  ],
+  "Paste the copied link in the Google Spreadsheet Link input box. Make sure that link is permitted by SPES.",
+  "Uploading grading sheets can be done with or without the google spreadsheets link. Just upload the grading sheet by clicking the upload file button and make sure to select a workbook file (.xlsx) that follows DepEd format. Reminder: Uploading a blank record is not permitted.",
+  "This should be what you'll see in order to proceed with the evaluation. If you encounter any error or having a hard time please click here.",
 ];
 
 const Intro = ({
@@ -47,13 +60,15 @@ const Intro = ({
                 layout="fill"
               />
             </div>
-            <p className="text-justify mt-5">
-              Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
-              adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-              laoreet dolore magna. Lorem ipsum dolor sit amet, consectetuer
-              adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
-              laoreet dolore magna.
-            </p>
+            {page === 0 ? (
+              <p className="text-justify mt-5">
+                {tuts[0][0]}{" "}
+                <span className="underline decoration-2">{tuts[0][1]}</span>{" "}
+                {tuts[0][2]}
+              </p>
+            ) : (
+              <p className="text-justify mt-5">{tuts[page]}</p>
+            )}
             <div className="grid grid-cols-3 mt-4">
               <div className="text-lg">
                 <button

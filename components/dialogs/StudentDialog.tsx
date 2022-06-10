@@ -263,7 +263,7 @@ const StudentDialog = ({
                 >
                   <Dialog.Panel className="w-fit h-fit transform overflow-hidden rounded-2xl bg-white p-10 text-left align-middle shadow-xl transition-all">
                     {dialog === "student info" ? (
-                      <div className="max-w-5xl">
+                      <div className="lg:max-w-3xl xl:max-w-5xl">
                         <div className="grid grid-cols-2">
                           <div className="col-span-1 flex gap-4">
                             <span
@@ -275,7 +275,7 @@ const StudentDialog = ({
                                   : "bg-yellow-200"
                               )}
                             >
-                              <h1 className="font-bold text-xl">
+                              <h1 className="font-bold lg:text-lg xl:text-xl">
                                 {student?.quarter![quarter].grade_before}
                               </h1>
                             </span>
@@ -302,7 +302,7 @@ const StudentDialog = ({
                             <div>
                               <Dialog.Title
                                 as="h1"
-                                className="flex justify-end text-2xl font-semibold leading-6 text-gray-900 w-full mb-2"
+                                className="flex justify-end lg:text-xl xl:text-2xl font-semibold leading-6 text-gray-900 w-full mb-2"
                               >
                                 {formatName(
                                   student ? student.name : "No Student Found"
@@ -314,7 +314,7 @@ const StudentDialog = ({
                             </div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 mt-2 h-72">
+                        <div className="grid grid-cols-2 mt-2 h-72 gap-3">
                           <div className="overflow-auto">
                             <h4 className="pl-6 font-semibold">{category}</h4>
                             <Line
@@ -345,7 +345,7 @@ const StudentDialog = ({
                             <div className="h-10 flex gap-2">
                               <span
                                 className={classNames(
-                                  "w-fit  p-2 flex justify-center items-center rounded-full font-semibold",
+                                  "w-fit p-2 flex justify-center items-center rounded-full font-semibold",
                                   getRemarks(
                                     getGrade(
                                       category === "Over All"
@@ -398,7 +398,7 @@ const StudentDialog = ({
                                 </span>
                               )}
                             </div>
-                            <p className="inline-block text-justify">
+                            <p className="inline-block text-justify lg:text-[0.8rem] xl:text-base">
                               {performanceAnalysis(
                                 student!,
                                 quarter,
