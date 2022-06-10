@@ -1622,24 +1622,24 @@ const StudentInfo = (user: any) => {
             </div>
           </div>
         ) : (
-          <div className="min-h-fit bg-ocean-100">
-            <div className="mx-12 my-10">
+          <div className="bg-ocean-100">
+            <div className="mx-12 py-10">
               <div className="pt-10">
                 <h2 className="text-2xl font-bold">
-                  What affected my performance? Submit your survey results
-                  <Link href="/getting-started">
+                  What affected my performance?
+                </h2>
+                <p className="">
+                  Let us help you conduct data gathering{" "}
+                  <Link href="/getting-started" passHref>
                     <a className="cursor-pointer font-bold underline decoration-2 underline-offset-2 text-ocean-400 italic">
-                      {" "}
                       here
                     </a>
                   </Link>
-                </h2>
+                </p>
               </div>
             </div>
           </div>
         )}
-        {/* Footer */}
-        <div className="bg-white h-[10vh]"></div>
       </>
     )
   );
