@@ -42,8 +42,6 @@ import { useRouter } from "next/router";
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
 
-let errors: number[] = [0, 0, 0, 0, 0, -1, -1, -1];
-
 const gettingStarted = (user: any) => {
   const { students, setStudents } = useClassroom();
   const { setJsonFile } = useJson();
@@ -55,7 +53,7 @@ const gettingStarted = (user: any) => {
   const [error, setError] = useState<any>(null);
   const router = useRouter();
   const [hasData, setData] = useState<boolean>(false);
-
+  const [errors] = useState<number[]>([0, 0, 0, 0, 0, -1, -1, -1]);
   // useEffect(() => {
   //   console.log(user);
   //   if (!user.user) {
@@ -483,7 +481,7 @@ const gettingStarted = (user: any) => {
     "Complete data",
   ];
 
-  const [page, setPage] = useState<number>(4);
+  const [page, setPage] = useState<number>(0);
 
   return (
     <React.Fragment>
