@@ -758,8 +758,8 @@ const StudentInfo = (user: any) => {
         </div>
         <div className="mx-12 mt-10 mb-4 grid grid-cols-3">
           <div className="col-span-2">
-            <h1 className=" text-xl">Student Evaluation</h1>
-            <h1 className="font-bold font-poppins text-4xl">
+            <h1 className="lg:text-lg xl:text-xl">Student Evaluation</h1>
+            <h1 className="font-bold font-poppins lg:text-3xl xl:text-4xl">
               {formatName(student?.name)}
             </h1>
             <h6>{student?.gender}</h6>
@@ -768,7 +768,7 @@ const StudentInfo = (user: any) => {
             <div className="flex items-center justify-end gap-4">
               <h1
                 className={classNames(
-                  "font-bold  text-4xl",
+                  "font-bold lg:text-2xl xl:text-4xl",
                   studentFailed(
                     getRemarks(getStudentAverage(student, myquar.length))
                   )
@@ -784,7 +784,7 @@ const StudentInfo = (user: any) => {
                 <ExclamationCircleIcon className="w-10 h-10 xl:w-12 xl:h-12 text-red-400" />
               )}
             </div>
-            <h2 className="flex justify-end text-[0.8rem] text-neutral-500">
+            <h2 className="flex justify-end lg:text-sm xl:text-[0.8rem] text-neutral-500">
               {getRemarksAnalysis(
                 student,
                 getRemarks(getStudentAverage(student, myquar.length))
@@ -793,10 +793,12 @@ const StudentInfo = (user: any) => {
           </div>
         </div>
         {/* General Section */}
-        <div className="bg-ocean-100 h-[110vh] flex flex-col justify-between">
+        <div className="bg-ocean-100 h-fit xl:h-[110vh] flex flex-col justify-between">
           <div className="mx-12 py-8">
-            <h3 className="text-justify mb-4">{getOverallFeedback()}</h3>
-            <h2 className="font-semibold text-xl">
+            <h3 className="text-justify lg:text-[0.8rem] xl:text-base mb-4">
+              {getOverallFeedback()}
+            </h3>
+            <h2 className="font-semibold lg:text-lg xl:text-xl">
               {myquar.length !== 4
                 ? `Initial Grade for ${myquar.length} ${quarterIsOne(
                     myquar.length
@@ -805,41 +807,23 @@ const StudentInfo = (user: any) => {
             </h2>
             {/* Bar Chart */}
             <div className="grid grid-cols-9 h-fit gap-4">
-              <div className="col-span-5 bg-neutral-50 p-4 rounded-xl">
+              <div className="lg:col-span-8 xl:col-span-5 bg-neutral-50 p-4 rounded-xl">
                 <BarChart
                   display={true}
                   indexAxis="x"
                   labels={myquar}
                   datasets={quarter_dataset}
                 />
-                <div className="border-t mt-3 text-sm text-neutral-500">
-                  <div className="flex gap-2">
-                    <p>
-                      Fluctuation:{" "}
-                      {student?.quarter_analysis.fluctuation.toFixed(1)}
-                    </p>
-                    {student?.quarter_analysis.plunge_task.length! > 0 && (
-                      <p>
-                        Plunged:{" "}
-                        {student?.quarter_analysis.plunge_task.join(", ")}
-                      </p>
-                    )}
-                    {student?.quarter_analysis.surge_task.length! > 0 && (
-                      <p>
-                        Surged:{" "}
-                        {student?.quarter_analysis.surge_task.join(", ")}
-                      </p>
-                    )}
-                  </div>
-                </div>
               </div>
               {/* Overall Performance Assessment */}
-              <div className="col-span-4 h-[65vh] overflow-x-auto px-3">
-                <h2 className="text-xl font-bold">Overall Performance:</h2>
+              <div className="col-span-6 xl:col-span-4 lg:h-[45vh] xl:h-[65vh] overflow-x-auto px-3">
+                <h2 className="text-lg xl:text-xl font-bold">
+                  Overall Performance:
+                </h2>
                 <div className="grid grid-cols-10 mb-4">
                   <CardInfo
                     className={classNames(
-                      "w-full h-fit px-4 py-2 bg-tallano_gold-100 rounded-l-xl",
+                      "w-full h-44 px-4 py-2 bg-tallano_gold-100 rounded-l-xl",
                       flag === "both"
                         ? "col-span-5"
                         : flag === "ww"
@@ -864,7 +848,7 @@ const StudentInfo = (user: any) => {
                   </CardInfo>
                   <CardInfo
                     className={classNames(
-                      "w-full h-fit px-4 py-2 bg-white rounded-r-xl",
+                      "w-full h-44 px-4 py-2 bg-white rounded-r-xl",
                       flag === "both"
                         ? "col-span-5"
                         : flag === "pt"
@@ -992,7 +976,7 @@ const StudentInfo = (user: any) => {
               </div>
               <div className="grid grid-cols-2 gap-4 mx-4 py-6 h-fit">
                 {/* Line Chart */}
-                <div>
+                <div className="lg:col-span-2 xl:col-span-1 lg:px-20">
                   <Line
                     data={{
                       labels:
@@ -1012,73 +996,9 @@ const StudentInfo = (user: any) => {
                       },
                     }}
                   />
-                  <div className="border-t mt-3 text-sm text-neutral-500">
-                    <div className="flex justify-between">
-                      <div className="flex justify-center items-center gap-2">
-                        <div className="bg-yellow-200 w-5 h-1"></div>
-
-                        <p>
-                          Fluctuation:{" "}
-                          {myStudent?.written_tasks_analysis?.fluctuation.toFixed(
-                            1
-                          )}
-                        </p>
-
-                        {myStudent?.written_tasks_analysis?.plunge_task
-                          .length! > 0 && (
-                          <p>
-                            Plunged:{" "}
-                            {myStudent?.written_tasks_analysis?.plunge_task.join(
-                              ", "
-                            )}
-                          </p>
-                        )}
-                        {myStudent?.written_tasks_analysis?.surge_task.length! >
-                          0 && (
-                          <p>
-                            Surged:{" "}
-                            {myStudent?.written_tasks_analysis?.surge_task.join(
-                              ", "
-                            )}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex justify-between">
-                      <div className="flex justify-center items-center gap-2">
-                        <div className="bg-ocean-200 w-5 h-1"></div>
-                        {myStudent?.performace_tasks_analysis?.fluctuation && (
-                          <p>
-                            Fluctuation:{" "}
-                            {myStudent?.performace_tasks_analysis?.fluctuation.toFixed(
-                              1
-                            )}
-                          </p>
-                        )}
-                        {myStudent?.performace_tasks_analysis?.plunge_task
-                          .length! > 0 && (
-                          <p>
-                            Plunged:{" "}
-                            {myStudent?.performace_tasks_analysis?.plunge_task.join(
-                              ", "
-                            )}
-                          </p>
-                        )}
-                        {myStudent?.performace_tasks_analysis?.surge_task
-                          .length! > 0 && (
-                          <p>
-                            Surged:{" "}
-                            {myStudent?.performace_tasks_analysis?.surge_task.join(
-                              ", "
-                            )}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
                 </div>
                 {/* Line Chart Assessment */}
-                <div className="h-[45vh] overflow-x-auto px-3">
+                <div className="max-h-[45vh] overflow-x-auto px-3 lg:col-span-2 lg:mb-8 lg:text-[0.8rem] xl:col-span-1 xl:text-base">
                   <h5 className="text-justify">
                     {performanceAnalysis(
                       student!,
@@ -1559,7 +1479,7 @@ const StudentInfo = (user: any) => {
           <div className="min-h-fit bg-ocean-100">
             <div className="mx-12 my-10">
               <div className="pt-10">
-                <h2 className="text-2xl font-bold">
+                <h2 className="lg:text-xl xl:text-2xl font-bold">
                   What affected my performance?
                 </h2>
                 <h3 className="italic">External Elements/Factors</h3>
