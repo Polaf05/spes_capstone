@@ -112,7 +112,7 @@ const Dashboard = () => {
     //   router.push("/login");
     // } else {
     if (!students) {
-      router.back();
+      router.push("/getting-started");
     } else {
       let qSum: any = 0;
       students[0].quarter?.map((quarter) => {
@@ -311,6 +311,7 @@ const Dashboard = () => {
               <div className="flex flex-col justify-center">
                 {" "}
                 <h2 className="text-xl xl:text-2xl font-bold">
+
                   Student Performance Evaluation System
                 </h2>
                 <Link href="/getting-started" passHref>

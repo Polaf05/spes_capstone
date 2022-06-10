@@ -79,7 +79,7 @@ export default function ClassroomInfo() {
     //   router.push("/login");
     // } else {
     if (!students) {
-      router.back();
+      router.push("/dashboard");
     } else {
       // console.log(students);
       const myStudent = students![0].quarter![quarter];

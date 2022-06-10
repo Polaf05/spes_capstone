@@ -137,7 +137,7 @@ export interface SurveyResult {
 export type EnvironmentFactors = {
   unwanted_noise: string;
   limited_space: string;
-  household_chorse: string;
+  household_chores: string;
   comfortability: string;
   support: string;
   internet: string;

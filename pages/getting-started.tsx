@@ -330,7 +330,7 @@ const gettingStarted = (user: any) => {
                 environment_factors: {
                   unwanted_noise: "No Data",
                   limited_space: "No Data",
-                  household_chorse: "No Data",
+                  household_chores: "No Data",
                   comfortability: "No Data",
                   support: "No Data",
                   internet: "No Data",

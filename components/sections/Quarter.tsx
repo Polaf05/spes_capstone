@@ -1466,7 +1466,7 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
                         labels: [
                           "Unwanted Noise",
                           "Limited Space",
-                          "House Chores",
+                          "House chores",
                           "Comfortability",
                           "Support",
                           "Internet",
