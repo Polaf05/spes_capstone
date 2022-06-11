@@ -804,7 +804,7 @@ const StudentInfo = (user: any) => {
                 ? `Initial Grade for ${myquar.length} ${quarterIsOne(
                     myquar.length
                   )}: ${getStudentAverage(student, myquar.length)}`
-                : `Final Grade: ${student?.final_grade_after}`}{" "}
+                : `Final Grade: ${student.final_grade_before}`}{" "}
             </h2>
             {myquar.length !== 4 &&
               getStudentAverage(student, myquar.length) < 75 && (
