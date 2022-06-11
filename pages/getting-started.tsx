@@ -194,11 +194,10 @@ const gettingStarted = (user: any) => {
                         };
                         highest_score = score_total;
                         if (
-                          highest_score.written_works.length > 0 ||
-                          highest_score.performance_work.length > 0
+                          highest_score.written_works.length == 0 ||
+                          highest_score.performance_work.length == 0
                         ) {
-                          console.log(errors[4]);
-                          errors[4] = 2;
+                          errors[4] = 1;
                         }
                         task_length.push(highest_score);
                       }
@@ -429,8 +428,8 @@ const gettingStarted = (user: any) => {
 
             // let download = await fetchJson(upload);
             console.log(class_list);
-            if (errors[4] === 0) {
-              errors[4] = 1;
+            if (errors[4] == 0) {
+              errors[4] = 2;
             }
             setStudents(class_list);
             setError(errors);
@@ -475,7 +474,7 @@ const gettingStarted = (user: any) => {
     "Sheet template format is correct",
     "Uploaded file format is correct (.xlsx)",
     "DepEd Grading Sheet Template is met",
-    "There is no data inside the grading sheet",
+    "The data is incomplete inside the grading sheet",
     "Names of the students are correct",
     "Grading Sheet is in Alphabetical Order",
     "Complete data",
