@@ -121,7 +121,7 @@ export function quarterAnalysis(quarter: Quarter[]) {
 
   for (let i = 0; i <= len; i++) {
     x.push(i);
-    percent.push(quarter[i].grade_before);
+    percent.push((quarter[i].grade_before / 100) * 10);
     //Getting the trend
     if (i < len) {
       let sum = quarter[i + 1].grade_before - quarter[i].grade_before;
@@ -162,7 +162,6 @@ export function quarterAnalysis(quarter: Quarter[]) {
 
   let lines: any;
 
-
   if (x.length > 1) {
     lines = findLineByLeastSquares(x, percent);
 
@@ -172,7 +171,6 @@ export function quarterAnalysis(quarter: Quarter[]) {
   } else {
     trends = getRemarks(x[x.length - 1]);
   }
-
   const quarterData: TaskAnalysis = {
     fluctuation: fluctuate,
     trend: trend,
@@ -407,14 +405,13 @@ function findLineByLeastSquares(values_x: number[], values_y: number[]) {
   let trend = parseFloat(
     (result_values_y[values_length - 1] - result_values_y[0]).toFixed(1)
   );
-
   if (trend == 0) {
     return { trend: trend, linguistic: "consistent linear" };
-  } else if (trend > 0 && trend <= 1) {
+  } else if (trend > 0 && trend <= 2) {
     return { trend: trend, linguistic: "slightly upward" };
-  } else if (trend < 0 && trend >= -1) {
+  } else if (trend < 0 && trend >= -2) {
     return { trend: trend, linguistic: "slightly downward" };
-  } else if (trend > 1) {
+  } else if (trend > 2) {
     return { trend: trend, linguistic: "upward" };
   } else {
     return { trend: trend, linguistic: "downward" };
