@@ -986,7 +986,7 @@ const StudentInfo = (user: any) => {
               </div>
               <div className="grid grid-cols-2 gap-4 mx-4 py-6 h-fit">
                 {/* Line Chart */}
-                <div className="lg:col-span-2 xl:col-span-1 lg:px-20">
+                <div className="lg:col-span-2 xl:col-span-1 lg:px-20 xl:px-0">
                   <Line
                     data={{
                       labels:
@@ -1496,8 +1496,10 @@ const StudentInfo = (user: any) => {
               </div>
               <div className="pb-10">
                 <div className="flex gap-3 mt-6">
-                  <h2 className="font-bold text-lg">Environmental Factors: </h2>
-                  <h2 className="font-bold text-lg">
+                  <h2 className="font-bold text-lg xl:text-xl">
+                    Environmental Factors:{" "}
+                  </h2>
+                  <h2 className="font-bold underline text-lg xl:text-xl">
                     {capitalize(
                       student?.inference_result?.environment.linguistic!
                     )}
@@ -1540,6 +1542,7 @@ const StudentInfo = (user: any) => {
                               },
                             },
                             plugins: {
+                              tooltip: { enabled: false },
                               legend: {
                                 display: false,
                               },
@@ -1583,8 +1586,10 @@ const StudentInfo = (user: any) => {
                 </div>
 
                 <div className="flex gap-3 py-6">
-                  <h2 className="font-bold text-lg">Technological Factors: </h2>
-                  <h2 className="font-bold text-lg">
+                  <h2 className="font-bold text-lg xl:text-xl">
+                    Technological Factors:{" "}
+                  </h2>
+                  <h2 className="font-bold underline text-lg xl:text-xl">
                     {capitalize(
                       student?.inference_result?.technological.linguistic!
                     )}
