@@ -60,6 +60,7 @@ import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { TaskDataScores } from "../types/Task";
 import Link from "next/link";
 import {
+  getGradeNeeded,
   getStudentAverage,
   studentFailed,
   transmuteGrade,
@@ -805,6 +806,15 @@ const StudentInfo = (user: any) => {
                   )}: ${getStudentAverage(student, myquar.length)}`
                 : `Final Grade: ${student?.final_grade_after}`}{" "}
             </h2>
+            {myquar.length !== 4 &&
+              getStudentAverage(student, myquar.length) < 75 && (
+                <p>{`Student needs to average at least ${getGradeNeeded(
+                  myquar.length,
+                  student
+                )}% for the remaining ${myquar.length} ${quarterIsOne(
+                  myquar.length
+                )} to pass the school year.`}</p>
+              )}
             {/* Bar Chart */}
             <div className="grid grid-cols-9 h-fit gap-4">
               <div className="lg:col-span-8 xl:col-span-5 bg-neutral-50 p-4 rounded-xl">
