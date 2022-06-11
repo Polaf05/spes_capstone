@@ -258,7 +258,7 @@ export default function ClassroomInfo() {
       : 0);
   const [categories] = useState([
     {
-      title: "Overall",
+      title: "Over All",
       value: getRemarks((ww_cat_ave + pt_cat_ave) / 2),
     },
     {

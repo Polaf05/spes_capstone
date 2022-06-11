@@ -589,20 +589,22 @@ const StudentInfo = (user: any) => {
       );
     }
 
-    let overall_highest = student?.quarter.reduce(function (prev, current) {
-      return prev.grade_before > current.grade_before ? prev : current;
-    });
-
     let tmp: number[] = [];
 
+    let available_quarters: Quarter[] = [];
     for (let i = 0; i < myquar.length; i++) {
       tmp.push(student?.quarter[i].grade_before!);
+      available_quarters.push(student?.quarter[i]!);
     }
     const max = Math.max(...tmp);
     const min = Math.min(...tmp);
+
+    let overall_highest = available_quarters.reduce(function (prev, current) {
+      return prev.grade_before > current.grade_before ? prev : current;
+    });
     let overall_index = tmp.indexOf(max) + 1;
 
-    let overall_lowest = student?.quarter.reduce(function (prev, current) {
+    let overall_lowest = available_quarters.reduce(function (prev, current) {
       return prev.grade_before < current.grade_before ? prev : current;
     });
 
