@@ -60,6 +60,7 @@ import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
 import { TaskDataScores } from "../types/Task";
 import Link from "next/link";
 import {
+  getGradeNeeded,
   getStudentAverage,
   studentFailed,
   transmuteGrade,
@@ -595,18 +596,31 @@ const StudentInfo = (user: any) => {
 
     let tmp: number[] = [];
 
+    let avail: any = [];
+
     for (let i = 0; i < myquar.length; i++) {
       tmp.push(student?.quarter[i].grade_before!);
+      avail.push(student?.quarter[i]);
     }
     const max = Math.max(...tmp);
     const min = Math.min(...tmp);
     let overall_index = tmp.indexOf(max) + 1;
 
-    let overall_lowest = student?.quarter.reduce(function (prev, current) {
+    let overall_lowest = student?.quarter.reduce(function (
+      prev: any,
+      current: any
+    ) {
       return prev.grade_before < current.grade_before ? prev : current;
     });
 
     let overall_index_lowest = tmp.indexOf(min) + 1;
+    if (avail.length > 0) {
+      overall_lowest = avail.reduce(function (prev: any, current: any) {
+        return prev.grade_before < current.grade_before ? prev : current;
+      });
+    }
+
+    console.log(student?.quarter, "TMP " + tmp, "MAX " + max);
 
     overall_feedback.push(
       `${
@@ -803,8 +817,17 @@ const StudentInfo = (user: any) => {
                 ? `Initial Grade for ${myquar.length} ${quarterIsOne(
                     myquar.length
                   )}: ${getStudentAverage(student, myquar.length)}`
-                : `Final Grade: ${student?.final_grade_after}`}{" "}
+                : `Final Grade: ${student.final_grade_before}`}{" "}
             </h2>
+            {myquar.length !== 4 &&
+              getStudentAverage(student, myquar.length) < 75 && (
+                <p>{`Student needs to average at least ${getGradeNeeded(
+                  myquar.length,
+                  student
+                )}% for the remaining ${myquar.length} ${quarterIsOne(
+                  myquar.length
+                )} to pass the school year.`}</p>
+              )}
             {/* Bar Chart */}
             <div className="grid grid-cols-9 h-fit gap-4">
               <div className="lg:col-span-8 xl:col-span-5 bg-neutral-50 p-4 rounded-xl">

@@ -78,7 +78,7 @@ export const performanceAnalysis = (
         taskString.push(`${gender.heShe} was present in all the task and`);
       }
 
-      taskString.push(`${taskSummary.fails} of it passed`);
+      taskString.push(`${taskSummary.pass} of it passed`);
       if (taskSummary.perfect > 0) {
         taskString.push(` where ${taskSummary.perfect} of it is perfect.`);
       } else {
@@ -174,13 +174,13 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in written works suddenly plunged in ${
+      } score in written works suddenly plummet in ${
         student?.quarter[i].written_tasks_analysis.plunge_task.length > 0
           ? "tasks"
           : "task"
       } ${formatArray(
         student?.quarter[i].written_tasks_analysis.plunge_task
-      )} while it surged  in ${
+      )} while it soared  in ${
         student?.quarter[i].written_tasks_analysis.surge_task.length > 0
           ? "tasks"
           : "task"
@@ -193,7 +193,7 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in written works suddenly plunged in ${
+      } score in written works suddenly plummet in ${
         student?.quarter[i].written_tasks_analysis.plunge_task.length > 1
           ? "tasks"
           : "task"
@@ -207,7 +207,7 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in written works suddenly surged  in ${
+      } score in written works suddenly soared  in ${
         student?.quarter[i].written_tasks_analysis.surge_task.length > 1
           ? "tasks"
           : "task"
@@ -222,13 +222,13 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in performance task suddenly plunged in ${
+      } score in performance task suddenly plummet in ${
         student?.quarter[i].performace_tasks_analysis.plunge_task.length > 0
           ? "tasks"
           : "task"
       } ${formatArray(
         student?.quarter[i].performace_tasks_analysis.plunge_task
-      )} while it surged  in ${
+      )} while it soared  in ${
         student?.quarter[i].performace_tasks_analysis.surge_task.length > 0
           ? "tasks"
           : "task"
@@ -243,7 +243,7 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in performance task suddenly plunged in ${
+      } score in performance task suddenly plummet in ${
         student?.quarter[i].performace_tasks_analysis.plunge_task.length > 1
           ? "tasks"
           : "task"
@@ -259,7 +259,7 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in performance task suddenly surged  in ${
+      } score in performance task suddenly soared  in ${
         student?.quarter[i].performace_tasks_analysis.surge_task.length > 1
           ? "tasks"
           : "task"
@@ -626,7 +626,7 @@ export const barGraphhAssessment = (student: Student, len: number) => {
       return {
         value: 1,
         linguistic:
-          "the student's performance is very poor and requires direct attention for the next incoming quarter.",
+          "the student's performance is very poor and requires direct attention for the incoming quarter.",
       };
     }
   } else {
@@ -640,7 +640,7 @@ export const barGraphhAssessment = (student: Student, len: number) => {
       return {
         value: 2,
         linguistic:
-          "the student's performance is poor and might need some attention for the next incoming quarter.",
+          "the student's performance is poor and might need some attention for the incoming quarter.",
       };
     } else if (student.quarter_analysis.trends === "Average") {
       return {
@@ -709,7 +709,7 @@ export const getEnvironmenetalAssessment = (
       assessment.push(
         `Factors like ${formatArray(
           group_values["Greatly Affecting"]
-        )} is severly affecting ${
+        )} is severely affecting ${
           gender.hisHer
         } performance that may be the reason why ${
           gender.hisHer
@@ -719,7 +719,7 @@ export const getEnvironmenetalAssessment = (
       assessment.push(
         `Although factors like ${formatArray(
           group_values["Greatly Affecting"]
-        )} severly affects ${
+        )} severely affects ${
           gender.hisHer
         } performance, he can still keep up in ${gender.hisHer} studies.`
       );
@@ -727,7 +727,7 @@ export const getEnvironmenetalAssessment = (
       assessment.push(
         `Although factors like ${formatArray(
           group_values["Greatly Affecting"]
-        )} severly affects ${
+        )} severely affects ${
           gender.hisHer
         } performance, he still performs very well in ${gender.hisHer} class.`
       );
@@ -780,7 +780,7 @@ export const getEnvironmenetalAssessment = (
       group_values["Affecting"].length > 0
     ) {
       assessment.push(
-        `Also factors like ${formatArray(
+        `Some factors like ${formatArray(
           group_values["Quite Affecting"]
         )} quitely affects ${
           gender.hisHer
@@ -788,7 +788,7 @@ export const getEnvironmenetalAssessment = (
       );
     } else {
       assessment.push(
-        `Factors like ${formatArray(
+        `Some factors like ${formatArray(
           group_values["Quite Affecting"]
         )} quitely affects ${
           gender.hisHer
