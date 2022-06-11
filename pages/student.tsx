@@ -825,7 +825,7 @@ const StudentInfo = (user: any) => {
                   myquar.length,
                   student
                 )}% for the remaining ${4 - myquar.length} ${quarterIsOne(
-                  myquar.length
+                  4 - myquar.length
                 )} to pass the school year.`}</p>
               )}
             {/* Bar Chart */}
