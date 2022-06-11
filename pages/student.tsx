@@ -595,18 +595,31 @@ const StudentInfo = (user: any) => {
 
     let tmp: number[] = [];
 
+    let avail: any = [];
+
     for (let i = 0; i < myquar.length; i++) {
       tmp.push(student?.quarter[i].grade_before!);
+      avail.push(student?.quarter[i]);
     }
     const max = Math.max(...tmp);
     const min = Math.min(...tmp);
     let overall_index = tmp.indexOf(max) + 1;
 
-    let overall_lowest = student?.quarter.reduce(function (prev, current) {
+    let overall_lowest = student?.quarter.reduce(function (
+      prev: any,
+      current: any
+    ) {
       return prev.grade_before < current.grade_before ? prev : current;
     });
 
     let overall_index_lowest = tmp.indexOf(min) + 1;
+    if (avail.length > 0) {
+      overall_lowest = avail.reduce(function (prev: any, current: any) {
+        return prev.grade_before < current.grade_before ? prev : current;
+      });
+    }
+
+    console.log(student?.quarter, "TMP " + tmp, "MAX " + max);
 
     overall_feedback.push(
       `${
