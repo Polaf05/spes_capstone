@@ -16,6 +16,15 @@ export const getRemarks = (grade: number) => {
 export const getGrade = (grade: any) =>
   typeof grade === "string" ? -1 : grade;
 
+export const getStudentGrades = (student: Student, quarters: number) => {
+  const grade_array: number[] = [];
+  //console.log(quarters);
+  for (let i = 0; i < quarters; i++) {
+    grade_array.push(student.quarter[i].grade_before);
+  }
+  return grade_array;
+};
+
 export const getStudentAverage = (student: Student, quarters: number) => {
   const grade_array: number[] = [];
   //console.log(quarters);
@@ -157,4 +166,14 @@ export const transmuteGrade = (grade: number) => {
 export const studentFailed = (remarks: string) => {
   if (remarks.match(/Poor/g)) return true;
   return false;
+};
+
+export const getGradeNeeded = (quarters: number, student: Student) => {
+  const sum = 0;
+  const grades: number[] = getStudentGrades(student, quarters);
+  const grade_sum: number = getSum(grades);
+  console.log(grade_sum, grades, quarters);
+  const ave_grade = (300 - grade_sum) / (4 - quarters);
+
+  return ave_grade;
 };
