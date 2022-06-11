@@ -811,7 +811,7 @@ const StudentInfo = (user: any) => {
                 <p>{`Student needs to average at least ${getGradeNeeded(
                   myquar.length,
                   student
-                )}% for the remaining ${myquar.length} ${quarterIsOne(
+                )}% for the remaining ${4 - myquar.length} ${quarterIsOne(
                   myquar.length
                 )} to pass the school year.`}</p>
               )}
