@@ -353,7 +353,7 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-16 mx-12 lg:mx-20 xl:mx-24 h-[80vh]">
+            <div className="mt-16 mx-12 lg:mx-20 xl:mx-24 h-[100vh]">
               <div className="flex justify-between">
                 <h2 className="text-lg xl:text-2xl font-semibold">
                   Quarter Summary
@@ -380,7 +380,7 @@ const Dashboard = () => {
                   </>
                 )}
               </div>
-              <div className="grid grid-flow-row grid-cols-9 h-fit gap-8 mt-4">
+              <div className="grid grid-flow-row grid-cols-9 h-fit gap-8 mt-4 mb-20">
                 <div className="col-span-9 xl:col-span-5">
                   <div className="px-16 xl:p-4">
                     <BarChart
@@ -528,9 +528,9 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <Footer />
         </>
       )}
+      <Footer />
     </>
   );
 };

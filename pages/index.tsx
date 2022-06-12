@@ -23,13 +23,15 @@ const Home: NextPage = () => {
             </button>
           </Link>
         </div>
-        <div className="w-44 h-44 relative xl:w-64 xl:h-64">
-          <Image
-            src="/logo.png"
-            alt="logo picture"
-            layout="fill"
-            objectFit="contain"
-          />
+        <div className="w-44 h-44 relative xl:w-64 xl:h-64 hover:cursor-pointer">
+          <Link href={"/about"} passHref>
+            <Image
+              src="/logo.png"
+              alt="logo picture"
+              layout="fill"
+              objectFit="contain"
+            />
+          </Link>
         </div>
       </div>
       <div className="float-right pr-4">
