@@ -311,14 +311,8 @@ const Dashboard = () => {
               <div className="flex flex-col justify-center">
                 {" "}
                 <h2 className="text-xl xl:text-2xl font-bold">
-
                   Student Performance Evaluation System
                 </h2>
-                <Link href="/getting-started" passHref>
-                  <button className="border-2 border-neutral-400 w-60 py-3 px-2 text-semibold bg-white hover:bg-ocean-100 hover:border-ocean-100 ">
-                    Generate new evaluation
-                  </button>
-                </Link>
               </div>
               <div className="w-20 h-20 xl:w-40 xl:h-40 p-2">
                 <Link href={`/`} passHref>
@@ -347,7 +341,7 @@ const Dashboard = () => {
                           onClick={() => {
                             setQuarter(idx);
                           }}
-                          className="rounded-3xl w-36 h-24 lg:w-36 lg:h-24 xl:w-48 xl:h-36 bg-ocean-100 grid place-items-center"
+                          className="rounded-3xl w-36 h-24 lg:w-36 lg:h-24 xl:w-48 xl:h-36 bg-ocean-100 hover:bg-ocean-400 hover:text-white grid place-items-center"
                         >
                           <h3 className="font-semibold text-lg">
                             Quarter {button}
@@ -360,9 +354,16 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="mt-16 mx-12 lg:mx-20 xl:mx-24 h-[80vh]">
-              <h2 className="text-lg xl:text-2xl font-semibold">
-                Quarter Summary
-              </h2>
+              <div className="flex justify-between">
+                <h2 className="text-lg xl:text-2xl font-semibold">
+                  Quarter Summary
+                </h2>
+                <Link href="/getting-started" passHref>
+                  <button className="border-2 border-ocean-400 w-60 py-3 px-2 text-semibold bg-white hover:bg-ocean-100 hover:border-ocean-100 ">
+                    Generate new evaluation
+                  </button>
+                </Link>
+              </div>
               <div className="flex gap-1 text-sm xl:text-lg items-center">
                 {quarters.length === 4 ? (
                   <>
