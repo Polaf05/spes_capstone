@@ -29,16 +29,26 @@ const About = () => {
             </Link>
           </div>
         </div>
-        <div className="">
-          <p className="w-1/2 text-justify text-[0.8rem]">
-            Paragraph (Large) Lorem ipsum dolor sit amet, consectetuer
-            adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet
-            dolore magna. Lorem ipsum dolor sit amet, consectetuer adipiscing
-            elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore
-            magna. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
-            diam nonummy nibh euismod tincidunt ut laoreet dolore magna. Lorem
-            ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
-            nibh euismod tincidunt ut laoreet dolore magna.
+        <div className="w-3/5 space-y-5">
+          <p className="text-justify text-[0.8rem]">
+            <span className="font-semibold italic">
+              "The jouney of a thousand miles begins with one step."
+            </span>
+            - Lao Tzu
+          </p>
+          <p className="text-justify text-[0.8rem]">
+            SPES development journey was never easy. There were times that the
+            task to complete the system seems to be unachievable. But here we
+            are, one step closer to our dream, to fully implement the potential
+            of SPES and gradute from college. Helping other people using
+            emerging technologies served as our inspiration on creating SPES.
+            Especially SPES is intended to help our modern-day heroes, our
+            teachers. Before we graduate from school, we would love to give back
+            something to them, a gift where there could be a platform dedicated
+            to help them ease the tons of work they do. To the teachers that
+            made us who we are today, this is dedicated to all of you. May you
+            find this tool helpful and see the potential of SPES be fully
+            utilized and adapted by future generations.
           </p>
         </div>
         <div className="grid grid-cols-2">
@@ -47,7 +57,7 @@ const About = () => {
               <div className="w-24 h-24 border border-black bg-[url('/nikol.jpg')] bg-cover"></div>
               <div>
                 <h4 className="text-lg font-bold">Ma. Louise Nicole Sacopon</h4>
-                <p className="">SPES Lead Manager</p>
+                <p className="">SPES Project Lead Manager</p>
                 <p className="text-sm text-neutral-600 italic">
                   malouisenicole.sacopon@tup.edu.ph
                 </p>
@@ -99,7 +109,7 @@ const About = () => {
                 <div>
                   <h4 className="font-semibold ">Mr. Nikki R. Calixto</h4>
                   <p className="text-[0.8rem] font-light">
-                    Master Teacher, Acacia NHS
+                    Teacher III, Acacia NHS
                   </p>
                 </div>
                 <div>
