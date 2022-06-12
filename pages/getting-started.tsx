@@ -492,7 +492,7 @@ const gettingStarted = (user: any) => {
     "Uploaded file format is correct (.xlsx)",
     "DepEd Grading Sheet Template is met",
     "Has data inside the grading sheet",
-    "No learning component is missing",
+    "Learning component is complete",
     "Names of the students are correct",
     "Grading Sheet is in Alphabetical Order",
     "Complete data",
