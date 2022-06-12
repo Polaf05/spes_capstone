@@ -29,6 +29,7 @@ import {
   getClassPerformanceAssessment,
   getTaskAnalysis,
 } from "../lib/functions/feedback";
+import Footer from "../components/sections/Footer";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -936,6 +937,7 @@ export default function ClassroomInfo() {
           </div>
         </div>
       )}
+      <Footer />
     </>
   );
 }

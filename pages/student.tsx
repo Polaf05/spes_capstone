@@ -72,6 +72,7 @@ import {
   quarterIsOne,
 } from "../lib/functions/concat";
 import { getPronoun, getRemarksAnalysis } from "../lib/functions/feedback";
+import Footer from "../components/sections/Footer";
 
 Chart.register(
   ArcElement,
@@ -1655,6 +1656,7 @@ const StudentInfo = (user: any) => {
             </div>
           </div>
         )}
+        <Footer />
       </>
     )
   );
