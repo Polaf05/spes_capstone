@@ -53,7 +53,7 @@ const gettingStarted = (user: any) => {
   const [error, setError] = useState<any>(null);
   const router = useRouter();
   const [hasData, setData] = useState<boolean>(false);
-  const [errors] = useState<number[]>([0, 0, 0, 0, 0, -1, -1, -1]);
+  const [errors] = useState<number[]>([0, 0, 0, 0, 0, 0, -1, -1, -1]);
   // useEffect(() => {
   //   console.log(user);
   //   if (!user.user) {
@@ -194,10 +194,22 @@ const gettingStarted = (user: any) => {
                         };
                         highest_score = score_total;
                         if (
+                          highest_score.written_works.length > 0 &&
+                          highest_score.performance_work.length > 0
+                        ) {
+                          errors[4] = 2;
+                        }
+
+                        if (
+                          highest_score.written_works.length == 0 &&
+                          highest_score.performance_work.length == 0
+                        ) {
+                          errors[5] = 0;
+                        } else if (
                           highest_score.written_works.length == 0 ||
                           highest_score.performance_work.length == 0
                         ) {
-                          errors[4] = 1;
+                          errors[5] = 1;
                         }
                         task_length.push(highest_score);
                       }
@@ -427,10 +439,15 @@ const gettingStarted = (user: any) => {
             // setJsonFile(upload);
 
             // let download = await fetchJson(upload);
-            console.log(class_list);
             if (errors[4] == 0) {
-              errors[4] = 2;
+              errors[4] = 1;
+              errors[5] = 1;
             }
+            console.log(class_list);
+            if (errors[5] == 0) {
+              errors[5] = 2;
+            }
+
             setStudents(class_list);
             setError(errors);
             // console.log("Error:", error);
@@ -474,7 +491,8 @@ const gettingStarted = (user: any) => {
     "Sheet template format is correct",
     "Uploaded file format is correct (.xlsx)",
     "DepEd Grading Sheet Template is met",
-    "The data is incomplete inside the grading sheet",
+    "Has data inside the grading sheet",
+    "No learning component is missing",
     "Names of the students are correct",
     "Grading Sheet is in Alphabetical Order",
     "Complete data",
@@ -637,7 +655,7 @@ const gettingStarted = (user: any) => {
                         )}
                         <h5
                           className={classNames(
-                            idx > 4 ? "text-neutral-400" : ""
+                            idx > 5 ? "text-neutral-400" : ""
                           )}
                         >
                           {msg}
@@ -653,8 +671,12 @@ const gettingStarted = (user: any) => {
                             errors[1] === 2 &&
                             errors[2] === 2 &&
                             errors[3] === 2 &&
-                            errors[4] === 2) ||
-                          (errors[2] === 2 && errors[3] === 2 && errors[4] == 2)
+                            errors[4] === 2 &&
+                            errors[5] === 2) ||
+                          (errors[2] === 2 &&
+                            errors[3] === 2 &&
+                            errors[4] == 2 &&
+                            errors[5] == 2)
                             ? "/dashboard"
                             : "#"
                         }
