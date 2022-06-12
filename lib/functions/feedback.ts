@@ -470,7 +470,7 @@ export const getClassPerformanceAssessment = (
 
       if (quarters >= 4) {
         // second sem has ended
-        message = `Not bad, class performed quite good for the school year, please check on your students especially those struggle on performance tasks as they might have failed the school year.`;
+        message = `Not bad, class performed quite good for the school year, please check on your students especially those struggling on performance tasks as they might have failed the school year.`;
       } else {
         // has remaining quarters
         message = `Class performed slightly better at written works, however, they need to focus on performance tasks for the remaining ${
@@ -482,7 +482,7 @@ export const getClassPerformanceAssessment = (
 
       if (quarters >= 4) {
         // second sem has ended
-        message = `Wow!, class is good at written works for the school year. However, please check on your students especially those struggle on performance tasks as they might have failed the school year`;
+        message = `Wow!, class is good at written works for the school year. However, please check on your students especially those struggling on performance tasks as they might have failed the school year`;
       } else {
         // has remaining quarters
         message = `Wow! class is good at written works. However, performance tasks still has a lot of room to improve for the remaining ${
@@ -494,7 +494,7 @@ export const getClassPerformanceAssessment = (
 
       if (quarters >= 4) {
         // second sem has ended
-        message = `Hooray! class performed outstandingly at written works for the school year. However, please check on your students especially those struggle on performance tasks as they might have failed the school year.`;
+        message = `Hooray! class performed outstandingly at written works for the school year. However, please check on your students especially those struggling on performance tasks as they might have failed the school year.`;
       } else {
         // has remaining quarters
         message = `Hooray! class performed outstandingly at written works. on the other hand, performance tasks still has a lot of room to improve for the remaining ${
@@ -602,7 +602,7 @@ export const getClassPerformanceAssessment = (
       // class is slightly better at performance tasks. However, focusing on written works is also needed.
       if (quarters >= 4) {
         // second sem has ended
-        message = `Not bad, class performed quite good for the school year, please check on your students especially those struggle on written works.`;
+        message = `Not bad, class performed quite good for the school year, please check on your students especially those struggling on written works.`;
       } else {
         // has remaining quarters
         message = `Class performed slightly better at performance tasks, however, they need to focus on written works for the remaining ${
@@ -613,7 +613,7 @@ export const getClassPerformanceAssessment = (
       // class is good at performance tasks. on the other hand, written works still has a lot of room to improve.
       if (quarters >= 4) {
         // second sem has ended
-        message = `Wow!, class is good at performance tasks for the school year. However, please check on your students especially those struggle on written works.`;
+        message = `Wow!, class is good at performance tasks for the school year. However, please check on your students especially those struggling on written works.`;
       } else {
         // has remaining quarters
         message = `Wow! class is good at performance tasks. However, written works still has a lot of room to improve for the remaining ${
@@ -624,7 +624,7 @@ export const getClassPerformanceAssessment = (
       // class is outstanding on performance tasks. on the other hand, written works still has a lot of room to improve.
       if (quarters >= 4) {
         // second sem has ended
-        message = `Hooray! class performed outstandingly at performance tasks for the school year. However, please check on your students especially those struggle on performance tasks as they might have failed the school year.`;
+        message = `Hooray! class performed outstandingly at performance tasks for the school year. However, please check on your students especially those struggling on performance tasks as they might have failed the school year.`;
       } else {
         // has remaining quarters
         message = `Hooray! class performed outstandingly at performance tasks. on the other hand, written works still has a lot of room to improve for the remaining ${
