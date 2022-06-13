@@ -301,6 +301,26 @@ export const Task = ({
                 </tbody>
               </table>
             </div>
+            <div
+              data-for="question"
+              data-tip="Click for a quick tutorial"
+              onMouseEnter={() => showTooltip(true)}
+              onMouseLeave={() => {
+                showTooltip(false);
+                setTimeout(() => showTooltip(true), 50);
+              }}
+              onClick={() => {
+                setClassDialogOpen(true);
+                setTutorial("classTable");
+              }}
+              className="flex items-center mt-1 gap-1 hover:cursor-pointer"
+            >
+              <QuestionMarkCircleIcon className="w-3 h-3 text-neutral-500 hover:cursor-pointer" />
+              <p className="text-neutral-500 text-sm">
+                Suggested Grade will only show on Overall tab, if google
+                spreadsheet data (external elements included) is available
+              </p>
+            </div>
           </div>
           <div className="col-span-5 h-fit">
             <h3 className="pt-10 pb-2 font-semibold text-lg">
