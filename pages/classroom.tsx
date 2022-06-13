@@ -24,12 +24,12 @@ import { classNames } from "../lib/functions/concat";
 import { TaskInfo } from "../types/Task";
 
 import Link from "next/link";
-import StudentDialog from "../components/dialogs/StudentDialog";
 import ReactTooltip from "react-tooltip";
 import {
   getClassPerformanceAssessment,
   getTaskAnalysis,
 } from "../lib/functions/feedback";
+import Footer from "../components/sections/Footer";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -403,7 +403,7 @@ export default function ClassroomInfo() {
                 <div className="col-span-1 flex items-center gap-4">
                   <div className="font-bold">
                     <Link href="/dashboard" passHref>
-                      <ArrowLeftIcon className="w-10 h-10 cursor-pointer"></ArrowLeftIcon>
+                      <ArrowLeftIcon className="w-10 h-10 cursor-pointer" />
                     </Link>
                   </div>
                   <div className="w-20 h-20 p-1">
@@ -937,6 +937,7 @@ export default function ClassroomInfo() {
           </div>
         </div>
       )}
+      <Footer />
     </>
   );
 }

@@ -1,8 +1,11 @@
 import { XIcon } from "@heroicons/react/outline";
+import Link from "next/link";
 import React, { useState } from "react";
 import { classNames } from "../../lib/functions/concat";
+import Msg from "./messages/Msg";
 
 const tutorial_msg = [
+  "",
   "Click on a student on the table to view student's information",
   "Click on the button to sort accordingly",
 ];
@@ -12,15 +15,19 @@ const ClassTable = () => {
 
   return (
     <div>
-      <div>
-        {step + 1}: {tutorial_msg[step]}
+      <div className="mb-4">
+        <p>{step === 0 ? <Msg></Msg> : `${step + 1}: ${tutorial_msg[step]}`}</p>
       </div>
       <div
         className={classNames(
           "w-full h-96 border",
           step === 0
+            ? "bg-[url('/suggestedGrade.jpg')] bg-cover"
+            : step === 1
             ? "bg-[url('/selectstudent.jpg')] bg-cover"
-            : "bg-[url('/sort.jpg')] bg-cover"
+            : step === 2
+            ? "bg-[url('/sort.jpg')] bg-cover"
+            : ""
         )}
       ></div>
       <div className="grid grid-cols-3 mt-2">
