@@ -94,7 +94,7 @@ const About = () => {
             <div className="mt-5 space-y-3">
               <div>
                 <h4 className="text-lg font-semibold ">
-                  Prof. Ellanie Vizconde
+                  Prof. Elanie Vizconde
                 </h4>
                 <p className="">SPES Capstone Adviser</p>
               </div>
