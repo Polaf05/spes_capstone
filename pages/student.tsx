@@ -621,7 +621,7 @@ const StudentInfo = (user: any) => {
       });
     }
 
-    console.log(student?.quarter, "TMP " + tmp, "MAX " + max);
+    //console.log(student?.quarter, "TMP " + tmp, "MAX " + max);
 
     overall_feedback.push(
       `${

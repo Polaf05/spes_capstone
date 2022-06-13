@@ -607,12 +607,12 @@ export const barGraphhAssessment = (student: Student, len: number) => {
     if (len >= 4) {
       return {
         value: 2,
-        linguistic: "the student's performance is slightly going downward",
+        linguistic: "the student's performance is slightly going downward.",
       };
     } else {
       return {
         value: 2,
-        linguistic: "the student's performance is slightly goind downward",
+        linguistic: "the student's performance is slightly going downward.",
       };
     }
   } else if (student.quarter_analysis.trends === "downward") {

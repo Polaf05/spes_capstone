@@ -443,7 +443,7 @@ const gettingStarted = (user: any) => {
               errors[4] = 1;
               errors[5] = 1;
             }
-            console.log(class_list);
+            //console.log(class_list);
             if (errors[5] == 0) {
               errors[5] = 2;
             }
