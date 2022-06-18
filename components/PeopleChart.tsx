@@ -18,7 +18,10 @@ const PeopleChart = ({
   return (
     <div className="h-28 w-full grid grid-cols-10 gap-2">
       {people.map((person, idx) => (
-        <div className="col-span-1 flex flex-col justify-center items-center">
+        <div
+          key={idx}
+          className="col-span-1 flex flex-col justify-center items-center"
+        >
           <div
             className={classNames(
               "rounded-full lg:w-4 lg:h-4  mb-1",
