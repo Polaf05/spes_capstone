@@ -194,15 +194,15 @@ export const Task = ({
                     <th>
                       <button
                         className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
-                        onClick={() => setSorting("Grade Before")}
+                        onClick={() => setSorting("Initial Grade")}
                       >
-                        Raw Grade
+                        Initial Grade
                       </button>
                     </th>
                     <th>
                       <button
                         className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
-                        onClick={() => setSorting("Adjustment Difference")}
+                        onClick={() => setSorting("Transmuted Grade")}
                       >
                         Transmuted Grade
                       </button>
@@ -323,7 +323,7 @@ export const Task = ({
                   />
                 </div>
                 <p className="text-[0.8rem] text-neutral-500 italic">
-                  Based on raw grade
+                  Based on initial grade
                 </p>
                 <section className="mt-2">
                   <div className="flex justify-between">
