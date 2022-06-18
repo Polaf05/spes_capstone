@@ -62,7 +62,7 @@ export const Task = ({
       setFilteredStudents([
         ...students!.sort((a, b) => {
           switch (sortingMethod) {
-            case "Grade Before":
+            case "Transmuted Grade":
               return category === "Over All"
                 ? b.quarter![quarter].grade_before -
                     a.quarter![quarter].grade_before
@@ -82,7 +82,7 @@ export const Task = ({
                 return 1;
               }
               return 0;
-            case "Grade After":
+            case "Initial Grade":
             case "Remarks":
               return category === "Over All"
                 ? b.quarter![quarter].grade_after -
