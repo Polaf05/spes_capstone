@@ -11,10 +11,13 @@ import {
   displayData,
   getGrade,
   getRemarks,
+  transmuteGrade,
 } from "../lib/functions/grade_computation";
 import { classNames, formatName } from "../lib/functions/concat";
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import ReactTooltip from "react-tooltip";
+import { PencilAltIcon } from "@heroicons/react/solid";
+import EditDialog from "./dialogs/EditDialog";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -134,7 +137,8 @@ export const Task = ({
   };
 
   const [tooltip, showTooltip] = useState<boolean>(false);
-
+  const [openEditDialog, setEditDialogOpen] = useState<boolean>(false);
+  const [range, setRange] = useState<number[]>([80, 70, 60, 40, 0]);
   return (
     students && (
       <>
@@ -192,7 +196,7 @@ export const Task = ({
                         className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                         onClick={() => setSorting("Grade Before")}
                       >
-                        Before
+                        Raw Grade
                       </button>
                     </th>
                     <th>
@@ -200,23 +204,7 @@ export const Task = ({
                         className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                         onClick={() => setSorting("Adjustment Difference")}
                       >
-                        Adjustment
-                      </button>
-                    </th>
-                    <th>
-                      <button
-                        className="font-semibold text- flex flex-col hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
-                        onClick={() => setSorting("Grade After")}
-                      >
-                        Suggested
-                      </button>
-                    </th>
-                    <th className="text-right">
-                      <button
-                        className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
-                        onClick={() => setSorting("Remarks")}
-                      >
-                        Remarks
+                        Transmuted Grade
                       </button>
                     </th>
                   </tr>
@@ -250,6 +238,19 @@ export const Task = ({
                         <td className="pl-4 text-left">
                           {formatName(student.name)}
                         </td>
+                        <td className="">
+                          {category === "Over All"
+                            ? 80
+                            : displayData(
+                                getGrade(
+                                  category === "Written Works"
+                                    ? student.quarter![quarter]
+                                        .written_percentage?.score
+                                    : student.quarter![quarter]
+                                        .performance_percentage?.score
+                                )
+                              )}
+                        </td>
                         <td>
                           {category === "Over All"
                             ? student.quarter![quarter].grade_before
@@ -261,39 +262,6 @@ export const Task = ({
                                     : student.quarter![quarter]
                                         .performance_percentage?.score
                                 )
-                              )}
-                        </td>
-                        <td className="text-base">
-                          (
-                          {category === "Over All"
-                            ? student.quarter![quarter].grade_after > 0
-                              ? student.quarter![quarter].diff
-                              : 0
-                            : 0}
-                          )
-                        </td>
-                        <td>
-                          {category === "Over All"
-                            ? student.quarter![quarter].grade_after
-                            : displayData(
-                                getGrade(
-                                  category === "Written Works"
-                                    ? student.quarter![quarter]
-                                        .written_percentage?.score
-                                    : student.quarter![quarter]
-                                        .performance_percentage?.score
-                                )
-                              )}
-                        </td>
-                        <td className="pr-4 text-right">
-                          {category === "Over All"
-                            ? student.quarter![quarter].remarks
-                            : getRemarks(
-                                category === "Written Works"
-                                  ? student.quarter![quarter].written_percentage
-                                      ?.score!
-                                  : student.quarter![quarter]
-                                      .performance_percentage?.score!
                               )}
                         </td>
                       </tr>
@@ -343,33 +311,50 @@ export const Task = ({
                 </div>
               </div>
               <div className="lg:col-span-5 xl:col-span-2 h-fit">
-                <h6 className="xl:text-lg font-semibold pt-3 border-b-2 border-black">
-                  Legend
-                </h6>
-                <section className="mt-4">
+                <div className="flex justify-between mt-3">
+                  <h6 className="xl:text-lg font-semibold border-b-2 border-black">
+                    Legend
+                  </h6>
+                  <PencilAltIcon
+                    onClick={() => {
+                      setEditDialogOpen(true);
+                    }}
+                    className="w-6 h-6 hover:cursor-pointer"
+                  />
+                </div>
+                <p className="text-[0.8rem] text-neutral-500 italic">
+                  Based on raw grade
+                </p>
+                <section className="mt-2">
                   <div className="flex justify-between">
-                    <p>{"Very Good:  (> 96) "}</p>
+                    <p>{"Exemplary:  (80 - 100) "}</p>
                     <div className="bg-legend-vgood border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>{"Good: (89 - 96) "}</p>
+                    <p>{"Accomplished: (70 - 79) "}</p>
                     <div className="bg-legend-good border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>{"Average: (82 - 88) "}</p>
+                    <p>{"Developing: (60 - 69) "}</p>
                     <div className="bg-legend-ave border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>{"Poor: (75 - 81) "}</p>
+                    <p>{"Beginning: (40 - 59) "}</p>
                     <div className="bg-legend-poor border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>{"Poor: (< 75) "}</p>
+                    <p>{"Fail: (0 - 39) "}</p>
                     <div className="bg-legend-vpoor border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                 </section>
               </div>
             </div>
+            <EditDialog
+              range={range}
+              setRange={setRange}
+              openEditDialog={openEditDialog}
+              setEditDialogOpen={setEditDialogOpen}
+            />
             {/* <div className="row-span-2 overflow-auto h-44 md:overflow-auto mt-5">
               <p className="inline-block text-justify">
                 Chart Description: Paragraph (Large) Lorem ipsum dolor sit amet,
