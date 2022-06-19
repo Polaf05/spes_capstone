@@ -287,7 +287,9 @@ export const getPassingRemarks = (passing_pct: number, quarter: number) => {
   const passing_student = `${
     10 - Number((failedStudents / 10).toFixed())
   } out of 10 students`;
-  const passing_pct_remarks = ` ${passing_pct}% of the classroom or `;
+  const passing_pct_remarks = ` ${passing_pct.toFixed(
+    1
+  )}% of the classroom or `;
 
   const quarter_remarks =
     quarter === 4

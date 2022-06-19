@@ -38,9 +38,10 @@ const StruggledStudentCard = ({
           </div>
           <div className={"space-y-2 max-h-[50vh] overflow-auto"}>
             {struggledStudents.map(
-              (student) =>
+              (student, idx) =>
                 toggleModule(title, student) && (
                   <div
+                    key={idx}
                     onClick={() => {
                       setStudent(student.student);
                       setIsOpen(true);

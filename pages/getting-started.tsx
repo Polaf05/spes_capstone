@@ -643,7 +643,7 @@ const gettingStarted = (user: any) => {
                   <h3 className="text-lg font-semibold">System Requirements</h3>
                   <div>
                     {checker_msg.map((msg, idx) => (
-                      <div className="flex gap-4 items-center py-1">
+                      <div key={idx} className="flex gap-4 items-center py-1">
                         {errors[idx] === 2 ? (
                           <CheckCircleIcon className="w-5 h-5 text-green-500" />
                         ) : errors[idx] === 0 ? (

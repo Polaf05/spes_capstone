@@ -73,6 +73,7 @@ import {
 } from "../lib/functions/concat";
 import { getPronoun, getRemarksAnalysis } from "../lib/functions/feedback";
 import Footer from "../components/sections/Footer";
+import FuzzyDialog from "../components/dialogs/FuzzyDialog";
 
 Chart.register(
   ArcElement,
@@ -746,6 +747,11 @@ const StudentInfo = (user: any) => {
   const [tooltip, setTooltip] = useState<boolean>(false);
   const [score, setScore] = useState<string>("no data");
   const [scr_remarks, setRemarks] = useState<string>("no data");
+  const [hidden] = useState<boolean>(true);
+  const [fuzzyDialog, setFuzzyDialogOpen] = useState<boolean>(false);
+
+  const ww_fuzzy_set = [10, 90, 0, 0, 0];
+  const pt_fuzzy_set = [0, 60, 40, 0, 0];
 
   return (
     student && (
@@ -808,7 +814,7 @@ const StudentInfo = (user: any) => {
           </div>
         </div>
         {/* General Section */}
-        <div className="bg-ocean-100 h-fit xl:h-[110vh] flex flex-col justify-between">
+        <div className="bg-ocean-100 h-fit flex flex-col justify-between">
           <div className="mx-12 py-8">
             <h3 className="text-justify lg:text-[0.8rem] xl:text-base mb-4">
               {getOverallFeedback()}
@@ -820,6 +826,7 @@ const StudentInfo = (user: any) => {
                   )}: ${getStudentAverage(student, myquar.length)}`
                 : `Final Grade: ${student.final_grade_before}`}{" "}
             </h2>
+
             {myquar.length !== 4 &&
               getStudentAverage(student, myquar.length) < 75 && (
                 <p>{`Student needs to average at least ${getGradeNeeded(
@@ -841,9 +848,25 @@ const StudentInfo = (user: any) => {
               </div>
               {/* Overall Performance Assessment */}
               <div className="col-span-6 xl:col-span-4 lg:h-[45vh] xl:h-[65vh] overflow-x-auto px-3">
-                <h2 className="text-lg xl:text-xl font-bold">
-                  Overall Performance:
-                </h2>
+                <div className="flex justify-between">
+                  <h2 className="text-lg xl:text-xl font-bold">
+                    Overall Performance:
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setFuzzyDialogOpen(true);
+                    }}
+                    className="underline font-semibold hover:text-ocean-400"
+                  >
+                    View Fuzzy Breakdown
+                  </button>
+                </div>
+                <FuzzyDialog
+                  ww_fuzzy_set={ww_fuzzy_set}
+                  pt_fuzzy_set={pt_fuzzy_set}
+                  fuzzyDialog={fuzzyDialog}
+                  setFuzzyDialogOpen={setFuzzyDialogOpen}
+                />
                 <div className="grid grid-cols-10 mb-4">
                   <CardInfo
                     className={classNames(
@@ -933,6 +956,7 @@ const StudentInfo = (user: any) => {
               </div>
             </div>
           </div>
+
           {/* Toggle Quarter */}
           <div className="flex justify-end">
             {myquar.map((q, idx) => (
@@ -969,7 +993,7 @@ const StudentInfo = (user: any) => {
                 <div className="col-span-1 flex justify-end gap-4">
                   <div className="flex flex-col place-content-center">
                     <h1 className="text-lg font-semibold">Quarter Grade:</h1>
-                    <h3 className="text-base">
+                    {/* <h3 className="text-base">
                       Suggested Grade:{" "}
                       {myStudent?.grade_after === 0 ? (
                         <span className="font-light">{"No data"}</span>
@@ -978,7 +1002,7 @@ const StudentInfo = (user: any) => {
                           {myStudent?.grade_after}
                         </span>
                       )}
-                    </h3>
+                    </h3> */}
                     <div className="flex gap-3">
                       <h3>
                         Class Ranking:{" "}
@@ -1367,130 +1391,138 @@ const StudentInfo = (user: any) => {
                     </div>
                   </div>
                 </div>
-                <div
-                  className={classNames(
-                    "col-span-5 grid grid-cols-10 gap-3 p-4"
-                  )}
-                >
-                  {/* WW Data */}
-                  <div
-                    className={classNames(
-                      wgh_ww! > wgh_pt!
-                        ? "col-span-6"
-                        : wgh_pt! > wgh_ww!
-                        ? "col-span-4"
-                        : "col-span-5"
-                    )}
-                  >
-                    {/* Written Works Circular Progress */}
-                    <div className="relative">
-                      <div className="z-40 absolute inset-0 flex justify-center items-center">
-                        <div className="flex flex-col justify-center items-center">
-                          <h2 className="font-bold text-3xl">
-                            {tdata.ww.percentage}%
-                          </h2>
-                          <h3 className="text-lg font-semibold">
-                            Written Works
-                          </h3>
-                          <p className="text-base">
-                            Scored {tdata.ww.score_sum} out of{" "}
-                            {tdata.ww.total_item}
-                          </p>
+                <div className="col-span-5">
+                  <div className="text-right">
+                    <button
+                      onClick={() => {
+                        setFuzzyDialogOpen(true);
+                      }}
+                      className="underline font-semibold hover:text-ocean-400"
+                    >
+                      View Fuzzy Breakdown
+                    </button>
+                  </div>
+                  <div className={classNames(" grid grid-cols-10 gap-3 p-4")}>
+                    {/* WW Data */}
+                    <div
+                      className={classNames(
+                        wgh_ww! > wgh_pt!
+                          ? "col-span-6"
+                          : wgh_pt! > wgh_ww!
+                          ? "col-span-4"
+                          : "col-span-5"
+                      )}
+                    >
+                      {/* Written Works Circular Progress */}
+                      <div className="relative">
+                        <div className="z-40 absolute inset-0 flex justify-center items-center">
+                          <div className="flex flex-col justify-center items-center">
+                            <h2 className="font-bold text-3xl">
+                              {tdata.ww.percentage}%
+                            </h2>
+                            <h3 className="text-lg font-semibold">
+                              Written Works
+                            </h3>
+                            <p className="text-base">
+                              Scored {tdata.ww.score_sum} out of{" "}
+                              {tdata.ww.total_item}
+                            </p>
+                          </div>
+                        </div>
+                        <CircularProgress
+                          value={tdata.ww.percentage}
+                          pathColor="#FFF598"
+                          strokeWidth={8}
+                        />
+                      </div>
+                      <div className="flex justify-end">
+                        <div className={"w-6/12"}>
+                          <div className="relative">
+                            <div className="z-40 absolute inset-0 flex justify-center items-center">
+                              <div className="flex flex-col justify-center items-center">
+                                <h2 className="font-bold text-xl">{ww_pct}%</h2>
+                                <h3 className="text-[0.8rem] font-semibold">
+                                  Surpassed
+                                </h3>
+                                <p
+                                  className={
+                                    wgh_ww! > wgh_pt!
+                                      ? "text-[0.6rem]"
+                                      : "text-[0.4rem]"
+                                  }
+                                >
+                                  {ww_surp_sum} out of {students?.length!}{" "}
+                                  students
+                                </p>
+                              </div>
+                            </div>
+                            <CircularProgress
+                              value={ww_pct}
+                              pathColor="#FFF598"
+                              strokeWidth={10}
+                            />
+                          </div>
                         </div>
                       </div>
-                      <CircularProgress
-                        value={tdata.ww.percentage}
-                        pathColor="#FFF598"
-                        strokeWidth={8}
-                      />
                     </div>
-                    <div className="flex justify-end">
+                    {/* PT Data */}
+                    <div
+                      className={classNames(
+                        wgh_ww! > wgh_pt!
+                          ? "col-span-4"
+                          : wgh_pt! > wgh_ww!
+                          ? "col-span-6"
+                          : "col-span-5"
+                      )}
+                    >
+                      {/* Performance Tasks Circular Progress */}
                       <div className={"w-6/12"}>
                         <div className="relative">
                           <div className="z-40 absolute inset-0 flex justify-center items-center">
                             <div className="flex flex-col justify-center items-center">
-                              <h2 className="font-bold text-xl">{ww_pct}%</h2>
+                              <h2 className="font-bold text-xl">{pt_pct}%</h2>
                               <h3 className="text-[0.8rem] font-semibold">
                                 Surpassed
                               </h3>
                               <p
                                 className={
-                                  wgh_ww! > wgh_pt!
+                                  wgh_ww! < wgh_pt!
                                     ? "text-[0.6rem]"
-                                    : "text-[0.4rem]"
+                                    : "text-[0.5rem]"
                                 }
                               >
-                                {ww_surp_sum} out of {students?.length!}{" "}
-                                students
+                                {pt_surp_sum} out of {students?.length} students
                               </p>
                             </div>
                           </div>
                           <CircularProgress
-                            value={ww_pct}
-                            pathColor="#FFF598"
+                            value={pt_pct}
+                            pathColor="#63C7FF"
                             strokeWidth={10}
                           />
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  {/* PT Data */}
-                  <div
-                    className={classNames(
-                      wgh_ww! > wgh_pt!
-                        ? "col-span-4"
-                        : wgh_pt! > wgh_ww!
-                        ? "col-span-6"
-                        : "col-span-5"
-                    )}
-                  >
-                    {/* Performance Tasks Circular Progress */}
-                    <div className={"w-6/12"}>
                       <div className="relative">
                         <div className="z-40 absolute inset-0 flex justify-center items-center">
                           <div className="flex flex-col justify-center items-center">
-                            <h2 className="font-bold text-xl">{pt_pct}%</h2>
-                            <h3 className="text-[0.8rem] font-semibold">
-                              Surpassed
+                            <h2 className="font-bold text-3xl">
+                              {tdata.pt.percentage}%
+                            </h2>
+                            <h3 className="text-lg font-semibold">
+                              Performance Tasks
                             </h3>
-                            <p
-                              className={
-                                wgh_ww! < wgh_pt!
-                                  ? "text-[0.6rem]"
-                                  : "text-[0.5rem]"
-                              }
-                            >
-                              {pt_surp_sum} out of {students?.length} students
+                            <p className="text-base">
+                              Scored {tdata.pt.score_sum} out of{" "}
+                              {tdata.pt.total_item}
                             </p>
                           </div>
                         </div>
                         <CircularProgress
-                          value={pt_pct}
+                          value={tdata.pt.percentage}
                           pathColor="#63C7FF"
-                          strokeWidth={10}
+                          strokeWidth={8}
                         />
                       </div>
-                    </div>
-                    <div className="relative">
-                      <div className="z-40 absolute inset-0 flex justify-center items-center">
-                        <div className="flex flex-col justify-center items-center">
-                          <h2 className="font-bold text-3xl">
-                            {tdata.pt.percentage}%
-                          </h2>
-                          <h3 className="text-lg font-semibold">
-                            Performance Tasks
-                          </h3>
-                          <p className="text-base">
-                            Scored {tdata.pt.score_sum} out of{" "}
-                            {tdata.pt.total_item}
-                          </p>
-                        </div>
-                      </div>
-                      <CircularProgress
-                        value={tdata.pt.percentage}
-                        pathColor="#63C7FF"
-                        strokeWidth={8}
-                      />
                     </div>
                   </div>
                 </div>
@@ -1499,7 +1531,7 @@ const StudentInfo = (user: any) => {
           </div>
         </div>
         {/* External Elements Section */}
-        {student.survey_result.name !== "No Data" ? (
+        {!hidden ? (
           <div className="min-h-fit bg-ocean-100">
             <div className="mx-12 my-10">
               <div className="pt-10">
@@ -1651,23 +1683,7 @@ const StudentInfo = (user: any) => {
             </div>
           </div>
         ) : (
-          <div className="bg-ocean-100">
-            <div className="mx-12 py-10">
-              <div className="pt-10">
-                <h2 className="text-2xl font-bold">
-                  What affected my performance?
-                </h2>
-                <p className="">
-                  Let us help you conduct data gathering{" "}
-                  <Link href="/getting-started" passHref>
-                    <a className="cursor-pointer font-bold underline decoration-2 underline-offset-2 text-ocean-400 italic">
-                      here
-                    </a>
-                  </Link>
-                </p>
-              </div>
-            </div>
-          </div>
+          <div className="bg-ocean-100"></div>
         )}
         <Footer />
       </>

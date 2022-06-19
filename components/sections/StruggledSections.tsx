@@ -143,8 +143,10 @@ const StruggledSections = ({
 
         <div className="mt-4 px-4 py-2 border-2 border-green-300 rounded-xl max-h-[50vh] overflow-auto">
           <div className="mt-4">
-            {studentsExcelled.map((student) => (
-              <h4 className="xl:text-lg">{formatName(student.name)}</h4>
+            {studentsExcelled.map((student, idx) => (
+              <h4 key={idx} className="xl:text-lg">
+                {formatName(student.name)}
+              </h4>
             ))}
           </div>
         </div>
@@ -164,8 +166,8 @@ const StruggledSections = ({
                 <h4>Students Excelled</h4>
               </div>
               <div className="mt-4 grid grid-cols-6 grid-flow-row gap-1 max-h-[50vh] overflow-auto">
-                {studentsExcelled.map((student) => (
-                  <div className="col-span-3">
+                {studentsExcelled.map((student, idx) => (
+                  <div key={idx} className="col-span-3">
                     <h4 className="text-lg">{student.name}</h4>
                   </div>
                 ))}

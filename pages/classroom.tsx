@@ -423,7 +423,7 @@ export default function ClassroomInfo() {
                 <Tab.List className="col-span-2 flex justify-end">
                   {categories.map((category, idx) => (
                     <Tab
-                      key={category.title}
+                      key={idx}
                       className={({ selected }: { selected: any }) =>
                         classNames(
                           "w-60 lg:text-lg xl:text-xl font-bold mx-2",
@@ -638,6 +638,7 @@ export default function ClassroomInfo() {
                           <div className="z-10 absolute py-8 lg:w-[4vw] xl:w-[3vw] h-full bg-white flex flex-col justify-around">
                             {tasks_buttons[0].map((button, idx) => (
                               <button
+                                key={idx}
                                 className={classNames(
                                   "text-sm font-semibold hover:underline",
                                   ((ww_task_array[idx].passed.length +
@@ -780,6 +781,7 @@ export default function ClassroomInfo() {
                             <div className="z-10 absolute py-8 lg:w-[4vw] xl:w-[3vw] h-full bg-white flex flex-col justify-around">
                               {tasks_buttons[1].map((button, idx) => (
                                 <button
+                                  key={idx}
                                   className={classNames(
                                     "text-sm font-semibold hover:underline",
                                     ((pt_task_array[idx].passed.length +
