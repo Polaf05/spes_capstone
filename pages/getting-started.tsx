@@ -264,7 +264,7 @@ const gettingStarted = (user: any) => {
 
                         const quarter_grade: Quarter = {
                           id: i,
-                          grade_before: item[35],
+                          grade_before: item[34],
                           diff: parseFloat((grade_after - item[35]).toFixed(1)),
                           grade_after: grade_after,
                           remarks: remarks as string,
