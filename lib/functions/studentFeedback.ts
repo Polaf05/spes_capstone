@@ -78,7 +78,7 @@ export const performanceAnalysis = (
         taskString.push(`${gender.heShe} was present in all the task and`);
       }
 
-      taskString.push(`${taskSummary.fails} of it passed`);
+      taskString.push(`${taskSummary.pass} of it passed`);
       if (taskSummary.perfect > 0) {
         taskString.push(` where ${taskSummary.perfect} of it is perfect.`);
       } else {
@@ -125,7 +125,7 @@ export const performanceAnalysis = (
   if (remarks === `very poor`) {
     if (task.value < 3) {
       quarter.push(
-        `The students requires attention because ${gender.hisHer} grade is very poor and ` +
+        `The student's requires attention because ${gender.hisHer} grade is very poor and ` +
           task.linguistics
       );
     } else {
@@ -134,7 +134,7 @@ export const performanceAnalysis = (
   } else if (remarks === `poor`) {
     if (task.value < 3) {
       quarter.push(
-        `The students grade this quarter is poor and ` + task.linguistics
+        `The student's grade this quarter is poor and ` + task.linguistics
       );
     } else {
       quarter.push(`Although Students grade is poor, ` + task.linguistics);
@@ -142,11 +142,11 @@ export const performanceAnalysis = (
   } else if (remarks === `average`) {
     if (task.value < 3 || task.value > 3) {
       quarter.push(
-        `The students grade this quarter is average and ` + task.linguistics
+        `The student's grade this quarter is average and ` + task.linguistics
       );
     } else {
       quarter.push(
-        `The students grade this quarter is average and ` + task.linguistics
+        `The student's grade this quarter is average and ` + task.linguistics
       );
     }
   } else if (remarks === `good`) {
@@ -154,7 +154,7 @@ export const performanceAnalysis = (
       quarter.push(`Although Students grade is good, ` + task.linguistics);
     } else {
       quarter.push(
-        `The students grade this quarter is good but ` + task.linguistics
+        `The student's grade this quarter is good but ` + task.linguistics
       );
     }
   } else {
@@ -162,7 +162,7 @@ export const performanceAnalysis = (
       quarter.push(`Although Students grade is very good, ` + task.linguistics);
     } else {
       quarter.push(
-        `The students grade this quarter is good and ` + task.linguistics
+        `The student's grade this quarter is good and ` + task.linguistics
       );
     }
   }
@@ -174,13 +174,13 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in written works suddenly plunged in ${
+      } score in written works suddenly plummet in ${
         student?.quarter[i].written_tasks_analysis.plunge_task.length > 0
           ? "tasks"
           : "task"
       } ${formatArray(
         student?.quarter[i].written_tasks_analysis.plunge_task
-      )} while it surged  in ${
+      )} while it soared  in ${
         student?.quarter[i].written_tasks_analysis.surge_task.length > 0
           ? "tasks"
           : "task"
@@ -193,7 +193,7 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in written works suddenly plunged in ${
+      } score in written works suddenly plummet in ${
         student?.quarter[i].written_tasks_analysis.plunge_task.length > 1
           ? "tasks"
           : "task"
@@ -207,7 +207,7 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in written works suddenly surged  in ${
+      } score in written works suddenly soared  in ${
         student?.quarter[i].written_tasks_analysis.surge_task.length > 1
           ? "tasks"
           : "task"
@@ -222,13 +222,13 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in performance task suddenly plunged in ${
+      } score in performance task suddenly plummet in ${
         student?.quarter[i].performace_tasks_analysis.plunge_task.length > 0
           ? "tasks"
           : "task"
       } ${formatArray(
         student?.quarter[i].performace_tasks_analysis.plunge_task
-      )} while it surged  in ${
+      )} while it soared  in ${
         student?.quarter[i].performace_tasks_analysis.surge_task.length > 0
           ? "tasks"
           : "task"
@@ -243,7 +243,7 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in performance task suddenly plunged in ${
+      } score in performance task suddenly plummet in ${
         student?.quarter[i].performace_tasks_analysis.plunge_task.length > 1
           ? "tasks"
           : "task"
@@ -259,7 +259,7 @@ export const performanceAnalysis = (
     quarter.push(
       `${
         student?.gender == "MALE" ? "His" : "Her"
-      } score in performance task suddenly surged  in ${
+      } score in performance task suddenly soared  in ${
         student?.quarter[i].performace_tasks_analysis.surge_task.length > 1
           ? "tasks"
           : "task"
@@ -332,37 +332,37 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 5:
         return {
           value: 5,
-          linguistics: `the students performance in both written works and performance task is very good because both is going in an upward motion.`,
+          linguistics: `the student's performance in both written works and performance task is very good because both is going in an upward motion.`,
         };
         break;
       case 4:
         return {
           value: 4,
-          linguistics: `the students performance in ${gender.hisHer} written works is very good because the trend is in an upward motion and ${gender.hisHer} performance in performance task is slighlty going upward.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is very good because the trend is in an upward motion and ${gender.hisHer} performance in performance task is slighlty going upward.`,
         };
         break;
       case 3:
         return {
           value: 3,
-          linguistics: `the students performance in ${gender.hisHer} written works is very good because the trend is in an upward motion but ${gender.hisHer} perforamance in ${gender.hisHer} performance task is just consistently linear.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is very good because the trend is in an upward motion but ${gender.hisHer} perforamance in ${gender.hisHer} performance task is just consistently linear.`,
         };
         break;
       case 2:
         return {
           value: 2,
-          linguistics: `the students perfromance in ${gender.hisHer} written works is very good because the trend is in an upward motion while ${gender.hisHer} performance in performance task is slightly going downward.`,
+          linguistics: `the student's perfromance in ${gender.hisHer} written works is very good because the trend is in an upward motion while ${gender.hisHer} performance in performance task is slightly going downward.`,
         };
         break;
       case 1:
         return {
           value: 1,
-          linguistics: `the students written works is very good because its trend is in an upward motion while ${gender.hisHer} performance in performance task is going on the opposite direction and requires direct attention.`,
+          linguistics: `the student's written works is very good because its trend is in an upward motion while ${gender.hisHer} performance in performance task is going on the opposite direction and requires direct attention.`,
         };
         break;
       default:
         return {
           value: 0,
-          linguistics: `the students written works is very good because its trend is in an upward motion while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}`,
+          linguistics: `the student's written works is very good because its trend is in an upward motion while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}`,
         };
     }
   } else if (
@@ -372,36 +372,36 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 5:
         return {
           value: 5,
-          linguistics: `the students performance in ${gender.hisHer} written works is good because the trend is slightly going in an upward motion and ${gender.hisHer} performance in performance task is very bacause it is going in an upward motion.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is good because the trend is slightly going in an upward motion and ${gender.hisHer} performance in performance task is very bacause it is going in an upward motion.`,
         };
         break;
       case 4:
         return {
           value: 4,
-          linguistics: `the students performance in both written works and perforamance task is good bacause it is both slightly doing in an upward motion.`,
+          linguistics: `the student's performance in both written works and perforamance task is good bacause it is both slightly doing in an upward motion.`,
         };
         break;
       case 3:
         return {
           value: 3,
-          linguistics: `the students performance in ${gender.hisHer} written works is good because the trend is slightly going in an upward motion but ${gender.hisHer} perforamance in ${gender.hisHer} performance task is just consistently linear.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is good because the trend is slightly going in an upward motion but ${gender.hisHer} perforamance in ${gender.hisHer} performance task is just consistently linear.`,
         };
         break;
       case 2:
         return {
           value: 2,
-          linguistics: `the students performance in ${gender.hisHer} written works is good because the trend is slightly going in an upward motion while ${gender.hisHer} performance in performance task is slightly going downward.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is good because the trend is slightly going in an upward motion while ${gender.hisHer} performance in performance task is slightly going downward.`,
         };
         break;
       case 1:
         return {
           value: 1,
-          linguistics: `the students performance in ${gender.hisHer} written works is good because the trend is slightly going in an upward motion while ${gender.hisHer} performance in performance task is going on the opposite direction and requires direct attention.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is good because the trend is slightly going in an upward motion while ${gender.hisHer} performance in performance task is going on the opposite direction and requires direct attention.`,
         };
       default:
         return {
           value: 0,
-          linguistics: `the students written works is good because its trend is in an upward motion while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}`,
+          linguistics: `the student's written works is good because its trend is in an upward motion while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}`,
         };
     }
   } else if (
@@ -411,37 +411,37 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 5:
         return {
           value: 5,
-          linguistics: `the students performance in ${gender.hisHer} written works is average because the trend is consistent and ${gender.hisHer} performance in performance task is very good bacause it is going in an upward motion.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is average because the trend is consistent and ${gender.hisHer} performance in performance task is very good bacause it is going in an upward motion.`,
         };
         break;
       case 4:
         return {
           value: 4,
-          linguistics: `the students performance in ${gender.hisHer} written works is average because the trend is consistent and ${gender.hisHer} performance in performance task is good bacause the trend is slightly going upward.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is average because the trend is consistent and ${gender.hisHer} performance in performance task is good bacause the trend is slightly going upward.`,
         };
         break;
       case 3:
         return {
           value: 3,
-          linguistics: `the students performance in both written works and performance task all through out the quarter is consistent.`,
+          linguistics: `the student's performance in both written works and performance task all through out the quarter is consistent.`,
         };
         break;
       case 2:
         return {
           value: 2,
-          linguistics: `the students performance in ${gender.hisHer} written works is average because the trend is consistent while ${gender.hisHer} performance task is slightly going in a downward motion.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is average because the trend is consistent while ${gender.hisHer} performance task is slightly going in a downward motion.`,
         };
         break;
       case 1:
         return {
           value: 1,
-          linguistics: `the students performance in ${gender.hisHer} written works is average because the trend is consistent while ${gender.hisHer} performance in performance task is very poor that requires a direct attention.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is average because the trend is consistent while ${gender.hisHer} performance in performance task is very poor that requires a direct attention.`,
         };
         break;
       default:
         return {
           value: 0,
-          linguistics: `the students written works is average because its trend is in an upward motion while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}`,
+          linguistics: `the student's written works is average because its trend is in an upward motion while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}`,
         };
     }
   } else if (
@@ -451,19 +451,19 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 5:
         return {
           value: 5,
-          linguistics: `the students performance in ${gender.hisHer} written works is poor and its motion is slightly going downward and ${gender.hisHer} performance in performance task is very good bacause it is going in an upward motion.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is poor and its motion is slightly going downward and ${gender.hisHer} performance in performance task is very good bacause it is going in an upward motion.`,
         };
         break;
       case 4:
         return {
           value: 4,
-          linguistics: `the students performance in ${gender.hisHer} written works is poor and its motion is slightly going downward and ${gender.hisHer} performance in performance task is good bacause the trend is slightly going upward.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is poor and its motion is slightly going downward and ${gender.hisHer} performance in performance task is good bacause the trend is slightly going upward.`,
         };
         break;
       case 3:
         return {
           value: 3,
-          linguistics: `the students performance in ${gender.hisHer} written works is poor and its motion is slightly going downward and ${gender.hisHer} performance in performance task si completely consistent.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is poor and its motion is slightly going downward and ${gender.hisHer} performance in performance task si completely consistent.`,
         };
         break;
       case 2:
@@ -475,12 +475,12 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 1:
         return {
           value: 1,
-          linguistics: `the students performance in ${gender.hisHer} written works is poor and its motion is slightly going downward while ${gender.hisHer} performance in performance task is very poor that requiress a direct attention.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is poor and its motion is slightly going downward while ${gender.hisHer} performance in performance task is very poor that requiress a direct attention.`,
         };
       default:
         return {
           value: 0,
-          linguistics: `the students written works is very poor because its trend is in an upward motion while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}`,
+          linguistics: `the student's written works is very poor because its trend is in an upward motion while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}`,
         };
     }
   } else if (student.quarter[i].written_tasks_analysis.trends === `downward`) {
@@ -488,36 +488,36 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 5:
         return {
           value: 5,
-          linguistics: `the students performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task is very good bacause it is going in an upward motion.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task is very good bacause it is going in an upward motion.`,
         };
         break;
       case 4:
         return {
           value: 4,
-          linguistics: `the students performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task is good bacause the trend is slightly going upward.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task is good bacause the trend is slightly going upward.`,
         };
         break;
       case 3:
         return {
           value: 3,
-          linguistics: `the students performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task si completely consistent.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task si completely consistent.`,
         };
         break;
       case 2:
         return {
           value: 2,
-          linguistics: `the students performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task is slightly going downward.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is very poor that requires a direct attention while ${gender.hisHer} performance in performance task is slightly going downward.`,
         };
         break;
       case 1:
         return {
           value: 1,
-          linguistics: `the students need both direct attention on ${gender.hisHer} performance task and written works because the trend of ${gender.hisHer} performance is going downward.`,
+          linguistics: `the student's need both direct attention on ${gender.hisHer} performance task and written works because the trend of ${gender.hisHer} performance is going downward.`,
         };
       default:
         return {
           value: 0,
-          linguistics: `the students written works is very good because its trend is in an upward motion while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}`,
+          linguistics: `the student's written works is very good because its trend is in an upward motion while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}`,
         };
     }
   } else {
@@ -525,36 +525,36 @@ export const lineGraphAssessment = (student: Student, i: number) => {
       case 5:
         return {
           value: 5,
-          linguistics: `the students performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task is very good bacause it is going in an upward motion.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task is very good bacause it is going in an upward motion.`,
         };
         break;
       case 4:
         return {
           value: 4,
-          linguistics: `the students performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task is good bacause the trend is slightly going upward.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task is good bacause the trend is slightly going upward.`,
         };
         break;
       case 3:
         return {
           value: 3,
-          linguistics: `the students performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task si completely consistent.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task si completely consistent.`,
         };
         break;
       case 2:
         return {
           value: 2,
-          linguistics: `the students performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task is slightly going downward.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task is slightly going downward.`,
         };
         break;
       case 1:
         return {
           value: 1,
-          linguistics: `the students performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task is slightly going downward.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task is slightly going downward.`,
         };
       default:
         return {
           value: 0,
-          linguistics: `the students performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}.`,
+          linguistics: `the student's performance in ${gender.hisHer} written works is ${student.quarter[i].performace_tasks_analysis.trends} while ${gender.hisHer} performance in performance task is ${student.quarter[i].performace_tasks_analysis.trends}.`,
         };
     }
   }
@@ -566,13 +566,13 @@ export const barGraphhAssessment = (student: Student, len: number) => {
       return {
         value: 5,
         linguistic:
-          "the students performance is very good and deserves a recognition.",
+          "the student's performance is very good and deserves a recognition.",
       };
     } else {
       return {
         value: 5,
         linguistic:
-          "the students performance is very good and deserves a recognition.",
+          "the student's performance is very good and deserves a recognition.",
       };
     }
   } else if (student.quarter_analysis.trends === "slightly upward") {
@@ -580,13 +580,13 @@ export const barGraphhAssessment = (student: Student, len: number) => {
       return {
         value: 4,
         linguistic:
-          "the students performance is slightly good and deserves a recognition",
+          "the student's performance is slightly good and deserves a recognition",
       };
     } else {
       return {
         value: 4,
         linguistic:
-          "the students performance is slithly good and deserves a recognition.",
+          "the student's performance is slithly good and deserves a recognition.",
       };
     }
   } else if (student.quarter_analysis.trends === "consistently linear") {
@@ -594,25 +594,25 @@ export const barGraphhAssessment = (student: Student, len: number) => {
       return {
         value: 3,
         linguistic:
-          "the students performance is consistently linear to all quarters.",
+          "the student's performance is consistently linear to all quarters.",
       };
     } else {
       return {
         value: 3,
         linguistic:
-          "the students performance is consistently linear to all quarters.",
+          "the student's performance is consistently linear to all quarters.",
       };
     }
   } else if (student.quarter_analysis.trends === "slightly downward") {
     if (len >= 4) {
       return {
         value: 2,
-        linguistic: "the students performance is slightly going downward",
+        linguistic: "the student's performance is slightly going downward.",
       };
     } else {
       return {
         value: 2,
-        linguistic: "the students performance is slightly goind downward",
+        linguistic: "the student's performance is slightly going downward.",
       };
     }
   } else if (student.quarter_analysis.trends === "downward") {
@@ -620,13 +620,13 @@ export const barGraphhAssessment = (student: Student, len: number) => {
       return {
         value: 1,
         linguistic:
-          "the students performance is very poor all throughout the school year.",
+          "the student's performance is very poor all throughout the school year.",
       };
     } else {
       return {
         value: 1,
         linguistic:
-          "the students performance is very poor and requires direct attention for the next incoming quarter.",
+          "the student's performance is very poor and requires direct attention for the incoming quarter.",
       };
     }
   } else {
@@ -634,28 +634,28 @@ export const barGraphhAssessment = (student: Student, len: number) => {
       return {
         value: 1,
         linguistic:
-          "the students performance is very poor and requires direct attention for the next quarter.",
+          "the student's performance is very poor and requires direct attention for the next quarter.",
       };
     } else if (student.quarter_analysis.trends === "Poor") {
       return {
         value: 2,
         linguistic:
-          "the students performance is poor and might need some attention for the next incoming quarter.",
+          "the student's performance is poor and might need some attention for the incoming quarter.",
       };
     } else if (student.quarter_analysis.trends === "Average") {
       return {
         value: 3,
-        linguistic: "the students perfomarnce is average.",
+        linguistic: "the student's perfomarnce is average.",
       };
     } else if (student.quarter_analysis.trends === "Good") {
       return {
         value: 4,
-        linguistic: "the students performance is good.",
+        linguistic: "the student's performance is good.",
       };
     } else {
       return {
         value: 5,
-        linguistic: "the students performance is very good.",
+        linguistic: "the student's performance is very good.",
       };
     }
   }
@@ -701,7 +701,7 @@ export const getEnvironmenetalAssessment = (
   var assessment: string[] = [];
 
   assessment.push(
-    `The students environmental factor is ${student.inference_result.environment.linguistic}.`
+    `The student's environmental factor is ${student.inference_result.environment.linguistic}.`
   );
 
   if (group_values["Greatly Affecting"].length > 0) {
@@ -709,7 +709,7 @@ export const getEnvironmenetalAssessment = (
       assessment.push(
         `Factors like ${formatArray(
           group_values["Greatly Affecting"]
-        )} is severly affecting ${
+        )} is severely affecting ${
           gender.hisHer
         } performance that may be the reason why ${
           gender.hisHer
@@ -719,7 +719,7 @@ export const getEnvironmenetalAssessment = (
       assessment.push(
         `Although factors like ${formatArray(
           group_values["Greatly Affecting"]
-        )} severly affects ${
+        )} severely affects ${
           gender.hisHer
         } performance, he can still keep up in ${gender.hisHer} studies.`
       );
@@ -727,7 +727,7 @@ export const getEnvironmenetalAssessment = (
       assessment.push(
         `Although factors like ${formatArray(
           group_values["Greatly Affecting"]
-        )} severly affects ${
+        )} severely affects ${
           gender.hisHer
         } performance, he still performs very well in ${gender.hisHer} class.`
       );
@@ -780,17 +780,17 @@ export const getEnvironmenetalAssessment = (
       group_values["Affecting"].length > 0
     ) {
       assessment.push(
-        `Also factors like ${formatArray(
+        `Some factors like ${formatArray(
           group_values["Quite Affecting"]
-        )} quitly affects ${
+        )} quitely affects ${
           gender.hisHer
         } performance but isn't that really affecting.`
       );
     } else {
       assessment.push(
-        `Factors like ${formatArray(
+        `Some factors like ${formatArray(
           group_values["Quite Affecting"]
-        )} quitly affects ${
+        )} quitely affects ${
           gender.hisHer
         } performance but isn't that really affecting.`
       );
@@ -842,14 +842,14 @@ export const getTechnologicalAssesment = (
     switch (wifi) {
       case 1:
         technologicalAssessment.push(
-          `The students data and wifi connection are both fast and reliable resulting that ${
+          `The student's data and wifi connection are both fast and reliable resulting that ${
             gender.hisHer
           } internet is ${student.inference_result.internet.linguistic.toLowerCase()}.`
         );
         break;
       case 2:
         technologicalAssessment.push(
-          `Although the students have a fast and reliable data, ${
+          `Although the student's have a fast and reliable data, ${
             gender.hisHer
           } wifi connection is slow resulting that ${
             gender.hisHer
@@ -858,7 +858,7 @@ export const getTechnologicalAssesment = (
         break;
       default:
         technologicalAssessment.push(
-          `The student doesn't have any available wifi connection however the students have a fast and reliable data connection resulting that ${
+          `The student doesn't have any available wifi connection however the student's have a fast and reliable data connection resulting that ${
             gender.hisHer
           } internet is ${student.inference_result.internet.linguistic.toLowerCase()}.`
         );
@@ -867,7 +867,7 @@ export const getTechnologicalAssesment = (
     switch (wifi) {
       case 1:
         technologicalAssessment.push(
-          `Although the students data is bad, ${
+          `Although the student's data is bad, ${
             gender.hisHer
           } wifi connection is fast and reliable resulting that ${
             gender.hisHer
