@@ -90,6 +90,8 @@ export interface Quarter {
   written_tasks_analysis: TaskAnalysis;
   performace_tasks_analysis: TaskAnalysis;
   ranking: number | null;
+  ww_fuzzy: fuzzyData;
+  pt_fuzzy: fuzzyData;
 }
 
 export type Classroom = {
@@ -159,4 +161,10 @@ export interface DataInference {
 export type InferenceDetails = {
   value: number;
   linguistic: string;
+};
+
+export type fuzzyData = {
+  value: number[];
+  satisfaction: number;
+  remarks: string;
 };
