@@ -2,13 +2,13 @@ import { Student } from "../../types/Students";
 import { Score, TaskScores } from "../../types/Task";
 
 export const getRemarks = (grade: number) => {
-  return grade < 75
+  return grade < 40
     ? "Very Poor"
-    : grade < 83
+    : grade < 60
     ? "Poor"
-    : grade < 90
+    : grade < 70
     ? "Average"
-    : grade < 97
+    : grade < 80
     ? "Good"
     : "Very Good";
 };
