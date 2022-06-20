@@ -39,7 +39,6 @@ const FuzzyDialog = ({
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          ext-lg
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
@@ -71,11 +70,11 @@ const FuzzyDialog = ({
                 </div>
                 <div className="mb-4 grid grid-cols-5 gap-4 mt-2">
                   <div className="space-y-2 col-span-1 flex flex-col items-center">
-                    <p>Exemplary</p>
-                    <p>Accomplished</p>
-                    <p>Developing</p>
-                    <p>Beginning</p>
-                    <p>Failed</p>
+                    <p>Very Good</p>
+                    <p>Good</p>
+                    <p>Average</p>
+                    <p>Poor</p>
+                    <p>Very Poor</p>
                   </div>
                   <div className="space-y-2 col-span-2">
                     {ww_fuzzy_set.map((res, idx) => (

@@ -240,7 +240,7 @@ export const Task = ({
                         </td>
                         <td className="">
                           {category === "Over All"
-                            ? 80
+                            ? student.quarter![quarter].grade_before
                             : displayData(
                                 getGrade(
                                   category === "Written Works"
@@ -253,14 +253,18 @@ export const Task = ({
                         </td>
                         <td>
                           {category === "Over All"
-                            ? student.quarter![quarter].grade_before
+                            ? transmuteGrade(
+                                student.quarter![quarter].grade_before
+                              )
                             : displayData(
-                                getGrade(
-                                  category === "Written Works"
-                                    ? student.quarter![quarter]
-                                        .written_percentage?.score
-                                    : student.quarter![quarter]
-                                        .performance_percentage?.score
+                                transmuteGrade(
+                                  getGrade(
+                                    category === "Written Works"
+                                      ? student.quarter![quarter]
+                                          .written_percentage?.score
+                                      : student.quarter![quarter]
+                                          .performance_percentage?.score
+                                  )
                                 )
                               )}
                         </td>
@@ -315,35 +319,35 @@ export const Task = ({
                   <h6 className="xl:text-lg font-semibold border-b-2 border-black">
                     Legend
                   </h6>
-                  <PencilAltIcon
+                  {/* <PencilAltIcon
                     onClick={() => {
                       setEditDialogOpen(true);
                     }}
                     className="w-6 h-6 hover:cursor-pointer"
-                  />
+                  /> */}
                 </div>
                 <p className="text-[0.8rem] text-neutral-500 italic">
                   Based on initial grade
                 </p>
                 <section className="mt-2">
                   <div className="flex justify-between">
-                    <p>{"Exemplary:  (80 - 100) "}</p>
+                    <p>{"Very Good:  (80 - 100) "}</p>
                     <div className="bg-legend-vgood border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>{"Accomplished: (70 - 79) "}</p>
+                    <p>{"Good: (70 - 79) "}</p>
                     <div className="bg-legend-good border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>{"Developing: (60 - 69) "}</p>
+                    <p>{"Average: (60 - 69) "}</p>
                     <div className="bg-legend-ave border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>{"Beginning: (40 - 59) "}</p>
+                    <p>{"Poor: (40 - 59) "}</p>
                     <div className="bg-legend-poor border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                   <div className="flex justify-between">
-                    <p>{"Fail: (0 - 39) "}</p>
+                    <p>{"Very Poor: (0 - 39) "}</p>
                     <div className="bg-legend-vpoor border lg:w-12 lg:h-4 xl:w-9"></div>
                   </div>
                 </section>
