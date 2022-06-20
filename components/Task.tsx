@@ -319,12 +319,12 @@ export const Task = ({
                   <h6 className="xl:text-lg font-semibold border-b-2 border-black">
                     Legend
                   </h6>
-                  <PencilAltIcon
+                  {/* <PencilAltIcon
                     onClick={() => {
                       setEditDialogOpen(true);
                     }}
                     className="w-6 h-6 hover:cursor-pointer"
-                  />
+                  /> */}
                 </div>
                 <p className="text-[0.8rem] text-neutral-500 italic">
                   Based on initial grade
