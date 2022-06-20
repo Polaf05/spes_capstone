@@ -233,7 +233,7 @@ const StudentInfo = (user: any) => {
   for (let i = 0; i < myquar.length; i++) {
     let a_sum: number = 0;
     students?.map((student, idx) => {
-      a_sum += student!.quarter![i].grade_before;
+      a_sum += transmuteGrade(student!.quarter![i].grade_before);
     });
     const ave = Number((a_sum / students?.length!).toFixed(1));
     ave_quarter_grade[i] = ave;
@@ -241,7 +241,7 @@ const StudentInfo = (user: any) => {
 
   for (let i = 0; i < myquar.length; i++) {
     //console.log(student?.quarter![i].grade_before!);
-    quarter_data.push(student?.quarter![i].grade_before!);
+    quarter_data.push(transmuteGrade(student?.quarter![i].grade_before!));
     sum += student?.quarter![i].ranking!;
     let scr = 0;
     //console.log(student?.quarter![i].written_percentage?.score!);
@@ -601,7 +601,7 @@ const StudentInfo = (user: any) => {
     let avail: any = [];
 
     for (let i = 0; i < myquar.length; i++) {
-      tmp.push(student?.quarter[i].grade_before!);
+      tmp.push(transmuteGrade(student?.quarter[i].grade_before!));
       avail.push(student?.quarter[i]);
     }
     const max = Math.max(...tmp);
