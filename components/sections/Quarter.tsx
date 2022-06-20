@@ -189,11 +189,11 @@ const StudentInfo = ({ quarter, id }: { quarter: number; id: string }) => {
   }
 
   for (let i = 0; i < myquar.length; i++) {
-    //console.log(student?.quarter![i].grade_before!);
+    ////console.log(student?.quarter![i].grade_before!);
     quarter_data.push(student?.quarter![i].grade_before!);
     sum += student?.quarter![i].ranking!;
     let scr = 0;
-    //console.log(student?.quarter![i].written_percentage?.score!);
+    ////console.log(student?.quarter![i].written_percentage?.score!);
 
     //get sum of Weighted Score
     if (typeof student?.quarter![i].written_percentage?.score! !== "string") {

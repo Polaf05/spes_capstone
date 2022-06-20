@@ -59,7 +59,7 @@ const gettingStarted = (user: any) => {
   const [hasData, setData] = useState<boolean>(false);
   const [errors] = useState<number[]>([0, 0, 0, 0, -1, -1, -1]);
   // useEffect(() => {
-  //   console.log(user);
+  //   //console.log(user);
   //   if (!user.user) {
   //     router.push("/login");
   //   }
@@ -465,14 +465,14 @@ const gettingStarted = (user: any) => {
                 inference_result: infer,
                 ranking: null,
               };
-              console.log(student_info);
+              //console.log(student_info);
               classroom.push(student_info);
             });
             let class_list = getRanking(classroom, task_length);
 
-            // // console.log("Class List:", class_list);
+            // // //console.log("Class List:", class_list);
             // let upload = await uploadJson(class_list);
-            // // console.log("Class ID:", upload);
+            // // //console.log("Class ID:", upload);
 
             // setJsonFile(upload);
 
@@ -481,16 +481,16 @@ const gettingStarted = (user: any) => {
               errors[4] = 1;
               errors[5] = 1;
             }
-            //console.log(class_list);
+            ////console.log(class_list);
             if (errors[5] == 0) {
               errors[5] = 2;
             }
 
             setStudents(class_list);
             setError(errors);
-            // console.log("Error:", error);
+            // //console.log("Error:", error);
           } else {
-            // console.log(
+            // //console.log(
             //   "excel file did not match the template, please upload another file"
             // );
 
@@ -507,7 +507,7 @@ const gettingStarted = (user: any) => {
         };
         reader.readAsBinaryString(file);
 
-        // console.log("file permitted");
+        // //console.log("file permitted");
       } else {
         setFileName(null);
         if (students) {
@@ -520,7 +520,7 @@ const gettingStarted = (user: any) => {
         );
         errors[2] = 1;
         errors[3] = 1;
-        // console.log("file denied");
+        // //console.log("file denied");
       }
     }
   };

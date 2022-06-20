@@ -74,6 +74,7 @@ import {
 import { getPronoun, getRemarksAnalysis } from "../lib/functions/feedback";
 import Footer from "../components/sections/Footer";
 import FuzzyDialog from "../components/dialogs/FuzzyDialog";
+import { fuzzyfy } from "../lib/functions/fuzzyis";
 
 Chart.register(
   ArcElement,
@@ -240,11 +241,11 @@ const StudentInfo = (user: any) => {
   }
 
   for (let i = 0; i < myquar.length; i++) {
-    //console.log(student?.quarter![i].grade_before!);
+    ////console.log(student?.quarter![i].grade_before!);
     quarter_data.push(transmuteGrade(student?.quarter![i].grade_before!));
     sum += student?.quarter![i].ranking!;
     let scr = 0;
-    //console.log(student?.quarter![i].written_percentage?.score!);
+    ////console.log(student?.quarter![i].written_percentage?.score!);
 
     //get sum of Weighted Score
     if (typeof student?.quarter![i].written_percentage?.score! !== "string") {
@@ -622,7 +623,7 @@ const StudentInfo = (user: any) => {
       });
     }
 
-    //console.log(student?.quarter, "TMP " + tmp, "MAX " + max);
+    ////console.log(student?.quarter, "TMP " + tmp, "MAX " + max);
 
     overall_feedback.push(
       `${
@@ -750,21 +751,37 @@ const StudentInfo = (user: any) => {
   const [hidden] = useState<boolean>(true);
   const [fuzzyDialog, setFuzzyDialogOpen] = useState<boolean>(false);
 
-  const ww_fuzzy_set = student?.quarter[0].ww_fuzzy.value as [];
-  const pt_fuzzy_set = [0, 60, 40, 0, 0];
+  let ave_ww_fuzz = fuzzyfy(ave_ww_pct / 100);
+  let ave_pt_fuzz = fuzzyfy(ave_pt_pct / 100);
 
-  const q_ww_fuzzy_set = [
-    [10, 90, 0, 0, 0],
-    [0, 30, 10, 70, 0],
-    [10, 90, 0, 0, 0],
-    [0, 60, 40, 0, 0],
-  ];
-  const q_pt_fuzzy_set = [
-    [0, 60, 40, 0, 0],
-    [10, 90, 0, 0, 0],
-    [0, 60, 40, 0, 0],
-    [10, 90, 0, 0, 0],
-  ];
+  let ww_fz = [];
+  let pt_fz = [];
+
+  for (let i = 0; i < 5; i++) {
+    ww_fz.push(parseFloat((ave_ww_fuzz[i] * 100).toFixed(2)));
+    pt_fz.push(parseFloat((ave_pt_fuzz[i] * 100).toFixed(2)));
+  }
+
+  const ww_fuzzy_set = ww_fz;
+  const pt_fuzzy_set = pt_fz;
+  let q_ww_fuzzy_set: any = [];
+  let q_pt_fuzzy_set: any = [];
+
+  student?.quarter.forEach((quarter) => {
+    let ww_multiply: number[] = [];
+    let pt_multiply: number[] = [];
+    for (let i = 0; i < quarter.ww_fuzzy.value.length; i++) {
+      ww_multiply.push(
+        parseFloat((quarter.ww_fuzzy.value[i] * 100).toFixed(2))
+      );
+      pt_multiply.push(
+        parseFloat((quarter.pt_fuzzy.value[i] * 100).toFixed(2))
+      );
+    }
+
+    q_ww_fuzzy_set.push(ww_multiply);
+    q_pt_fuzzy_set.push(pt_multiply);
+  });
 
   const [isOverall, setIsOverall] = useState<number>(-1);
 
@@ -991,7 +1008,7 @@ const StudentInfo = (user: any) => {
                   onClick={() => {
                     setQuarter(idx);
                     setMyStudent(student?.quarter![idx]!);
-                    //console.log(student?.quarter[idx]);
+                    ////console.log(student?.quarter[idx]);
                   }}
                 >
                   {myquar[idx]}
@@ -1417,8 +1434,8 @@ const StudentInfo = (user: any) => {
                   <div className="text-right">
                     <button
                       onClick={() => {
-                        setFuzzyDialogOpen(true);
                         setIsOverall(quarter);
+                        setFuzzyDialogOpen(true);
                       }}
                       className="underline font-semibold hover:text-ocean-400"
                     >

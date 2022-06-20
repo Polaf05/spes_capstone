@@ -81,7 +81,7 @@ export default function ClassroomInfo() {
     if (!students) {
       router.push("/dashboard");
     } else {
-      // console.log(students);
+      // //console.log(students);
       const myStudent = students![0].quarter![quarter];
       // get weighted omsim of a written works and performance task
       const wgh_ww = myStudent.written_weighted_score?.highest_possible_score;
@@ -163,7 +163,7 @@ export default function ClassroomInfo() {
       });
       //total score
       task_info.total = task.highest_possible_score;
-      //console.log(score_sum);
+      ////console.log(score_sum);
       task_info.ave_score = Number(
         (score_sum / task_info.participated).toFixed(1)
       );

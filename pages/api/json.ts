@@ -4,7 +4,7 @@ import { XMLHttpRequest } from "xmlhttprequest";
 const postJsonhandler: NextApiHandler = async (req, res) => {
   const { body } = req;
 
-  //console.log(body);
+  ////console.log(body);
 
   try {
     const response = await fetch("https://api.jsonbin.io/v3/b", {

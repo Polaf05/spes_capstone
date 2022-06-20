@@ -48,7 +48,7 @@ const BarChart = ({
         },
         onClick: function (evt, element) {
           // onClickNot working element null
-          //console.log(evt, element);
+          ////console.log(evt, element);
           if (element.length > 0) {
           }
         },

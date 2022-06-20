@@ -18,7 +18,7 @@ export const getGrade = (grade: any) =>
 
 export const getStudentGrades = (student: Student, quarters: number) => {
   const grade_array: number[] = [];
-  //console.log(quarters);
+  ////console.log(quarters);
   for (let i = 0; i < quarters; i++) {
     grade_array.push(transmuteGrade(student.quarter[i].grade_before));
   }
@@ -27,7 +27,7 @@ export const getStudentGrades = (student: Student, quarters: number) => {
 
 export const getStudentAverage = (student: Student, quarters: number) => {
   const grade_array: number[] = [];
-  //console.log(quarters);
+  ////console.log(quarters);
   for (let i = 0; i < quarters; i++) {
     grade_array.push(transmuteGrade(student.quarter[i].grade_before));
   }
@@ -172,7 +172,7 @@ export const getGradeNeeded = (quarters: number, student: Student) => {
   const sum = 0;
   const grades: number[] = getStudentGrades(student, quarters);
   const grade_sum: number = getSum(grades);
-  console.log(grade_sum, grades, quarters);
+  //console.log(grade_sum, grades, quarters);
   const ave_grade = (300 - grade_sum) / (4 - quarters);
 
   return ave_grade;

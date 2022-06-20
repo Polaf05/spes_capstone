@@ -15,7 +15,7 @@ const login = (user: any) => {
     if (users != null) {
       router.push("/getting-started");
     }
-    console.log(user);
+    //console.log(user);
   }, [users]);
 
   const handleSubmit = async (e: any) => {
@@ -26,19 +26,19 @@ const login = (user: any) => {
     const user = await axios.post("/api/auth/login", credentials);
 
     setUser(user);
-    console.log(user);
+    //console.log(user);
   };
 
   const handleGetUser = async () => {
     const user = await axios.get("/api/user");
 
-    console.log(user);
+    //console.log(user);
   };
 
   const handleLogOut = async () => {
     const user = await axios.get("/api/auth/logout");
 
-    console.log(user);
+    //console.log(user);
   };
 
   const [page, setPage] = useState<number>(3);
