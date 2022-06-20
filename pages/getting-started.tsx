@@ -527,9 +527,6 @@ const gettingStarted = (user: any) => {
     "DepEd Grading Sheet Template is met",
     "Has data inside the grading sheet",
     "Learning component is complete",
-    "Names of the students are correct",
-    "Grading Sheet is in Alphabetical Order",
-    "Complete data",
   ];
 
   const [page, setPage] = useState<number>(4);
@@ -630,7 +627,7 @@ const gettingStarted = (user: any) => {
                         <h3 className="font-bold text-white"></h3>
                       </div> */}
                       <h3 className="font-semibold text-lg">
-                        Upload Grading Sheet:{" "}
+                        Upload Grading Sheet{" "}
                         <span className="underline font-light">{fileName}</span>
                       </h3>
                     </div>
