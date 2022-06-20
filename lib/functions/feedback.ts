@@ -281,7 +281,7 @@ export const getMarginResults = (dataset: Dataset, option: string) => {
 };
 
 export const getPassingRemarks = (passing_pct: number, quarter: number) => {
-  //console.log("here:", passing_pct, quarter);
+  ////console.log("here:", passing_pct, quarter);
 
   const failedStudents = 100 - passing_pct;
   const passing_student = `${
@@ -701,7 +701,7 @@ export const getClassPerformanceAssessment = (
   const participants_diff = ww_participation - pt_participation;
   const ave_score_pct = ((ww_ave_pct + pt_ave_pct) / 2).toFixed(1);
 
-  //console.log(ww_ave_pct, pt_ave_pct, ave_score_pct);
+  ////console.log(ww_ave_pct, pt_ave_pct, ave_score_pct);
 
   if (participants_diff > 5) {
     if (ww_participation > 88) {

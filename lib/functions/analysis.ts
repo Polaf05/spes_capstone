@@ -81,7 +81,7 @@ export function fluctuation(task: TaskData[], possible: TaskData[]) {
   if (x.length > 1) {
     lines = findLineByLeastSquares(x, percent);
 
-    // //console.log(lines);
+    // ////console.log(lines);
 
     trends = lines.linguistic;
   } else {
@@ -173,7 +173,7 @@ export function quarterAnalysis(quarter: Quarter[]) {
   if (x.length > 1) {
     lines = findLineByLeastSquares(x, percent);
 
-    // console.log(lines);
+    // //console.log(lines);
 
     trends = lines.linguistic;
   } else {
@@ -408,7 +408,7 @@ function findLineByLeastSquares(values_x: number[], values_y: number[]) {
     result_values_y.push(y);
   }
 
-  // //console.log(result_values_x, result_values_y);
+  // ////console.log(result_values_x, result_values_y);
 
   let trend = parseFloat(
     (result_values_y[values_length - 1] - result_values_y[0]).toFixed(1)

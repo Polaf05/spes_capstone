@@ -70,7 +70,7 @@ export async function getSurveyList(link: string) {
             let surveyData = giveValue(survey);
             surveyType.push(surveyData);
           }
-          // console.log(giveValue(row as []));
+          // //console.log(giveValue(row as []));
         });
         return surveyType;
       }

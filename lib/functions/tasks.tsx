@@ -53,7 +53,7 @@ export const getTasksInfo = (
           });
           //total score
           task_info.total = task.highest_possible_score;
-          //console.log(score_sum);
+          ////console.log(score_sum);
           task_info.ave_score = Number(
             (score_sum / task_info.participated).toFixed(1)
           );

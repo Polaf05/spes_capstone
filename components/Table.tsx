@@ -7,7 +7,7 @@ const Table = ({ setIsOpen }: { setIsOpen: any }) => {
   let counter = 0;
 
   const { students } = useClassroom();
-  //console.log(students);
+  ////console.log(students);
   const [sortingMethod, setSorting] = useState("name");
   const { setStudent } = useSelectedStudent();
   const [filteredStudents, setFilteredStudents] = useState<Student[] | null>(

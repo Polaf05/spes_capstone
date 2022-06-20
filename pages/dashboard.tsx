@@ -181,10 +181,10 @@ const Dashboard = () => {
           getStudentAverage(student, qSum)
         );
 
-        //console.log(student.name, ": ", student_ave_remarks);
+        ////console.log(student.name, ": ", student_ave_remarks);
         if (student_ave_remarks.match(/Very Poor/g)) failedStudentsCount += 1;
       });
-      //console.log(failedStudentsCount);
+      ////console.log(failedStudentsCount);
 
       setFailedStudentsPCT(getScorePCT(failedStudentsCount, students.length));
 
