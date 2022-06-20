@@ -20,7 +20,7 @@ export const getStudentGrades = (student: Student, quarters: number) => {
   const grade_array: number[] = [];
   //console.log(quarters);
   for (let i = 0; i < quarters; i++) {
-    grade_array.push(student.quarter[i].grade_before);
+    grade_array.push(transmuteGrade(student.quarter[i].grade_before));
   }
   return grade_array;
 };
@@ -29,7 +29,7 @@ export const getStudentAverage = (student: Student, quarters: number) => {
   const grade_array: number[] = [];
   //console.log(quarters);
   for (let i = 0; i < quarters; i++) {
-    grade_array.push(student.quarter[i].grade_before);
+    grade_array.push(transmuteGrade(student.quarter[i].grade_before));
   }
   return getAverageGrade([grade_array])[0];
 };
