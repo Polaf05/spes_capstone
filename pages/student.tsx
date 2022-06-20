@@ -753,6 +753,21 @@ const StudentInfo = (user: any) => {
   const ww_fuzzy_set = [10, 90, 0, 0, 0];
   const pt_fuzzy_set = [0, 60, 40, 0, 0];
 
+  const q_ww_fuzzy_set = [
+    [10, 90, 0, 0, 0],
+    [0, 30, 10, 70, 0],
+    [10, 90, 0, 0, 0],
+    [0, 60, 40, 0, 0],
+  ];
+  const q_pt_fuzzy_set = [
+    [0, 60, 40, 0, 0],
+    [10, 90, 0, 0, 0],
+    [0, 60, 40, 0, 0],
+    [10, 90, 0, 0, 0],
+  ];
+
+  const [isOverall, setIsOverall] = useState<number>(-1);
+
   return (
     student && (
       <>
@@ -855,6 +870,7 @@ const StudentInfo = (user: any) => {
                   <button
                     onClick={() => {
                       setFuzzyDialogOpen(true);
+                      setIsOverall(-1);
                     }}
                     className="underline font-semibold hover:text-ocean-400"
                   >
@@ -862,8 +878,12 @@ const StudentInfo = (user: any) => {
                   </button>
                 </div>
                 <FuzzyDialog
-                  ww_fuzzy_set={ww_fuzzy_set}
-                  pt_fuzzy_set={pt_fuzzy_set}
+                  ww_fuzzy_set={
+                    isOverall === -1 ? ww_fuzzy_set : q_ww_fuzzy_set[isOverall]
+                  }
+                  pt_fuzzy_set={
+                    isOverall === -1 ? pt_fuzzy_set : q_pt_fuzzy_set[isOverall]
+                  }
                   fuzzyDialog={fuzzyDialog}
                   setFuzzyDialogOpen={setFuzzyDialogOpen}
                 />
@@ -1398,6 +1418,7 @@ const StudentInfo = (user: any) => {
                     <button
                       onClick={() => {
                         setFuzzyDialogOpen(true);
+                        setIsOverall(quarter);
                       }}
                       className="underline font-semibold hover:text-ocean-400"
                     >
