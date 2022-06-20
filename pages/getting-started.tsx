@@ -56,7 +56,7 @@ const gettingStarted = (user: any) => {
   const [error, setError] = useState<any>(null);
   const router = useRouter();
   const [hasData, setData] = useState<boolean>(false);
-  const [errors] = useState<number[]>([0, 0, 0, 0, 0, 0, -1, -1, -1]);
+  const [errors] = useState<number[]>([0, 0, 0, 0, -1, -1, -1]);
   // useEffect(() => {
   //   console.log(user);
   //   if (!user.user) {
@@ -523,8 +523,6 @@ const gettingStarted = (user: any) => {
     }
   };
   const checker_msg = [
-    "Link is correct and not restricted",
-    "Sheet template format is correct",
     "Uploaded file format is correct (.xlsx)",
     "DepEd Grading Sheet Template is met",
     "Has data inside the grading sheet",
@@ -583,7 +581,7 @@ const gettingStarted = (user: any) => {
               </div>
               <div className="px-2 grid grid-cols-2">
                 <div className="space-y-4">
-                  <div className="space-y-4 pr-6">
+                  {/* <div className="space-y-4 pr-6">
                     <div className="flex items-center gap-2">
                       <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
                         <h3 className="font-bold text-white">1</h3>
@@ -625,12 +623,12 @@ const gettingStarted = (user: any) => {
                         )}
                       </button>
                     </div>
-                  </div>
+                  </div> */}
                   <div className="space-y-4 pr-6">
                     <div className="flex items-center gap-2">
-                      <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
-                        <h3 className="font-bold text-white">2</h3>
-                      </div>
+                      {/* <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
+                        <h3 className="font-bold text-white"></h3>
+                      </div> */}
                       <h3 className="font-semibold text-lg">
                         Upload Grading Sheet:{" "}
                         <span className="underline font-light">{fileName}</span>
@@ -691,7 +689,7 @@ const gettingStarted = (user: any) => {
                         )}
                         <h5
                           className={classNames(
-                            idx > 5 ? "text-neutral-400" : ""
+                            idx > 3 ? "text-neutral-400" : ""
                           )}
                         >
                           {msg}
