@@ -750,7 +750,7 @@ const StudentInfo = (user: any) => {
   const [hidden] = useState<boolean>(true);
   const [fuzzyDialog, setFuzzyDialogOpen] = useState<boolean>(false);
 
-  const ww_fuzzy_set = [10, 90, 0, 0, 0];
+  const ww_fuzzy_set = student?.quarter[0].ww_fuzzy.value as [];
   const pt_fuzzy_set = [0, 60, 40, 0, 0];
 
   return (

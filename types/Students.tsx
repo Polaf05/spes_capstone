@@ -80,6 +80,7 @@ export interface Quarter {
   grade_before: number;
   grade_after: number;
   remarks: string;
+  remarks_fuzzy: string;
   diff: number;
   written_works: TaskData[];
   performance_tasks: TaskData[];

@@ -41,6 +41,7 @@ import {
 import Intro from "../components/sections/Intro";
 import { useJson } from "../hooks/useSetJson";
 import { useRouter } from "next/router";
+import { transmuteGrade } from "../lib/functions/grade_computation";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
@@ -295,7 +296,8 @@ const gettingStarted = (user: any) => {
                           grade_before: item[34],
                           diff: parseFloat((grade_after - item[35]).toFixed(1)),
                           grade_after: final_grade.satisfaction,
-                          remarks: final_grade.remarks,
+                          remarks: getRemarks(transmuteGrade(item[34])),
+                          remarks_fuzzy: final_grade.remarks,
                           written_works: written_works,
                           performance_tasks: performace_works,
                           written_percentage: getWeighted(
