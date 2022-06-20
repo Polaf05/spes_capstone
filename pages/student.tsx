@@ -930,7 +930,7 @@ const StudentInfo = (user: any) => {
                           </p>
                           <div className="w-full grid place-items-center">
                             <h2 className="font-bold text-2xl">
-                              {quarter.grade_before}
+                              {transmuteGrade(quarter.grade_before)}
                             </h2>
                             <h2 className="border-t-2 border-black font-semibold text-base">
                               Class Rank:
@@ -1016,7 +1016,9 @@ const StudentInfo = (user: any) => {
                   <div className="grid place-content-center">
                     <div className="grid place-content-center w-28 h-28 rounded-full bg-tallano_gold-200">
                       <h1 className="font-bold text-3xl">
-                        {myStudent?.grade_before}
+                        {transmuteGrade(
+                          myStudent ? myStudent.grade_before : -1
+                        )}
                       </h1>
                     </div>
                   </div>
