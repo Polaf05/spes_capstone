@@ -70,9 +70,7 @@ const gettingStarted = (user: any) => {
     let gsheet = await getSurveyList(text);
 
     if (gsheet !== null) {
-      errors[0] = 2;
       if (gsheet) {
-        errors[1] = 2;
         setForms(gsheet);
         setMessage("FORMS CONNECTED");
       } else {
@@ -80,14 +78,8 @@ const gettingStarted = (user: any) => {
       }
       setStudents(null);
       setFileName(null);
-
-      errors[2] = 0;
-      errors[3] = 0;
-      errors[4] = 0;
     } else {
       setMessage("ERROR, INCORRECT TEMPLATE OR THE FORMS IS RESTRICTED");
-      errors[0] = 1;
-      errors[1] = 1;
       setForms([]);
       setStudents(null);
       setFileName(null);
@@ -99,15 +91,16 @@ const gettingStarted = (user: any) => {
   const handleFile = async (e: any) => {
     const [file] = e.target.files;
 
+    errors[0] = 0;
+    errors[1] = 0;
     errors[2] = 0;
     errors[3] = 0;
-    errors[4] = 0;
 
     if (file != null) {
       const file_name = file.name;
       if (file_name.match(".xlsx")) {
         setFileName(file_name);
-        errors[2] = 2;
+        errors[0] = 2;
         setMessage("File uploaded successfully");
         const reader = new FileReader();
 
@@ -127,7 +120,7 @@ const gettingStarted = (user: any) => {
           let task_length = [] as any;
 
           if (wsname[6] === "DO NOT DELETE") {
-            errors[3] = 2;
+            errors[1] = 2;
             wsname.map((value, index) => {
               if (index != wsname.length - 1) {
                 const ws = wb.Sheets[value];
@@ -201,19 +194,19 @@ const gettingStarted = (user: any) => {
                           highest_score.written_works.length > 0 &&
                           highest_score.performance_work.length > 0
                         ) {
-                          errors[4] = 2;
+                          errors[2] = 2;
                         }
 
                         if (
                           highest_score.written_works.length == 0 &&
                           highest_score.performance_work.length == 0
                         ) {
-                          errors[5] = 0;
+                          errors[3] = 0;
                         } else if (
                           highest_score.written_works.length == 0 ||
                           highest_score.performance_work.length == 0
                         ) {
-                          errors[5] = 1;
+                          errors[3] = 1;
                         }
                         task_length.push(highest_score);
                       }
@@ -477,13 +470,13 @@ const gettingStarted = (user: any) => {
             // setJsonFile(upload);
 
             // let download = await fetchJson(upload);
-            if (errors[4] == 0) {
-              errors[4] = 1;
-              errors[5] = 1;
+            if (errors[2] == 0) {
+              errors[2] = 1;
+              errors[3] = 1;
             }
             ////console.log(class_list);
-            if (errors[5] == 0) {
-              errors[5] = 2;
+            if (errors[3] == 0) {
+              errors[3] = 2;
             }
 
             setStudents(class_list);
@@ -518,8 +511,8 @@ const gettingStarted = (user: any) => {
         setMessage(
           "File is incompatible, system only accepts excel files with proper format"
         );
-        errors[2] = 1;
-        errors[3] = 1;
+        errors[0] = 1;
+        errors[1] = 1;
         // //console.log("file denied");
       }
     }
@@ -703,13 +696,11 @@ const gettingStarted = (user: any) => {
                           (errors[0] === 2 &&
                             errors[1] === 2 &&
                             errors[2] === 2 &&
-                            errors[3] === 2 &&
-                            errors[4] === 2 &&
-                            errors[5] === 2) ||
-                          (errors[2] === 2 &&
-                            errors[3] === 2 &&
-                            errors[4] == 2 &&
-                            errors[5] == 2)
+                            errors[3] === 2) ||
+                          (errors[0] === 2 &&
+                            errors[1] === 2 &&
+                            errors[2] == 2 &&
+                            errors[3] == 2)
                             ? "/dashboard"
                             : "#"
                         }
@@ -721,11 +712,11 @@ const gettingStarted = (user: any) => {
                             (errors[0] === 2 &&
                               errors[1] === 2 &&
                               errors[2] === 2 &&
-                              errors[3] === 2 &&
-                              errors[4] === 2) ||
-                              (errors[2] === 2 &&
-                                errors[3] === 2 &&
-                                errors[4] === 2)
+                              errors[3] === 2) ||
+                              (errors[0] === 2 &&
+                                errors[1] === 2 &&
+                                errors[2] == 2 &&
+                                errors[3] == 2)
                               ? "opacity-100 cursor-pointer"
                               : "cursor-not-allowed"
                           )}
