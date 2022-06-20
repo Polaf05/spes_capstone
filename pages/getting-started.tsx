@@ -21,6 +21,9 @@ import {
   uploadJson,
 } from "../lib/functions/formatting";
 import {
+  componentSatisfaction,
+  computeFinalGrade,
+  computeFuzzy,
   fluctuation,
   getRanking,
   quarterAnalysis,
@@ -262,12 +265,37 @@ const gettingStarted = (user: any) => {
                           getGradeAfter(grade_after).toFixed(1)
                         );
 
+                        let written_com = computeFuzzy(
+                          item[17],
+                          highest_score.written_weighted_score * 100
+                        );
+                        let performance_com = computeFuzzy(
+                          item[30],
+                          highest_score.performance_weighted_score * 100
+                        );
+
+                        let written: componentSatisfaction = {
+                          score: written_com.satisfaction,
+                          highest: highest_score.written_weighted_score * 100,
+                        };
+
+                        let performance: componentSatisfaction = {
+                          score: performance_com.satisfaction,
+                          highest:
+                            highest_score.performance_weighted_score * 100,
+                        };
+
+                        let final_grade = computeFinalGrade(
+                          written,
+                          performance
+                        );
+
                         const quarter_grade: Quarter = {
                           id: i,
                           grade_before: item[34],
                           diff: parseFloat((grade_after - item[35]).toFixed(1)),
-                          grade_after: grade_after,
-                          remarks: remarks as string,
+                          grade_after: final_grade.satisfaction,
+                          remarks: final_grade.remarks,
                           written_works: written_works,
                           performance_tasks: performace_works,
                           written_percentage: getWeighted(
@@ -289,6 +317,14 @@ const gettingStarted = (user: any) => {
                           written_tasks_analysis: written_task_details,
                           performace_tasks_analysis: performace_task_details,
                           ranking: 0,
+                          ww_fuzzy: computeFuzzy(
+                            item[17],
+                            highest_score.written_weighted_score * 100
+                          ),
+                          pt_fuzzy: computeFuzzy(
+                            item[30],
+                            highest_score.performance_weighted_score * 100
+                          ),
                         };
                         i++;
                         quarters.push(quarter_grade);
@@ -427,7 +463,7 @@ const gettingStarted = (user: any) => {
                 inference_result: infer,
                 ranking: null,
               };
-              //// console.log(student_info);
+              console.log(student_info);
               classroom.push(student_info);
             });
             let class_list = getRanking(classroom, task_length);

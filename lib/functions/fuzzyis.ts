@@ -5,6 +5,8 @@ import {
   SurveyResult,
 } from "../../types/Students";
 
+import * as fuzzylogic from "fuzzylogic";
+
 export function remoteExperience(effectivity: number, similarities: number) {
   const system = new FIS("experience");
 
@@ -422,7 +424,6 @@ export function environmentalFactors(envVariables: number[]) {
   let average = sum / envVariables.length;
 
   return average;
-
 }
 
 export function externalElements(
@@ -641,3 +642,18 @@ export function getInferenceValue(inference: number) {
 
   return data;
 }
+export const fuzzyfy = function (score: number) {
+  let very_good = fuzzylogic.triangle(score, 0.7, 1, 1.25);
+  let good = fuzzylogic.triangle(score, 0.6, 0.7, 1);
+  let average = fuzzylogic.triangle(score, 0.4, 0.6, 0.7);
+  let poor = fuzzylogic.triangle(score, 0, 0.4, 0.6);
+  let very_poor = fuzzylogic.triangle(score, -0.25, 0, 0.4);
+
+  return [
+    parseFloat(very_good.toFixed(2)),
+    parseFloat(good.toFixed(2)),
+    parseFloat(average.toFixed(2)),
+    parseFloat(poor.toFixed(2)),
+    parseFloat(very_poor.toFixed(2)),
+  ];
+};

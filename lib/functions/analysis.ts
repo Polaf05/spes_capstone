@@ -1,6 +1,14 @@
 import { LinearScale } from "chart.js";
-import { Quarter, Student, TaskAnalysis, TaskData } from "../../types/Students";
+import {
+  fuzzyData,
+  Quarter,
+  scoreData,
+  Student,
+  TaskAnalysis,
+  TaskData,
+} from "../../types/Students";
 import { getRemarks } from "./formatting";
+import { fuzzyfy } from "./fuzzyis";
 
 export function fluctuation(task: TaskData[], possible: TaskData[]) {
   let trend = [];
@@ -417,3 +425,119 @@ function findLineByLeastSquares(values_x: number[], values_y: number[]) {
     return { trend: trend, linguistic: "downward" };
   }
 }
+
+export const computeFuzzy = (grade: number, total_score: number) => {
+  let percent = grade / total_score;
+
+  let linguistic = fuzzyfy(percent);
+  let ceiling: number[] = [0, 0, 0, 0, 0];
+  let remarks: string[] = [];
+
+  for (let i = 0; i < linguistic.length; i++) {
+    if (linguistic[i] > 0) {
+      switch (i) {
+        case 0:
+          //1
+          ceiling[0] = 1;
+          remarks.push(`Very Good at ${linguistic[i]}`);
+          break;
+        case 1:
+          //.79
+          ceiling[1] = 0.79;
+
+          remarks.push(`Good at ${linguistic[i]}`);
+          break;
+        case 2:
+          //.69
+          ceiling[2] = 0.69;
+          remarks.push(`Average at ${linguistic[i]}`);
+          break;
+        case 3:
+          //.59
+          ceiling[3] = 0.59;
+          remarks.push(`Poor at ${linguistic[i]}`);
+          break;
+        default:
+          //.39
+          ceiling[4] = 0.39;
+          remarks.push(`Very Poor at ${linguistic[i]}`);
+      }
+    }
+  }
+
+  let product: number[] = [];
+  for (let i = 0; i < ceiling.length; i++) {
+    product.push(linguistic[i] * ceiling[i]);
+  }
+
+  const sumProduct = product.reduce(
+    (previousValue, currentValue) => previousValue + currentValue,
+    0
+  );
+  const sumCeiling = ceiling.reduce(
+    (previousValue, currentValue) => previousValue + currentValue,
+    0
+  );
+
+  let component = sumProduct / sumCeiling;
+
+  const fuzz: fuzzyData = {
+    value: linguistic,
+    satisfaction: parseFloat(component.toFixed(2)),
+    remarks: remarks.join(" "),
+  };
+  return fuzz;
+};
+
+export type componentSatisfaction = {
+  highest: number;
+  score: number;
+};
+
+export const computeFinalGrade = (
+  written: componentSatisfaction,
+  performance: componentSatisfaction
+) => {
+  let ww_fuzz = written.highest * written.score;
+  let pt_fuzz = performance.highest * written.score;
+
+  let summationHighest = written.highest + performance.highest;
+
+  let finalGrade = (ww_fuzz + pt_fuzz) / summationHighest;
+
+  let linguistic = fuzzyfy(finalGrade);
+
+  let remarks: string[] = [];
+
+  for (let i = 0; i < linguistic.length; i++) {
+    if (linguistic[i] > 0) {
+      switch (i) {
+        case 0:
+          //1
+          remarks.push(`Very Good at ${linguistic[i]}`);
+          break;
+        case 1:
+          //.79
+          remarks.push(`Good at ${linguistic[i]}`);
+          break;
+        case 2:
+          //.69
+          remarks.push(`Average at ${linguistic[i]}`);
+          break;
+        case 3:
+          //.59
+          remarks.push(`Poor at ${linguistic[i]}`);
+          break;
+        default:
+          //.39
+          remarks.push(`Very Poor at ${linguistic[i]}`);
+      }
+    }
+  }
+  const fuzz: fuzzyData = {
+    value: linguistic,
+    satisfaction: parseFloat(finalGrade.toFixed(2)),
+    remarks: remarks.join(" "),
+  };
+  return fuzz;
+};
