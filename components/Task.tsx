@@ -62,6 +62,7 @@ export const Task = ({
       setFilteredStudents([
         ...students!.sort((a, b) => {
           switch (sortingMethod) {
+            case "Initial Grade":
             case "Transmuted Grade":
               return category === "Over All"
                 ? b.quarter![quarter].grade_before -
@@ -82,7 +83,6 @@ export const Task = ({
                 return 1;
               }
               return 0;
-            case "Initial Grade":
             case "Remarks":
               return category === "Over All"
                 ? b.quarter![quarter].grade_after -
@@ -196,7 +196,7 @@ export const Task = ({
                         className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                         onClick={() => setSorting("Initial Grade")}
                       >
-                        Initial Grade
+                        Initial
                       </button>
                     </th>
                     <th>
@@ -204,7 +204,23 @@ export const Task = ({
                         className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                         onClick={() => setSorting("Transmuted Grade")}
                       >
-                        Transmuted Grade
+                        Transmuted
+                      </button>
+                    </th>
+                    <th>
+                      <button
+                        className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
+                        onClick={() => setSorting("Fuzzy Grade")}
+                      >
+                        Fuzzy
+                      </button>
+                    </th>
+                    <th>
+                      <button
+                        className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
+                        onClick={() => setSorting("Fuzzy Remarks")}
+                      >
+                        Fuzzy Remarks
                       </button>
                     </th>
                   </tr>
@@ -265,6 +281,34 @@ export const Task = ({
                                       : student.quarter![quarter]
                                           .performance_percentage?.score
                                   )
+                                )
+                              )}
+                        </td>
+                        <td>
+                          {category === "Over All"
+                            ? transmuteGrade(
+                                student.quarter![quarter].grade_after * 100
+                              )
+                            : displayData(
+                                transmuteGrade(
+                                  getGrade(
+                                    category === "Written Works"
+                                      ? student.quarter![quarter].ww_fuzzy.value
+                                      : student.quarter![quarter].pt_fuzzy.value
+                                  )
+                                )
+                              )}
+                        </td>
+                        <td>
+                          {category === "Over All"
+                            ? getRemarks(student.quarter![quarter].grade_before)
+                            : getRemarks(
+                                getGrade(
+                                  category === "Written Works"
+                                    ? student.quarter![quarter]
+                                        .written_percentage?.score
+                                    : student.quarter![quarter]
+                                        .performance_percentage?.score
                                 )
                               )}
                         </td>
