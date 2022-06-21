@@ -196,7 +196,7 @@ export const Task = ({
                         className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                         onClick={() => setSorting("Initial Grade")}
                       >
-                        Initial
+                        Initial Grade
                       </button>
                     </th>
                     <th>
@@ -204,7 +204,7 @@ export const Task = ({
                         className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                         onClick={() => setSorting("Transmuted Grade")}
                       >
-                        Transmuted
+                        Final Grade
                       </button>
                     </th>
                     <th>
@@ -212,17 +212,17 @@ export const Task = ({
                         className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                         onClick={() => setSorting("Fuzzy Grade")}
                       >
-                        Fuzzy
+                        Performance Rate
                       </button>
                     </th>
-                    <th>
+                    {/* <th>
                       <button
                         className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
                         onClick={() => setSorting("Fuzzy Remarks")}
                       >
-                        Fuzzy Remarks
+                        Remarks
                       </button>
-                    </th>
+                    </th> */}
                   </tr>
                 </thead>
                 {/* Table Contents */}
@@ -233,13 +233,17 @@ export const Task = ({
                         className={classNames(
                           "hover:cursor-pointer text-center hover:font-semibold",
                           (category === "Over All"
-                            ? student.quarter![quarter].grade_before
-                            : getGrade(
-                                category === "Written Works"
-                                  ? student.quarter![quarter].written_percentage
-                                      ?.score
-                                  : student.quarter![quarter]
-                                      .performance_percentage?.score
+                            ? transmuteGrade(
+                                student.quarter![quarter].grade_before
+                              )
+                            : transmuteGrade(
+                                getGrade(
+                                  category === "Written Works"
+                                    ? student.quarter![quarter]
+                                        .written_percentage?.score
+                                    : student.quarter![quarter]
+                                        .performance_percentage?.score
+                                )
                               )) > 75
                             ? "odd:bg-yellow-50 even:bg-white"
                             : "bg-red-200"
@@ -256,7 +260,7 @@ export const Task = ({
                         </td>
                         <td className="">
                           {category === "Over All"
-                            ? student.quarter![quarter].grade_before
+                            ? student.quarter![quarter].grade_before.toFixed()
                             : displayData(
                                 getGrade(
                                   category === "Written Works"
@@ -264,7 +268,7 @@ export const Task = ({
                                         .written_percentage?.score
                                     : student.quarter![quarter]
                                         .performance_percentage?.score
-                                )
+                                ).toFixed()
                               )}
                         </td>
                         <td>
@@ -286,20 +290,18 @@ export const Task = ({
                         </td>
                         <td>
                           {category === "Over All"
-                            ? transmuteGrade(
-                                student.quarter![quarter].grade_after * 100
-                              )
+                            ? student.quarter![quarter].grade_after * 100
                             : displayData(
-                                transmuteGrade(
-                                  getGrade(
-                                    category === "Written Works"
-                                      ? student.quarter![quarter].ww_fuzzy.value
-                                      : student.quarter![quarter].pt_fuzzy.value
-                                  )
+                                getGrade(
+                                  category === "Written Works"
+                                    ? student.quarter![quarter].ww_fuzzy
+                                        .satisfaction * 100
+                                    : student.quarter![quarter].pt_fuzzy
+                                        .satisfaction * 100
                                 )
                               )}
                         </td>
-                        <td>
+                        {/* <td>
                           {category === "Over All"
                             ? getRemarks(student.quarter![quarter].grade_before)
                             : getRemarks(
@@ -311,7 +313,7 @@ export const Task = ({
                                         .performance_percentage?.score
                                 )
                               )}
-                        </td>
+                        </td> */}
                       </tr>
                     ))}
                 </tbody>
@@ -333,8 +335,8 @@ export const Task = ({
             >
               <QuestionMarkCircleIcon className="w-3 h-3 text-neutral-500 hover:cursor-pointer" />
               <p className="text-neutral-500 text-sm">
-                Suggested Grade will only show on Overall tab, if google
-                spreadsheet data (external elements included) is available
+                Performance is rated through fuzzification process. Fuzzy rate
+                implies the performance of a student for the quarter.
               </p>
             </div>
           </div>
