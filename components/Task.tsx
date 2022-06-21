@@ -268,7 +268,7 @@ export const Task = ({
                                         .written_percentage?.score
                                     : student.quarter![quarter]
                                         .performance_percentage?.score
-                                ).toFixed()
+                                )
                               )}
                         </td>
                         <td>
@@ -290,7 +290,6 @@ export const Task = ({
                         </td>
                         <td>
                           {category === "Over All"
-
                             ? parseFloat(
                                 (
                                   student.quarter![quarter].grade_after * 100
