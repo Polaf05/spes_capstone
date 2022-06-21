@@ -286,16 +286,26 @@ export const Task = ({
                         </td>
                         <td>
                           {category === "Over All"
-                            ? transmuteGrade(
-                                student.quarter![quarter].grade_after * 100
+                            ? parseFloat(
+                                (
+                                  student.quarter![quarter].grade_after * 100
+                                ).toFixed()
                               )
                             : displayData(
-                                transmuteGrade(
-                                  getGrade(
-                                    category === "Written Works"
-                                      ? student.quarter![quarter].ww_fuzzy.value
-                                      : student.quarter![quarter].pt_fuzzy.value
-                                  )
+                                getGrade(
+                                  category === "Written Works"
+                                    ? parseFloat(
+                                        (
+                                          student.quarter![quarter].ww_fuzzy
+                                            .satisfaction * 100
+                                        ).toFixed()
+                                      )
+                                    : parseFloat(
+                                        (
+                                          student.quarter![quarter].pt_fuzzy
+                                            .satisfaction * 100
+                                        ).toFixed()
+                                      )
                                 )
                               )}
                         </td>

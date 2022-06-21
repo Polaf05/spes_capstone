@@ -466,7 +466,7 @@ export const computeFuzzy = (grade: number, total_score: number) => {
   }
 
   let product: number[] = [];
-  for (let i = 0; i < ceiling.length; i++) {
+  for (let i = 0; i < linguistic.length; i++) {
     product.push(linguistic[i] * ceiling[i]);
   }
 
@@ -474,12 +474,8 @@ export const computeFuzzy = (grade: number, total_score: number) => {
     (previousValue, currentValue) => previousValue + currentValue,
     0
   );
-  const sumCeiling = ceiling.reduce(
-    (previousValue, currentValue) => previousValue + currentValue,
-    0
-  );
 
-  let component = sumProduct / sumCeiling;
+  let component = sumProduct / 1;
   const fuzz: fuzzyData = {
     value: linguistic,
     satisfaction: parseFloat(component.toFixed(2)),
