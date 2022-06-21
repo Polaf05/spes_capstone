@@ -6,13 +6,18 @@ import {
   XIcon,
 } from "@heroicons/react/outline";
 import { classNames } from "../../lib/functions/concat";
+import { Student } from "../../types/Students";
 
 const FuzzyDialog = ({
+  student,
+  quarter,
   ww_fuzzy_set,
   pt_fuzzy_set,
   fuzzyDialog,
   setFuzzyDialogOpen,
 }: {
+  student: Student;
+  quarter: number;
   ww_fuzzy_set: number[];
   pt_fuzzy_set: number[];
 
@@ -106,6 +111,14 @@ const FuzzyDialog = ({
                       </div>
                     ))}
                   </div>
+                </div>
+                <div className="grid grid-cols-5 gap-4">
+                  <p className="text-[0.8rem] font-light col-start-2 col-span-2">
+                    {student.quarter[quarter].ww_fuzzy.remarks}
+                  </p>
+                  <p className="text-[0.8rem] font-light col-span-2">
+                    {student.quarter[quarter].pt_fuzzy.remarks}
+                  </p>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

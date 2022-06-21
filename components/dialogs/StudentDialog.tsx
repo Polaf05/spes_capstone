@@ -39,7 +39,10 @@ import {
   formatName,
   studentInCategory,
 } from "../../lib/functions/concat";
-import { getGrade } from "../../lib/functions/grade_computation";
+import {
+  getGrade,
+  transmuteGrade,
+} from "../../lib/functions/grade_computation";
 import { getRemarks } from "../../lib/functions/formatting";
 import { StruggledStudent, Student } from "../../types/Students";
 import StudentScores from "../students/StudentScores";
@@ -276,16 +279,18 @@ const StudentDialog = ({
                               )}
                             >
                               <h1 className="font-bold lg:text-lg xl:text-xl">
-                                {student?.quarter![quarter].grade_before}
+                                {transmuteGrade(
+                                  student?.quarter![quarter].grade_before
+                                )}
                               </h1>
                             </span>
                             <div className="">
                               <h1 className="font-bold text-lg">
-                                Grade before
+                                Quarter grade
                               </h1>
                               <div className="flex place-items-center">
                                 <p className="">
-                                  Suggested Grade:{" "}
+                                  Performance Rate (Fuzzy):{" "}
                                   {student?.quarter![quarter].grade_after ===
                                   0 ? (
                                     <span className="font-light italic">

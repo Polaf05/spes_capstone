@@ -895,6 +895,8 @@ const StudentInfo = (user: any) => {
                   </button>
                 </div>
                 <FuzzyDialog
+                  student={student}
+                  quarter={quarter}
                   ww_fuzzy_set={
                     isOverall === -1 ? ww_fuzzy_set : q_ww_fuzzy_set[isOverall]
                   }
