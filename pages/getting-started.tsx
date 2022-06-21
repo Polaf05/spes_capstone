@@ -530,7 +530,7 @@ const gettingStarted = (user: any) => {
       <div className="bg-[url('/bg-form.jpg')] bg-cover min-h-screen">
         {page > 3 ? (
           <div className="flex justify-center h-screen items-center">
-            <div className="space-y-4 bg-ocean-100 w-10/12 h-4/5 rounded-2xl p-10 xl:w-4/5">
+            <div className="space-y-4 bg-ocean-100 w-10/12 h-fit rounded-2xl p-10 xl:w-4/5">
               <div className="flex justify-between">
                 <div>
                   <h1 className="text-2xl font-bold">
