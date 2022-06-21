@@ -757,9 +757,60 @@ const StudentInfo = (user: any) => {
   let ww_fz = [];
   let pt_fz = [];
 
+  let ww_fuzzy_remarks: string[] = [];
+  let pt_fuzzy_remarks: string[] = [];
+
   for (let i = 0; i < 5; i++) {
     ww_fz.push(parseFloat((ave_ww_fuzz[i] * 100).toFixed(2)));
     pt_fz.push(parseFloat((ave_pt_fuzz[i] * 100).toFixed(2)));
+  }
+  for (let i = 0; i < 5; i++) {
+    if (ww_fz[i] > 0) {
+      switch (i) {
+        case 0:
+          //1
+          ww_fuzzy_remarks.push(`Very Good at ${ww_fz[i]}`);
+          break;
+        case 1:
+          //.79
+          ww_fuzzy_remarks.push(`Good at ${ww_fz[i]}`);
+          break;
+        case 2:
+          //.69
+          ww_fuzzy_remarks.push(`Average at ${ww_fz[i]}`);
+          break;
+        case 3:
+          //.59
+          ww_fuzzy_remarks.push(`Poor at ${ww_fz[i]}`);
+          break;
+        default:
+          //.39
+          ww_fuzzy_remarks.push(`Very Poor at ${ww_fz[i]}`);
+      }
+    }
+    if (pt_fz[i] > 0) {
+      switch (i) {
+        case 0:
+          //1
+          pt_fuzzy_remarks.push(`Very Good at ${pt_fz[i]}`);
+          break;
+        case 1:
+          //.79
+          pt_fuzzy_remarks.push(`Good at ${pt_fz[i]}`);
+          break;
+        case 2:
+          //.69
+          pt_fuzzy_remarks.push(`Average at ${pt_fz[i]}`);
+          break;
+        case 3:
+          //.59
+          pt_fuzzy_remarks.push(`Poor at ${pt_fz[i]}`);
+          break;
+        default:
+          //.39
+          pt_fuzzy_remarks.push(`Very Poor at ${pt_fz[i]}`);
+      }
+    }
   }
 
   const ww_fuzzy_set = ww_fz;
