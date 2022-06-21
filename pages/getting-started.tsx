@@ -40,7 +40,11 @@ import {
 import Intro from "../components/sections/Intro";
 import { useJson } from "../hooks/useSetJson";
 import { useRouter } from "next/router";
-import { transmuteGrade, getRemarks } from "../lib/functions/grade_computation";
+import {
+  transmuteGrade,
+  getRemarks,
+  getGrade,
+} from "../lib/functions/grade_computation";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
@@ -259,11 +263,11 @@ const gettingStarted = (user: any) => {
                         );
 
                         let written_com = computeFuzzy(
-                          item[17],
+                          getGrade(item[17]) === -1 ? 0 : item[17],
                           highest_score.written_weighted_score * 100
                         );
                         let performance_com = computeFuzzy(
-                          item[30],
+                          getGrade(item[30]) === -1 ? 0 : item[30],
                           highest_score.performance_weighted_score * 100
                         );
 
