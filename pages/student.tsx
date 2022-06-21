@@ -946,6 +946,9 @@ const StudentInfo = (user: any) => {
                   </button>
                 </div>
                 <FuzzyDialog
+                  isOverall={isOverall}
+                  ww_fuzzy_remarks={ww_fuzzy_remarks.join(" ")}
+                  pt_fuzzy_remarks={pt_fuzzy_remarks.join(" ")}
                   student={student}
                   quarter={quarter}
                   ww_fuzzy_set={

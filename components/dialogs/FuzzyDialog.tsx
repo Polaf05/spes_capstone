@@ -9,6 +9,9 @@ import { classNames } from "../../lib/functions/concat";
 import { Student } from "../../types/Students";
 
 const FuzzyDialog = ({
+  isOverall,
+  ww_fuzzy_remarks,
+  pt_fuzzy_remarks,
   student,
   quarter,
   ww_fuzzy_set,
@@ -16,6 +19,9 @@ const FuzzyDialog = ({
   fuzzyDialog,
   setFuzzyDialogOpen,
 }: {
+  isOverall: number;
+  ww_fuzzy_remarks: string;
+  pt_fuzzy_remarks: string;
   student: Student;
   quarter: number;
   ww_fuzzy_set: number[];
@@ -114,10 +120,14 @@ const FuzzyDialog = ({
                 </div>
                 <div className="grid grid-cols-5 gap-4">
                   <p className="text-[0.8rem] font-light col-start-2 col-span-2">
-                    {student.quarter[quarter].ww_fuzzy.remarks}
+                    {isOverall >= 0
+                      ? student.quarter[quarter].ww_fuzzy.remarks
+                      : ww_fuzzy_remarks}
                   </p>
                   <p className="text-[0.8rem] font-light col-span-2">
-                    {student.quarter[quarter].pt_fuzzy.remarks}
+                    {isOverall >= 0
+                      ? student.quarter[quarter].pt_fuzzy.remarks
+                      : pt_fuzzy_remarks}
                   </p>
                 </div>
               </Dialog.Panel>
