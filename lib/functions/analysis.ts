@@ -480,7 +480,6 @@ export const computeFuzzy = (grade: number, total_score: number) => {
   );
 
   let component = sumProduct / sumCeiling;
-
   const fuzz: fuzzyData = {
     value: linguistic,
     satisfaction: parseFloat(component.toFixed(2)),
@@ -499,7 +498,7 @@ export const computeFinalGrade = (
   performance: componentSatisfaction
 ) => {
   let ww_fuzz = written.highest * written.score;
-  let pt_fuzz = performance.highest * written.score;
+  let pt_fuzz = performance.highest * performance.score;
 
   let summationHighest = written.highest + performance.highest;
 
