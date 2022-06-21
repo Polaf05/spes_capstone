@@ -290,14 +290,27 @@ export const Task = ({
                         </td>
                         <td>
                           {category === "Over All"
-                            ? student.quarter![quarter].grade_after * 100
+
+                            ? parseFloat(
+                                (
+                                  student.quarter![quarter].grade_after * 100
+                                ).toFixed()
+                              )
                             : displayData(
                                 getGrade(
                                   category === "Written Works"
-                                    ? student.quarter![quarter].ww_fuzzy
-                                        .satisfaction * 100
-                                    : student.quarter![quarter].pt_fuzzy
-                                        .satisfaction * 100
+                                    ? parseFloat(
+                                        (
+                                          student.quarter![quarter].ww_fuzzy
+                                            .satisfaction * 100
+                                        ).toFixed()
+                                      )
+                                    : parseFloat(
+                                        (
+                                          student.quarter![quarter].pt_fuzzy
+                                            .satisfaction * 100
+                                        ).toFixed()
+                                      )
                                 )
                               )}
                         </td>
