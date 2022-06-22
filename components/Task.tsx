@@ -83,7 +83,7 @@ export const Task = ({
                 return 1;
               }
               return 0;
-            case "Remarks":
+            case "Performance Rate":
               return category === "Over All"
                 ? b.quarter![quarter].grade_after -
                     a.quarter![quarter].grade_after
@@ -210,7 +210,7 @@ export const Task = ({
                     <th>
                       <button
                         className="font-semibold hover:cursor-pointer rounded-full px-4 hover:bg-ocean-100 focus-within:bg-ocean-100"
-                        onClick={() => setSorting("Fuzzy Grade")}
+                        onClick={() => setSorting("Performance Rate")}
                       >
                         Performance Rate
                       </button>

@@ -17,6 +17,7 @@ import {
 import {
   getAverageGrade,
   getGrade,
+  getRemarks,
   transmuteGrade,
 } from "../lib/functions/grade_computation";
 import { useSelectedQuarter } from "../hooks/useSelectedQuarter";
@@ -32,18 +33,6 @@ import {
 import Footer from "../components/sections/Footer";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
-
-const getRemarks = (grade: number) => {
-  return grade < 75
-    ? "Very Poor"
-    : grade < 83
-    ? "Poor"
-    : grade < 90
-    ? "Average"
-    : grade < 97
-    ? "Good"
-    : "Very Good";
-};
 
 // export async function getServerSideProps(context: any) {
 //   let headerCookie = context.req.headers.cookie;
