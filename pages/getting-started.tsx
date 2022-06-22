@@ -14,13 +14,15 @@ import {
 import {
   fetchJson,
   getGradeAfter,
-  getRemarks,
   getSurveyResults,
   getTask,
   getWeighted,
   uploadJson,
 } from "../lib/functions/formatting";
 import {
+  componentSatisfaction,
+  computeFinalGrade,
+  computeFuzzy,
   fluctuation,
   getRanking,
   quarterAnalysis,
@@ -38,6 +40,11 @@ import {
 import Intro from "../components/sections/Intro";
 import { useJson } from "../hooks/useSetJson";
 import { useRouter } from "next/router";
+import {
+  transmuteGrade,
+  getRemarks,
+  getGrade,
+} from "../lib/functions/grade_computation";
 
 const INITIAL_MESSAGE =
   "An error message will appear here if there is problem with your file";
@@ -53,9 +60,9 @@ const gettingStarted = (user: any) => {
   const [error, setError] = useState<any>(null);
   const router = useRouter();
   const [hasData, setData] = useState<boolean>(false);
-  const [errors] = useState<number[]>([0, 0, 0, 0, 0, 0, -1, -1, -1]);
+  const [errors] = useState<number[]>([0, 0, 0, 0, -1, -1, -1]);
   // useEffect(() => {
-  //   console.log(user);
+  //   //console.log(user);
   //   if (!user.user) {
   //     router.push("/login");
   //   }
@@ -66,9 +73,7 @@ const gettingStarted = (user: any) => {
     let gsheet = await getSurveyList(text);
 
     if (gsheet !== null) {
-      errors[0] = 2;
       if (gsheet) {
-        errors[1] = 2;
         setForms(gsheet);
         setMessage("FORMS CONNECTED");
       } else {
@@ -76,14 +81,8 @@ const gettingStarted = (user: any) => {
       }
       setStudents(null);
       setFileName(null);
-
-      errors[2] = 0;
-      errors[3] = 0;
-      errors[4] = 0;
     } else {
       setMessage("ERROR, INCORRECT TEMPLATE OR THE FORMS IS RESTRICTED");
-      errors[0] = 1;
-      errors[1] = 1;
       setForms([]);
       setStudents(null);
       setFileName(null);
@@ -95,15 +94,16 @@ const gettingStarted = (user: any) => {
   const handleFile = async (e: any) => {
     const [file] = e.target.files;
 
+    errors[0] = 0;
+    errors[1] = 0;
     errors[2] = 0;
     errors[3] = 0;
-    errors[4] = 0;
 
     if (file != null) {
       const file_name = file.name;
       if (file_name.match(".xlsx")) {
         setFileName(file_name);
-        errors[2] = 2;
+        errors[0] = 2;
         setMessage("File uploaded successfully");
         const reader = new FileReader();
 
@@ -123,7 +123,7 @@ const gettingStarted = (user: any) => {
           let task_length = [] as any;
 
           if (wsname[6] === "DO NOT DELETE") {
-            errors[3] = 2;
+            errors[1] = 2;
             wsname.map((value, index) => {
               if (index != wsname.length - 1) {
                 const ws = wb.Sheets[value];
@@ -197,19 +197,19 @@ const gettingStarted = (user: any) => {
                           highest_score.written_works.length > 0 &&
                           highest_score.performance_work.length > 0
                         ) {
-                          errors[4] = 2;
+                          errors[2] = 2;
                         }
 
                         if (
                           highest_score.written_works.length == 0 &&
                           highest_score.performance_work.length == 0
                         ) {
-                          errors[5] = 0;
+                          errors[3] = 0;
                         } else if (
                           highest_score.written_works.length == 0 ||
                           highest_score.performance_work.length == 0
                         ) {
-                          errors[5] = 1;
+                          errors[3] = 1;
                         }
                         task_length.push(highest_score);
                       }
@@ -262,12 +262,38 @@ const gettingStarted = (user: any) => {
                           getGradeAfter(grade_after).toFixed(1)
                         );
 
+                        let written_com = computeFuzzy(
+                          getGrade(item[17]) === -1 ? 0 : item[17],
+                          highest_score.written_weighted_score * 100
+                        );
+                        let performance_com = computeFuzzy(
+                          getGrade(item[30]) === -1 ? 0 : item[30],
+                          highest_score.performance_weighted_score * 100
+                        );
+
+                        let written: componentSatisfaction = {
+                          score: written_com.satisfaction,
+                          highest: highest_score.written_weighted_score * 100,
+                        };
+
+                        let performance: componentSatisfaction = {
+                          score: performance_com.satisfaction,
+                          highest:
+                            highest_score.performance_weighted_score * 100,
+                        };
+
+                        let final_grade = computeFinalGrade(
+                          written,
+                          performance
+                        );
+
                         const quarter_grade: Quarter = {
                           id: i,
-                          grade_before: item[35],
+                          grade_before: item[34],
                           diff: parseFloat((grade_after - item[35]).toFixed(1)),
-                          grade_after: grade_after,
-                          remarks: remarks as string,
+                          grade_after: final_grade.satisfaction,
+                          remarks: getRemarks(item[34]),
+                          remarks_fuzzy: final_grade.remarks,
                           written_works: written_works,
                           performance_tasks: performace_works,
                           written_percentage: getWeighted(
@@ -289,6 +315,14 @@ const gettingStarted = (user: any) => {
                           written_tasks_analysis: written_task_details,
                           performace_tasks_analysis: performace_task_details,
                           ranking: 0,
+                          ww_fuzzy: computeFuzzy(
+                            item[17],
+                            highest_score.written_weighted_score * 100
+                          ),
+                          pt_fuzzy: computeFuzzy(
+                            item[30],
+                            highest_score.performance_weighted_score * 100
+                          ),
                         };
                         i++;
                         quarters.push(quarter_grade);
@@ -427,32 +461,32 @@ const gettingStarted = (user: any) => {
                 inference_result: infer,
                 ranking: null,
               };
-              //// console.log(student_info);
+              //console.log(student_info);
               classroom.push(student_info);
             });
             let class_list = getRanking(classroom, task_length);
 
-            // // console.log("Class List:", class_list);
+            // // //console.log("Class List:", class_list);
             // let upload = await uploadJson(class_list);
-            // // console.log("Class ID:", upload);
+            // // //console.log("Class ID:", upload);
 
             // setJsonFile(upload);
 
             // let download = await fetchJson(upload);
-            if (errors[4] == 0) {
-              errors[4] = 1;
-              errors[5] = 1;
+            if (errors[2] == 0) {
+              errors[2] = 1;
+              errors[3] = 1;
             }
-            //console.log(class_list);
-            if (errors[5] == 0) {
-              errors[5] = 2;
+            console.log(class_list);
+            if (errors[3] == 0) {
+              errors[3] = 2;
             }
 
             setStudents(class_list);
             setError(errors);
-            // console.log("Error:", error);
+            // //console.log("Error:", error);
           } else {
-            // console.log(
+            // //console.log(
             //   "excel file did not match the template, please upload another file"
             // );
 
@@ -469,7 +503,7 @@ const gettingStarted = (user: any) => {
         };
         reader.readAsBinaryString(file);
 
-        // console.log("file permitted");
+        // //console.log("file permitted");
       } else {
         setFileName(null);
         if (students) {
@@ -480,22 +514,17 @@ const gettingStarted = (user: any) => {
         setMessage(
           "File is incompatible, system only accepts excel files with proper format"
         );
-        errors[2] = 1;
-        errors[3] = 1;
-        // console.log("file denied");
+        errors[0] = 1;
+        errors[1] = 1;
+        // //console.log("file denied");
       }
     }
   };
   const checker_msg = [
-    "Link is correct and not restricted",
-    "Sheet template format is correct",
     "Uploaded file format is correct (.xlsx)",
     "DepEd Grading Sheet Template is met",
     "Has data inside the grading sheet",
     "Learning component is complete",
-    "Names of the students are correct",
-    "Grading Sheet is in Alphabetical Order",
-    "Complete data",
   ];
 
   const [page, setPage] = useState<number>(4);
@@ -504,8 +533,8 @@ const gettingStarted = (user: any) => {
     <React.Fragment>
       <div className="bg-[url('/bg-form.jpg')] bg-cover min-h-screen">
         {page > 3 ? (
-          <div className="flex justify-center">
-            <div className="space-y-4 bg-ocean-100 w-10/12 my-10 rounded-2xl p-10 xl:w-4/5">
+          <div className="flex justify-center h-screen items-center">
+            <div className="space-y-4 bg-ocean-100 w-10/12 h-fit rounded-2xl p-10 xl:w-4/5">
               <div className="flex justify-between">
                 <div>
                   <h1 className="text-2xl font-bold">
@@ -547,7 +576,7 @@ const gettingStarted = (user: any) => {
               </div>
               <div className="px-2 grid grid-cols-2">
                 <div className="space-y-4">
-                  <div className="space-y-4 pr-6">
+                  {/* <div className="space-y-4 pr-6">
                     <div className="flex items-center gap-2">
                       <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
                         <h3 className="font-bold text-white">1</h3>
@@ -589,14 +618,14 @@ const gettingStarted = (user: any) => {
                         )}
                       </button>
                     </div>
-                  </div>
+                  </div> */}
                   <div className="space-y-4 pr-6">
                     <div className="flex items-center gap-2">
-                      <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
-                        <h3 className="font-bold text-white">2</h3>
-                      </div>
+                      {/* <div className="bg-ocean-400 w-6 h-6 flex justify-center items-center rounded-full">
+                        <h3 className="font-bold text-white"></h3>
+                      </div> */}
                       <h3 className="font-semibold text-lg">
-                        Upload Grading Sheet:{" "}
+                        Upload Grading Sheet{" "}
                         <span className="underline font-light">{fileName}</span>
                       </h3>
                     </div>
@@ -643,7 +672,7 @@ const gettingStarted = (user: any) => {
                   <h3 className="text-lg font-semibold">System Requirements</h3>
                   <div>
                     {checker_msg.map((msg, idx) => (
-                      <div className="flex gap-4 items-center py-1">
+                      <div key={idx} className="flex gap-4 items-center py-1">
                         {errors[idx] === 2 ? (
                           <CheckCircleIcon className="w-5 h-5 text-green-500" />
                         ) : errors[idx] === 0 ? (
@@ -655,7 +684,7 @@ const gettingStarted = (user: any) => {
                         )}
                         <h5
                           className={classNames(
-                            idx > 5 ? "text-neutral-400" : ""
+                            idx > 3 ? "text-neutral-400" : ""
                           )}
                         >
                           {msg}
@@ -670,13 +699,11 @@ const gettingStarted = (user: any) => {
                           (errors[0] === 2 &&
                             errors[1] === 2 &&
                             errors[2] === 2 &&
-                            errors[3] === 2 &&
-                            errors[4] === 2 &&
-                            errors[5] === 2) ||
-                          (errors[2] === 2 &&
-                            errors[3] === 2 &&
-                            errors[4] == 2 &&
-                            errors[5] == 2)
+                            errors[3] === 2) ||
+                          (errors[0] === 2 &&
+                            errors[1] === 2 &&
+                            errors[2] == 2 &&
+                            errors[3] == 2)
                             ? "/dashboard"
                             : "#"
                         }
@@ -688,11 +715,11 @@ const gettingStarted = (user: any) => {
                             (errors[0] === 2 &&
                               errors[1] === 2 &&
                               errors[2] === 2 &&
-                              errors[3] === 2 &&
-                              errors[4] === 2) ||
-                              (errors[2] === 2 &&
-                                errors[3] === 2 &&
-                                errors[4] === 2)
+                              errors[3] === 2) ||
+                              (errors[0] === 2 &&
+                                errors[1] === 2 &&
+                                errors[2] == 2 &&
+                                errors[3] == 2)
                               ? "opacity-100 cursor-pointer"
                               : "cursor-not-allowed"
                           )}

@@ -73,6 +73,8 @@ import {
 } from "../lib/functions/concat";
 import { getPronoun, getRemarksAnalysis } from "../lib/functions/feedback";
 import Footer from "../components/sections/Footer";
+import FuzzyDialog from "../components/dialogs/FuzzyDialog";
+import { fuzzyfy } from "../lib/functions/fuzzyis";
 
 Chart.register(
   ArcElement,
@@ -232,18 +234,18 @@ const StudentInfo = (user: any) => {
   for (let i = 0; i < myquar.length; i++) {
     let a_sum: number = 0;
     students?.map((student, idx) => {
-      a_sum += student!.quarter![i].grade_before;
+      a_sum += transmuteGrade(student!.quarter![i].grade_before);
     });
     const ave = Number((a_sum / students?.length!).toFixed(1));
     ave_quarter_grade[i] = ave;
   }
 
   for (let i = 0; i < myquar.length; i++) {
-    //console.log(student?.quarter![i].grade_before!);
-    quarter_data.push(student?.quarter![i].grade_before!);
+    ////console.log(student?.quarter![i].grade_before!);
+    quarter_data.push(transmuteGrade(student?.quarter![i].grade_before!));
     sum += student?.quarter![i].ranking!;
     let scr = 0;
-    //console.log(student?.quarter![i].written_percentage?.score!);
+    ////console.log(student?.quarter![i].written_percentage?.score!);
 
     //get sum of Weighted Score
     if (typeof student?.quarter![i].written_percentage?.score! !== "string") {
@@ -600,7 +602,7 @@ const StudentInfo = (user: any) => {
     let avail: any = [];
 
     for (let i = 0; i < myquar.length; i++) {
-      tmp.push(student?.quarter[i].grade_before!);
+      tmp.push(transmuteGrade(student?.quarter[i].grade_before!));
       avail.push(student?.quarter[i]);
     }
     const max = Math.max(...tmp);
@@ -621,7 +623,7 @@ const StudentInfo = (user: any) => {
       });
     }
 
-    //console.log(student?.quarter, "TMP " + tmp, "MAX " + max);
+    ////console.log(student?.quarter, "TMP " + tmp, "MAX " + max);
 
     overall_feedback.push(
       `${
@@ -746,6 +748,93 @@ const StudentInfo = (user: any) => {
   const [tooltip, setTooltip] = useState<boolean>(false);
   const [score, setScore] = useState<string>("no data");
   const [scr_remarks, setRemarks] = useState<string>("no data");
+  const [hidden] = useState<boolean>(true);
+  const [fuzzyDialog, setFuzzyDialogOpen] = useState<boolean>(false);
+
+  let ave_ww_fuzz = fuzzyfy(ave_ww_pct / 100);
+  let ave_pt_fuzz = fuzzyfy(ave_pt_pct / 100);
+
+  let ww_fz = [];
+  let pt_fz = [];
+
+  let ww_fuzzy_remarks: string[] = [];
+  let pt_fuzzy_remarks: string[] = [];
+
+  for (let i = 0; i < 5; i++) {
+    ww_fz.push(parseFloat((ave_ww_fuzz[i] * 100).toFixed(2)));
+    pt_fz.push(parseFloat((ave_pt_fuzz[i] * 100).toFixed(2)));
+  }
+  for (let i = 0; i < 5; i++) {
+    if (ww_fz[i] > 0) {
+      switch (i) {
+        case 0:
+          //1
+          ww_fuzzy_remarks.push(`Very Good at ${ww_fz[i]}`);
+          break;
+        case 1:
+          //.79
+          ww_fuzzy_remarks.push(`Good at ${ww_fz[i]}`);
+          break;
+        case 2:
+          //.69
+          ww_fuzzy_remarks.push(`Average at ${ww_fz[i]}`);
+          break;
+        case 3:
+          //.59
+          ww_fuzzy_remarks.push(`Poor at ${ww_fz[i]}`);
+          break;
+        default:
+          //.39
+          ww_fuzzy_remarks.push(`Very Poor at ${ww_fz[i]}`);
+      }
+    }
+    if (pt_fz[i] > 0) {
+      switch (i) {
+        case 0:
+          //1
+          pt_fuzzy_remarks.push(`Very Good at ${pt_fz[i]}`);
+          break;
+        case 1:
+          //.79
+          pt_fuzzy_remarks.push(`Good at ${pt_fz[i]}`);
+          break;
+        case 2:
+          //.69
+          pt_fuzzy_remarks.push(`Average at ${pt_fz[i]}`);
+          break;
+        case 3:
+          //.59
+          pt_fuzzy_remarks.push(`Poor at ${pt_fz[i]}`);
+          break;
+        default:
+          //.39
+          pt_fuzzy_remarks.push(`Very Poor at ${pt_fz[i]}`);
+      }
+    }
+  }
+
+  const ww_fuzzy_set = ww_fz;
+  const pt_fuzzy_set = pt_fz;
+  let q_ww_fuzzy_set: any = [];
+  let q_pt_fuzzy_set: any = [];
+
+  student?.quarter.forEach((quarter) => {
+    let ww_multiply: number[] = [];
+    let pt_multiply: number[] = [];
+    for (let i = 0; i < quarter.ww_fuzzy.value.length; i++) {
+      ww_multiply.push(
+        parseFloat((quarter.ww_fuzzy.value[i] * 100).toFixed(2))
+      );
+      pt_multiply.push(
+        parseFloat((quarter.pt_fuzzy.value[i] * 100).toFixed(2))
+      );
+    }
+
+    q_ww_fuzzy_set.push(ww_multiply);
+    q_pt_fuzzy_set.push(pt_multiply);
+  });
+
+  const [isOverall, setIsOverall] = useState<number>(-1);
 
   return (
     student && (
@@ -808,7 +897,7 @@ const StudentInfo = (user: any) => {
           </div>
         </div>
         {/* General Section */}
-        <div className="bg-ocean-100 h-fit xl:h-[110vh] flex flex-col justify-between">
+        <div className="bg-ocean-100 h-fit flex flex-col justify-between">
           <div className="mx-12 py-8">
             <h3 className="text-justify lg:text-[0.8rem] xl:text-base mb-4">
               {getOverallFeedback()}
@@ -820,6 +909,7 @@ const StudentInfo = (user: any) => {
                   )}: ${getStudentAverage(student, myquar.length)}`
                 : `Final Grade: ${student.final_grade_before}`}{" "}
             </h2>
+
             {myquar.length !== 4 &&
               getStudentAverage(student, myquar.length) < 75 && (
                 <p>{`Student needs to average at least ${getGradeNeeded(
@@ -841,9 +931,35 @@ const StudentInfo = (user: any) => {
               </div>
               {/* Overall Performance Assessment */}
               <div className="col-span-6 xl:col-span-4 lg:h-[45vh] xl:h-[65vh] overflow-x-auto px-3">
-                <h2 className="text-lg xl:text-xl font-bold">
-                  Overall Performance:
-                </h2>
+                <div className="flex justify-between">
+                  <h2 className="text-lg xl:text-xl font-bold">
+                    Overall Performance:
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setFuzzyDialogOpen(true);
+                      setIsOverall(-1);
+                    }}
+                    className="underline font-semibold hover:text-ocean-400"
+                  >
+                    View Fuzzy Breakdown
+                  </button>
+                </div>
+                <FuzzyDialog
+                  isOverall={isOverall}
+                  ww_fuzzy_remarks={ww_fuzzy_remarks.join(" ")}
+                  pt_fuzzy_remarks={pt_fuzzy_remarks.join(" ")}
+                  student={student}
+                  quarter={quarter}
+                  ww_fuzzy_set={
+                    isOverall === -1 ? ww_fuzzy_set : q_ww_fuzzy_set[isOverall]
+                  }
+                  pt_fuzzy_set={
+                    isOverall === -1 ? pt_fuzzy_set : q_pt_fuzzy_set[isOverall]
+                  }
+                  fuzzyDialog={fuzzyDialog}
+                  setFuzzyDialogOpen={setFuzzyDialogOpen}
+                />
                 <div className="grid grid-cols-10 mb-4">
                   <CardInfo
                     className={classNames(
@@ -907,7 +1023,7 @@ const StudentInfo = (user: any) => {
                           </p>
                           <div className="w-full grid place-items-center">
                             <h2 className="font-bold text-2xl">
-                              {quarter.grade_before}
+                              {transmuteGrade(quarter.grade_before)}
                             </h2>
                             <h2 className="border-t-2 border-black font-semibold text-base">
                               Class Rank:
@@ -933,6 +1049,7 @@ const StudentInfo = (user: any) => {
               </div>
             </div>
           </div>
+
           {/* Toggle Quarter */}
           <div className="flex justify-end">
             {myquar.map((q, idx) => (
@@ -947,7 +1064,7 @@ const StudentInfo = (user: any) => {
                   onClick={() => {
                     setQuarter(idx);
                     setMyStudent(student?.quarter![idx]!);
-                    //console.log(student?.quarter[idx]);
+                    ////console.log(student?.quarter[idx]);
                   }}
                 >
                   {myquar[idx]}
@@ -969,7 +1086,7 @@ const StudentInfo = (user: any) => {
                 <div className="col-span-1 flex justify-end gap-4">
                   <div className="flex flex-col place-content-center">
                     <h1 className="text-lg font-semibold">Quarter Grade:</h1>
-                    <h3 className="text-base">
+                    {/* <h3 className="text-base">
                       Suggested Grade:{" "}
                       {myStudent?.grade_after === 0 ? (
                         <span className="font-light">{"No data"}</span>
@@ -978,7 +1095,7 @@ const StudentInfo = (user: any) => {
                           {myStudent?.grade_after}
                         </span>
                       )}
-                    </h3>
+                    </h3> */}
                     <div className="flex gap-3">
                       <h3>
                         Class Ranking:{" "}
@@ -992,7 +1109,9 @@ const StudentInfo = (user: any) => {
                   <div className="grid place-content-center">
                     <div className="grid place-content-center w-28 h-28 rounded-full bg-tallano_gold-200">
                       <h1 className="font-bold text-3xl">
-                        {myStudent?.grade_before}
+                        {transmuteGrade(
+                          myStudent ? myStudent.grade_before : -1
+                        )}
                       </h1>
                     </div>
                   </div>
@@ -1367,130 +1486,139 @@ const StudentInfo = (user: any) => {
                     </div>
                   </div>
                 </div>
-                <div
-                  className={classNames(
-                    "col-span-5 grid grid-cols-10 gap-3 p-4"
-                  )}
-                >
-                  {/* WW Data */}
-                  <div
-                    className={classNames(
-                      wgh_ww! > wgh_pt!
-                        ? "col-span-6"
-                        : wgh_pt! > wgh_ww!
-                        ? "col-span-4"
-                        : "col-span-5"
-                    )}
-                  >
-                    {/* Written Works Circular Progress */}
-                    <div className="relative">
-                      <div className="z-40 absolute inset-0 flex justify-center items-center">
-                        <div className="flex flex-col justify-center items-center">
-                          <h2 className="font-bold text-3xl">
-                            {tdata.ww.percentage}%
-                          </h2>
-                          <h3 className="text-lg font-semibold">
-                            Written Works
-                          </h3>
-                          <p className="text-base">
-                            Scored {tdata.ww.score_sum} out of{" "}
-                            {tdata.ww.total_item}
-                          </p>
+                <div className="col-span-5">
+                  <div className="text-right">
+                    <button
+                      onClick={() => {
+                        setIsOverall(quarter);
+                        setFuzzyDialogOpen(true);
+                      }}
+                      className="underline font-semibold hover:text-ocean-400"
+                    >
+                      View Fuzzy Breakdown
+                    </button>
+                  </div>
+                  <div className={classNames(" grid grid-cols-10 gap-3 p-4")}>
+                    {/* WW Data */}
+                    <div
+                      className={classNames(
+                        wgh_ww! > wgh_pt!
+                          ? "col-span-6"
+                          : wgh_pt! > wgh_ww!
+                          ? "col-span-4"
+                          : "col-span-5"
+                      )}
+                    >
+                      {/* Written Works Circular Progress */}
+                      <div className="relative">
+                        <div className="z-40 absolute inset-0 flex justify-center items-center">
+                          <div className="flex flex-col justify-center items-center">
+                            <h2 className="font-bold text-3xl">
+                              {tdata.ww.percentage}%
+                            </h2>
+                            <h3 className="text-lg font-semibold">
+                              Written Works
+                            </h3>
+                            <p className="text-base">
+                              Scored {tdata.ww.score_sum} out of{" "}
+                              {tdata.ww.total_item}
+                            </p>
+                          </div>
+                        </div>
+                        <CircularProgress
+                          value={tdata.ww.percentage}
+                          pathColor="#FFF598"
+                          strokeWidth={8}
+                        />
+                      </div>
+                      <div className="flex justify-end">
+                        <div className={"w-6/12"}>
+                          <div className="relative">
+                            <div className="z-40 absolute inset-0 flex justify-center items-center">
+                              <div className="flex flex-col justify-center items-center">
+                                <h2 className="font-bold text-xl">{ww_pct}%</h2>
+                                <h3 className="text-[0.8rem] font-semibold">
+                                  Surpassed
+                                </h3>
+                                <p
+                                  className={
+                                    wgh_ww! > wgh_pt!
+                                      ? "text-[0.6rem]"
+                                      : "text-[0.4rem]"
+                                  }
+                                >
+                                  {ww_surp_sum} out of {students?.length!}{" "}
+                                  students
+                                </p>
+                              </div>
+                            </div>
+                            <CircularProgress
+                              value={ww_pct}
+                              pathColor="#FFF598"
+                              strokeWidth={10}
+                            />
+                          </div>
                         </div>
                       </div>
-                      <CircularProgress
-                        value={tdata.ww.percentage}
-                        pathColor="#FFF598"
-                        strokeWidth={8}
-                      />
                     </div>
-                    <div className="flex justify-end">
+                    {/* PT Data */}
+                    <div
+                      className={classNames(
+                        wgh_ww! > wgh_pt!
+                          ? "col-span-4"
+                          : wgh_pt! > wgh_ww!
+                          ? "col-span-6"
+                          : "col-span-5"
+                      )}
+                    >
+                      {/* Performance Tasks Circular Progress */}
                       <div className={"w-6/12"}>
                         <div className="relative">
                           <div className="z-40 absolute inset-0 flex justify-center items-center">
                             <div className="flex flex-col justify-center items-center">
-                              <h2 className="font-bold text-xl">{ww_pct}%</h2>
+                              <h2 className="font-bold text-xl">{pt_pct}%</h2>
                               <h3 className="text-[0.8rem] font-semibold">
                                 Surpassed
                               </h3>
                               <p
                                 className={
-                                  wgh_ww! > wgh_pt!
+                                  wgh_ww! < wgh_pt!
                                     ? "text-[0.6rem]"
-                                    : "text-[0.4rem]"
+                                    : "text-[0.5rem]"
                                 }
                               >
-                                {ww_surp_sum} out of {students?.length!}{" "}
-                                students
+                                {pt_surp_sum} out of {students?.length} students
                               </p>
                             </div>
                           </div>
                           <CircularProgress
-                            value={ww_pct}
-                            pathColor="#FFF598"
+                            value={pt_pct}
+                            pathColor="#63C7FF"
                             strokeWidth={10}
                           />
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  {/* PT Data */}
-                  <div
-                    className={classNames(
-                      wgh_ww! > wgh_pt!
-                        ? "col-span-4"
-                        : wgh_pt! > wgh_ww!
-                        ? "col-span-6"
-                        : "col-span-5"
-                    )}
-                  >
-                    {/* Performance Tasks Circular Progress */}
-                    <div className={"w-6/12"}>
                       <div className="relative">
                         <div className="z-40 absolute inset-0 flex justify-center items-center">
                           <div className="flex flex-col justify-center items-center">
-                            <h2 className="font-bold text-xl">{pt_pct}%</h2>
-                            <h3 className="text-[0.8rem] font-semibold">
-                              Surpassed
+                            <h2 className="font-bold text-3xl">
+                              {tdata.pt.percentage}%
+                            </h2>
+                            <h3 className="text-lg font-semibold">
+                              Performance Tasks
                             </h3>
-                            <p
-                              className={
-                                wgh_ww! < wgh_pt!
-                                  ? "text-[0.6rem]"
-                                  : "text-[0.5rem]"
-                              }
-                            >
-                              {pt_surp_sum} out of {students?.length} students
+                            <p className="text-base">
+                              Scored {tdata.pt.score_sum} out of{" "}
+                              {tdata.pt.total_item}
                             </p>
                           </div>
                         </div>
                         <CircularProgress
-                          value={pt_pct}
+                          value={tdata.pt.percentage}
                           pathColor="#63C7FF"
-                          strokeWidth={10}
+                          strokeWidth={8}
                         />
                       </div>
-                    </div>
-                    <div className="relative">
-                      <div className="z-40 absolute inset-0 flex justify-center items-center">
-                        <div className="flex flex-col justify-center items-center">
-                          <h2 className="font-bold text-3xl">
-                            {tdata.pt.percentage}%
-                          </h2>
-                          <h3 className="text-lg font-semibold">
-                            Performance Tasks
-                          </h3>
-                          <p className="text-base">
-                            Scored {tdata.pt.score_sum} out of{" "}
-                            {tdata.pt.total_item}
-                          </p>
-                        </div>
-                      </div>
-                      <CircularProgress
-                        value={tdata.pt.percentage}
-                        pathColor="#63C7FF"
-                        strokeWidth={8}
-                      />
                     </div>
                   </div>
                 </div>
@@ -1499,7 +1627,7 @@ const StudentInfo = (user: any) => {
           </div>
         </div>
         {/* External Elements Section */}
-        {student.survey_result.name !== "No Data" ? (
+        {!hidden ? (
           <div className="min-h-fit bg-ocean-100">
             <div className="mx-12 my-10">
               <div className="pt-10">
@@ -1651,23 +1779,7 @@ const StudentInfo = (user: any) => {
             </div>
           </div>
         ) : (
-          <div className="bg-ocean-100">
-            <div className="mx-12 py-10">
-              <div className="pt-10">
-                <h2 className="text-2xl font-bold">
-                  What affected my performance?
-                </h2>
-                <p className="">
-                  Let us help you conduct data gathering{" "}
-                  <Link href="/getting-started" passHref>
-                    <a className="cursor-pointer font-bold underline decoration-2 underline-offset-2 text-ocean-400 italic">
-                      here
-                    </a>
-                  </Link>
-                </p>
-              </div>
-            </div>
-          </div>
+          <div className="bg-ocean-100"></div>
         )}
         <Footer />
       </>

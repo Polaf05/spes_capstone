@@ -22,7 +22,11 @@ const TaskAssessment = () => {
           "w-full h-80 border",
           step === 0
             ? "bg-[url('/select.jpg')] bg-cover"
-            : "bg-[url('/redlabel.jpg')] bg-cover"
+            : step === 1
+            ? "bg-[url('/redlabel.jpg')] bg-cover"
+            : step === 2
+            ? "bg-[url('/redlabel.jpg')] bg-cover"
+            : ""
         )}
       ></div>
       <div className="grid grid-cols-3 mt-2">
@@ -37,6 +41,7 @@ const TaskAssessment = () => {
         <div className="col-span-1 flex justify-center items-center gap-2">
           {tutorial_msg.map((msg, idx) => (
             <span
+              key={idx}
               className={classNames(
                 "w-3 h-3 rounded-full border border-ocean-400",
                 idx === step ? "bg-ocean-400" : "bg-white"

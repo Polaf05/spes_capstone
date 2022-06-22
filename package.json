@@ -17,6 +17,7 @@
     "eslint-config-prettier": "^8.5.0",
     "fs": "^0.0.1-security",
     "fuzzyis": "^1.0.2",
+    "fuzzylogic": "^0.3.5",
     "googleapis": "^100.0.0",
     "http2": "^3.3.7",
     "jsonwebtoken": "^8.5.1",

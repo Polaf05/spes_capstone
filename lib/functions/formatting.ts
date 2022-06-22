@@ -293,7 +293,7 @@ export function getSurveyResults(survey_list: SurveyResult[], name: string) {
     (element) => element.name.toUpperCase() == formatName(name.toUpperCase())
   );
 
-  console.log(survey);
+  ////console.log(survey);
 
   return survey as SurveyResult;
 }

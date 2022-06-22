@@ -2,13 +2,13 @@ import { Student } from "../../types/Students";
 import { Score, TaskScores } from "../../types/Task";
 
 export const getRemarks = (grade: number) => {
-  return grade < 75
+  return grade < 40
     ? "Very Poor"
-    : grade < 83
+    : grade < 60
     ? "Poor"
-    : grade < 90
+    : grade < 70
     ? "Average"
-    : grade < 97
+    : grade < 80
     ? "Good"
     : "Very Good";
 };
@@ -18,18 +18,18 @@ export const getGrade = (grade: any) =>
 
 export const getStudentGrades = (student: Student, quarters: number) => {
   const grade_array: number[] = [];
-  //console.log(quarters);
+  ////console.log(quarters);
   for (let i = 0; i < quarters; i++) {
-    grade_array.push(student.quarter[i].grade_before);
+    grade_array.push(transmuteGrade(student.quarter[i].grade_before));
   }
   return grade_array;
 };
 
 export const getStudentAverage = (student: Student, quarters: number) => {
   const grade_array: number[] = [];
-  //console.log(quarters);
+  ////console.log(quarters);
   for (let i = 0; i < quarters; i++) {
-    grade_array.push(student.quarter[i].grade_before);
+    grade_array.push(transmuteGrade(student.quarter[i].grade_before));
   }
   return getAverageGrade([grade_array])[0];
 };
@@ -172,7 +172,7 @@ export const getGradeNeeded = (quarters: number, student: Student) => {
   const sum = 0;
   const grades: number[] = getStudentGrades(student, quarters);
   const grade_sum: number = getSum(grades);
-  console.log(grade_sum, grades, quarters);
+  //console.log(grade_sum, grades, quarters);
   const ave_grade = (300 - grade_sum) / (4 - quarters);
 
   return ave_grade;
