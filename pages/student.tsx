@@ -75,6 +75,7 @@ import { getPronoun, getRemarksAnalysis } from "../lib/functions/feedback";
 import Footer from "../components/sections/Footer";
 import FuzzyDialog from "../components/dialogs/FuzzyDialog";
 import { fuzzyfy } from "../lib/functions/fuzzyis";
+import { studentHasData } from "../lib/functions/tasks";
 
 Chart.register(
   ArcElement,
@@ -1454,11 +1455,14 @@ const StudentInfo = (user: any) => {
                   </div>
                   <div className="mt-4">
                     <h2 className="text-xl font-bold">
-                      {tdata.ww.raw_scores.score[ww_best_task!] == -1 &&
+                      {tdata.ww.raw_scores.score[ww_best_task!] == -1 ||
                       tdata.pt.raw_scores.score[pt_best_task!] == -1
                         ? ""
                         : tdata.underperformed_tasks.length > 0
                         ? `${capitalize("student")} had a hard time with:`
+                        : tdata.ww.raw_scores.status.includes("??") ||
+                          tdata.pt.raw_scores.status.includes("??")
+                        ? ""
                         : `Wow! ${capitalize(
                             "student"
                           )} didn't fail a single task!`}
