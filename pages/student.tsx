@@ -75,7 +75,6 @@ import { getPronoun, getRemarksAnalysis } from "../lib/functions/feedback";
 import Footer from "../components/sections/Footer";
 import FuzzyDialog from "../components/dialogs/FuzzyDialog";
 import { fuzzyfy } from "../lib/functions/fuzzyis";
-import { studentHasData } from "../lib/functions/tasks";
 
 Chart.register(
   ArcElement,
