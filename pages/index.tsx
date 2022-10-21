@@ -14,8 +14,7 @@ const Home: NextPage = () => {
           <p className="text-justify inline-block text-base xl:text-lg">
             A data analytics web-based platform that automates evaluation on
             students from online/hybrid learning set-up amidst pandemic based on
-            their semester-long performance. It includes additional factors in
-            the evaluation, such as "Environmental" and "Technological" factors.
+            their semester-long performance.
           </p>
           <Link href={"/getting-started"} passHref>
             <button className="rounded-full w-64 h-14 border-2 border-ocean-300 bg-white text-ocean-300 hover:bg-ocean-300 hover:text-white text-lg font-bold">
@@ -35,7 +34,7 @@ const Home: NextPage = () => {
         </div>
       </div>
       <div className="float-right pr-4">
-        <p className="text-sm text-neutral-400">ver 0.1.12</p>
+        <p className="text-sm text-neutral-400">ver 0.1.13</p>
       </div>
     </div>
   );
