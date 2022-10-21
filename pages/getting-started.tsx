@@ -549,17 +549,6 @@ const gettingStarted = (user: any) => {
                       is a data analytics web-based platform that automates
                       evaluation on students from online/hybrid learning set-up
                       amidst pandemic based on their semester-long performance.
-                      It includes additional factors in the evaluation, such as
-                      "Environmental" and "Technological" factors. Click{" "}
-                      <span
-                        onClick={() => {
-                          setPage(0);
-                        }}
-                        className="cursor-pointer font-bold underline decoration-2 underline-offset-2 text-ocean-400"
-                      >
-                        here
-                      </span>{" "}
-                      for a quick tutorial.
                     </p>
                   </div>
                 </div>
